@@ -1,0 +1,848 @@
+{
+  "schemaVersion": 1,
+  "setId": "holiday-review-2026",
+  "title": "連休用総合復習60問",
+  "officialPastExam": false,
+  "questions": [
+    {
+      "id": "holiday-review-2026-01",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 1,
+      "type": "multiple_choice",
+      "question": "HTTPのステータスコード404の意味として適切なものはどれか。",
+      "options": [
+        "要求されたリソースが見つからない",
+        "サーバ内部でエラーが発生した",
+        "アクセスが認証されていない",
+        "リクエストが成功した"
+      ],
+      "correctIndex": 0,
+      "explanation": "404はNot Found。対処手順ではなく意味を確認する。"
+    },
+    {
+      "id": "holiday-review-2026-02",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 2,
+      "type": "multiple_choice",
+      "question": "HTML文書でhead要素とbody要素の親となる要素はどれか。",
+      "options": [
+        "section",
+        "html",
+        "main",
+        "h1"
+      ],
+      "correctIndex": 1,
+      "explanation": "通常、html要素の中にheadとbodyを置く。"
+    },
+    {
+      "id": "holiday-review-2026-03",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 3,
+      "type": "multiple_choice",
+      "question": "FTPSとSFTPの関係として適切なものはどれか。",
+      "options": [
+        "どちらも安全な転送に使われるが仕組みは異なる",
+        "SFTPはWebページの表示言語である",
+        "両者は同一のプロトコルである",
+        "FTPSだけが暗号化に対応する"
+      ],
+      "correctIndex": 0,
+      "explanation": "FTPSはFTPにTLSを利用し、SFTPはSSHを利用する。"
+    },
+    {
+      "id": "holiday-review-2026-04",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 4,
+      "type": "multiple_choice",
+      "question": "バックアップの3-2-1ルールとして適切なものはどれか。",
+      "options": [
+        "3つのコピー、2種類の媒体、1つは別の場所",
+        "3人で確認、2回保存、1回削除",
+        "3つのパスワード、2つのID、1つの端末",
+        "3日に1回、2台のPC、1つのフォルダ"
+      ],
+      "correctIndex": 0,
+      "explanation": "3-2-1ルールの各数字の意味を確認。"
+    },
+    {
+      "id": "holiday-review-2026-05",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 5,
+      "type": "multiple_choice",
+      "question": "表の見出しセルに使うHTML要素はどれか。",
+      "options": [
+        "tr",
+        "td",
+        "th",
+        "table"
+      ],
+      "correctIndex": 2,
+      "explanation": "thは見出しセル。tdはデータセル。"
+    },
+    {
+      "id": "holiday-review-2026-06",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 6,
+      "type": "multiple_choice",
+      "question": "クリエイティブ・コモンズの「BY」が求める条件はどれか。",
+      "options": [
+        "改変の禁止",
+        "同一条件での共有",
+        "非営利利用のみ",
+        "適切なクレジット表示"
+      ],
+      "correctIndex": 3,
+      "explanation": "BYは表示（クレジット表記）。"
+    },
+    {
+      "id": "holiday-review-2026-07",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 7,
+      "type": "true_false",
+      "question": "CSSでdisplay: none;を指定すると、通常その要素の表示領域も確保されない。",
+      "options": [
+        "○",
+        "×"
+      ],
+      "correctIndex": 0,
+      "explanation": "display:noneはレイアウト上の領域もなくなる。"
+    },
+    {
+      "id": "holiday-review-2026-08",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 8,
+      "type": "multiple_choice",
+      "question": "img要素のalt属性の目的として適切なものはどれか。",
+      "options": [
+        "画像の幅だけを指定する",
+        "画像の表示順を指定する",
+        "画像の代替となるテキストを指定する",
+        "リンク先を指定する"
+      ],
+      "correctIndex": 2,
+      "explanation": "altは画像の代替テキスト。"
+    },
+    {
+      "id": "holiday-review-2026-09",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 9,
+      "type": "true_false",
+      "question": "SFTPはFTPにTLSを追加して暗号化する方式である。",
+      "options": [
+        "○",
+        "×"
+      ],
+      "correctIndex": 1,
+      "explanation": "SFTPはSSHを利用する。FTPにTLSを利用する方式はFTPS。"
+    },
+    {
+      "id": "holiday-review-2026-10",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 10,
+      "type": "multiple_choice",
+      "question": "HTTPSでHTTP通信を保護する技術はどれか。",
+      "options": [
+        "TLS",
+        "DNS",
+        "CSS",
+        "PHP"
+      ],
+      "correctIndex": 0,
+      "explanation": "TLSにより通信を暗号化する。"
+    },
+    {
+      "id": "holiday-review-2026-11",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 11,
+      "type": "multiple_choice",
+      "question": "HTTPのステータスコード500が示すものはどれか。",
+      "options": [
+        "サーバ内部のエラー",
+        "リクエストが成功した",
+        "リソースが移動した",
+        "リソースが見つからない"
+      ],
+      "correctIndex": 0,
+      "explanation": "500はInternal Server Error。"
+    },
+    {
+      "id": "holiday-review-2026-12",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 12,
+      "type": "true_false",
+      "question": "IPv4アドレスは32ビットで表される。",
+      "options": [
+        "○",
+        "×"
+      ],
+      "correctIndex": 0,
+      "explanation": "IPv4は32ビット。"
+    },
+    {
+      "id": "holiday-review-2026-13",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 13,
+      "type": "true_false",
+      "question": "HTTPは、OSI参照モデルではアプリケーション層に分類される。",
+      "options": [
+        "○",
+        "×"
+      ],
+      "correctIndex": 0,
+      "explanation": "HTTPはアプリケーション層（第7層）のプロトコルとして扱う。"
+    },
+    {
+      "id": "holiday-review-2026-14",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 14,
+      "type": "multiple_choice",
+      "question": "CSSのボックスモデルでborderの内側の余白はどれか。",
+      "options": [
+        "border",
+        "outline",
+        "padding",
+        "margin"
+      ],
+      "correctIndex": 2,
+      "explanation": "paddingは内容とborderの間の余白。"
+    },
+    {
+      "id": "holiday-review-2026-15",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 15,
+      "type": "multiple_choice",
+      "question": "認証の説明として適切なものはどれか。",
+      "options": [
+        "ドメイン名をIPアドレスに変換する",
+        "利用者に操作権限を与える",
+        "利用者が本人かどうかを確かめる",
+        "データを別の場所へ保存する"
+      ],
+      "correctIndex": 2,
+      "explanation": "認証は本人確認。権限の判断は認可。"
+    },
+    {
+      "id": "holiday-review-2026-16",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 16,
+      "type": "true_false",
+      "question": "クリエイティブ・コモンズの「NC」は非営利を意味する。",
+      "options": [
+        "○",
+        "×"
+      ],
+      "correctIndex": 0,
+      "explanation": "NCはNonCommercial。"
+    },
+    {
+      "id": "holiday-review-2026-17",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 17,
+      "type": "true_false",
+      "question": "TCPとUDPは、到達確認や再送制御の仕組みが同じである。",
+      "options": [
+        "○",
+        "×"
+      ],
+      "correctIndex": 1,
+      "explanation": "TCPは信頼性のための制御を備え、UDPとは特徴が異なる。"
+    },
+    {
+      "id": "holiday-review-2026-18",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 18,
+      "type": "true_false",
+      "question": "th要素は、HTMLの表でデータセルを表すためだけに使用する。",
+      "options": [
+        "○",
+        "×"
+      ],
+      "correctIndex": 1,
+      "explanation": "thは見出しセルを表す。"
+    },
+    {
+      "id": "holiday-review-2026-19",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 19,
+      "type": "multiple_choice",
+      "question": "フォームの入力欄に使われる要素はどれか。",
+      "options": [
+        "title",
+        "input",
+        "link",
+        "meta"
+      ],
+      "correctIndex": 1,
+      "explanation": "input要素はフォームの入力部品。"
+    },
+    {
+      "id": "holiday-review-2026-20",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 20,
+      "type": "true_false",
+      "question": "多要素認証では、異なる種類の認証要素を組み合わせる。",
+      "options": [
+        "○",
+        "×"
+      ],
+      "correctIndex": 0,
+      "explanation": "知識・所持・生体など異なる要素を組み合わせる。"
+    },
+    {
+      "id": "holiday-review-2026-21",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 21,
+      "type": "true_false",
+      "question": "HTTPSは、HTTP通信をTLSなどで保護する仕組みである。",
+      "options": [
+        "○",
+        "×"
+      ],
+      "correctIndex": 0,
+      "explanation": "HTTPSではTLSによる暗号化通信を利用する。"
+    },
+    {
+      "id": "holiday-review-2026-22",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 22,
+      "type": "true_false",
+      "question": "img要素のsrc属性は、画像の代替テキストを指定する。",
+      "options": [
+        "○",
+        "×"
+      ],
+      "correctIndex": 1,
+      "explanation": "srcは画像ファイルの参照先を指定する。代替テキストはalt属性。"
+    },
+    {
+      "id": "holiday-review-2026-23",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 23,
+      "type": "true_false",
+      "question": "TCPは、OSI参照モデルのネットワーク層に分類される。",
+      "options": [
+        "○",
+        "×"
+      ],
+      "correctIndex": 1,
+      "explanation": "TCPはトランスポート層（第4層）。ネットワーク層（第3層）にはIPが対応する。"
+    },
+    {
+      "id": "holiday-review-2026-24",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 24,
+      "type": "multiple_choice",
+      "question": "HTMLの表でデータセルを表す要素はどれか。",
+      "options": [
+        "table",
+        "td",
+        "tr",
+        "th"
+      ],
+      "correctIndex": 1,
+      "explanation": "tdはデータセル。thは見出しセル、trは行、tableは表全体を表す。"
+    },
+    {
+      "id": "holiday-review-2026-25",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 25,
+      "type": "multiple_choice",
+      "question": "CSSでclass=\"card\"の要素を選ぶセレクタはどれか。",
+      "options": [
+        ".card",
+        "*card",
+        "card",
+        "#card"
+      ],
+      "correctIndex": 0,
+      "explanation": "クラスセレクタは.を付ける。"
+    },
+    {
+      "id": "holiday-review-2026-26",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 26,
+      "type": "true_false",
+      "question": "DNSはドメイン名とIPアドレスを対応付ける名前解決に利用される。",
+      "options": [
+        "○",
+        "×"
+      ],
+      "correctIndex": 0,
+      "explanation": "DNSはドメイン名からIPアドレスを調べるなどの名前解決に用いられる。"
+    },
+    {
+      "id": "holiday-review-2026-27",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 27,
+      "type": "multiple_choice",
+      "question": "a要素でリンク先を指定する属性はどれか。",
+      "options": [
+        "alt",
+        "href",
+        "src",
+        "type"
+      ],
+      "correctIndex": 1,
+      "explanation": "a要素のリンク先はhref属性。"
+    },
+    {
+      "id": "holiday-review-2026-28",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 28,
+      "type": "true_false",
+      "question": "CSSのIDセレクタは、要素名の前にピリオドを付ける。",
+      "options": [
+        "○",
+        "×"
+      ],
+      "correctIndex": 1,
+      "explanation": "IDセレクタは#、クラスセレクタは.。"
+    },
+    {
+      "id": "holiday-review-2026-29",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 29,
+      "type": "multiple_choice",
+      "question": "CSSで要素をレイアウト上の領域ごと非表示にする指定はどれか。",
+      "options": [
+        "color: white;",
+        "display: none;",
+        "visibility: hidden;",
+        "opacity: 0;"
+      ],
+      "correctIndex": 1,
+      "explanation": "display:noneは要素の領域も確保しない。"
+    },
+    {
+      "id": "holiday-review-2026-30",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 30,
+      "type": "multiple_choice",
+      "question": "認可の説明として適切なものはどれか。",
+      "options": [
+        "通信を暗号化する",
+        "ファイルを圧縮する",
+        "利用者にその操作を許可するか判断する",
+        "利用者が本人かどうか確かめる"
+      ],
+      "correctIndex": 2,
+      "explanation": "認可はアクセス権限の判断。"
+    },
+    {
+      "id": "holiday-review-2026-31",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 31,
+      "type": "multiple_choice",
+      "question": "CSSでid=\"main\"の要素を選ぶセレクタはどれか。",
+      "options": [
+        ".main",
+        "*main",
+        "main",
+        "#main"
+      ],
+      "correctIndex": 3,
+      "explanation": "IDセレクタは#を付ける。"
+    },
+    {
+      "id": "holiday-review-2026-32",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 32,
+      "type": "true_false",
+      "question": "フィッシングは、偽サイトなどに誘導して情報を盗む手口である。",
+      "options": [
+        "○",
+        "×"
+      ],
+      "correctIndex": 0,
+      "explanation": "偽のメールやサイトを使うことがある。"
+    },
+    {
+      "id": "holiday-review-2026-33",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 33,
+      "type": "multiple_choice",
+      "question": "img要素で画像の場所を指定する属性はどれか。",
+      "options": [
+        "id",
+        "alt",
+        "href",
+        "src"
+      ],
+      "correctIndex": 3,
+      "explanation": "img要素の画像ファイルはsrc属性で指定する。"
+    },
+    {
+      "id": "holiday-review-2026-34",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 34,
+      "type": "true_false",
+      "question": "CSSのmarginは、隣接するブロック要素の上下方向で相殺される場合がある。",
+      "options": [
+        "○",
+        "×"
+      ],
+      "correctIndex": 0,
+      "explanation": "通常フローのブロック要素では上下のmarginが相殺される場合がある。"
+    },
+    {
+      "id": "holiday-review-2026-35",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 35,
+      "type": "true_false",
+      "question": "HTTPのステータスコード200は、リクエストが成功したことを示す。",
+      "options": [
+        "○",
+        "×"
+      ],
+      "correctIndex": 0,
+      "explanation": "200はOK。"
+    },
+    {
+      "id": "holiday-review-2026-36",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 36,
+      "type": "multiple_choice",
+      "question": "CSSのボックスモデルでborderの外側の余白はどれか。",
+      "options": [
+        "border",
+        "padding",
+        "content",
+        "margin"
+      ],
+      "correctIndex": 3,
+      "explanation": "marginはborderの外側の余白。"
+    },
+    {
+      "id": "holiday-review-2026-37",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 37,
+      "type": "multiple_choice",
+      "question": "著作権のうち、著作物を複製する行為に関係する権利はどれか。",
+      "options": [
+        "複製権",
+        "公表権",
+        "氏名表示権",
+        "同一性保持権"
+      ],
+      "correctIndex": 0,
+      "explanation": "複製権は著作物を複製する権利。"
+    },
+    {
+      "id": "holiday-review-2026-38",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 38,
+      "type": "multiple_choice",
+      "question": "CSSで縦方向のスクロールを指定するプロパティと値はどれか。",
+      "options": [
+        "overflow-x: scroll;",
+        "visibility: hidden;",
+        "overflow-y: scroll;",
+        "display: none;"
+      ],
+      "correctIndex": 2,
+      "explanation": "overflow-yは縦方向のはみ出しを制御する。"
+    },
+    {
+      "id": "holiday-review-2026-39",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 39,
+      "type": "true_false",
+      "question": "ウェブコンテンツでは、情報を色の違いだけで伝えることを避ける必要がある。",
+      "options": [
+        "○",
+        "×"
+      ],
+      "correctIndex": 0,
+      "explanation": "JIS X 8341-3の色の使用に関する達成基準では、色だけを唯一の視覚的手段にしない。"
+    },
+    {
+      "id": "holiday-review-2026-40",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 40,
+      "type": "true_false",
+      "question": "HTMLのh1要素は、ページの本文に使う一般的な段落を表す。",
+      "options": [
+        "○",
+        "×"
+      ],
+      "correctIndex": 1,
+      "explanation": "h1は見出し。段落を表すのはp要素。"
+    },
+    {
+      "id": "holiday-review-2026-41",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 41,
+      "type": "multiple_choice",
+      "question": "ul要素内のリスト項目に使う要素はどれか。",
+      "options": [
+        "span",
+        "p",
+        "a",
+        "li"
+      ],
+      "correctIndex": 3,
+      "explanation": "リストの各項目にはli要素を使う。"
+    },
+    {
+      "id": "holiday-review-2026-42",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 42,
+      "type": "true_false",
+      "question": "PHPはブラウザ側でのみ実行され、サーバ側で処理することはできない。",
+      "options": [
+        "○",
+        "×"
+      ],
+      "correctIndex": 1,
+      "explanation": "PHPは一般にサーバ側で処理を実行し、データベースとも連携できる。"
+    },
+    {
+      "id": "holiday-review-2026-43",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 43,
+      "type": "multiple_choice",
+      "question": "TCPの特徴として適切なものはどれか。",
+      "options": [
+        "文字の表示色を指定する",
+        "IPアドレスをドメイン名に変換する",
+        "HTMLの要素を解析する",
+        "到達確認や再送制御を行う"
+      ],
+      "correctIndex": 3,
+      "explanation": "TCPは信頼性を高める制御を備える。"
+    },
+    {
+      "id": "holiday-review-2026-44",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 44,
+      "type": "multiple_choice",
+      "question": "OSI参照モデルで、UDPが対応する層はどれか。",
+      "options": [
+        "ネットワーク層",
+        "データリンク層",
+        "トランスポート層",
+        "アプリケーション層"
+      ],
+      "correctIndex": 2,
+      "explanation": "UDPはトランスポート層（第4層）に対応する。"
+    },
+    {
+      "id": "holiday-review-2026-45",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 45,
+      "type": "multiple_choice",
+      "question": "OSI参照モデルで、アプリケーション層のプロトコルはどれか。",
+      "options": [
+        "PPP",
+        "HTTP",
+        "IP",
+        "TCP"
+      ],
+      "correctIndex": 1,
+      "explanation": "HTTPはアプリケーション層。TCPはトランスポート層、IPはネットワーク層、PPPはデータリンク層に対応する。"
+    },
+    {
+      "id": "holiday-review-2026-46",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 46,
+      "type": "true_false",
+      "question": "バックアップの3-2-1ルールは、3種類のパスワードを使うという意味である。",
+      "options": [
+        "○",
+        "×"
+      ],
+      "correctIndex": 1,
+      "explanation": "3つのコピー、2種類の媒体、1つを別の場所に保管する考え方。"
+    },
+    {
+      "id": "holiday-review-2026-47",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 47,
+      "type": "true_false",
+      "question": "JIS X 8341-3は、ウェブコンテンツのアクセシビリティに関係する。",
+      "options": [
+        "○",
+        "×"
+      ],
+      "correctIndex": 0,
+      "explanation": "ウェブコンテンツのアクセシビリティに関する規格。"
+    },
+    {
+      "id": "holiday-review-2026-48",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 48,
+      "type": "true_false",
+      "question": "CSSのoverflow-yは、横方向のはみ出しを制御する。",
+      "options": [
+        "○",
+        "×"
+      ],
+      "correctIndex": 1,
+      "explanation": "overflow-yは縦方向。横方向はoverflow-x。"
+    },
+    {
+      "id": "holiday-review-2026-49",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 49,
+      "type": "true_false",
+      "question": "CSSでmargin: 30px;を指定した通常フローのp要素が縦に2つ続くとき、上下のmarginは必ず合計60pxになる。",
+      "options": [
+        "○",
+        "×"
+      ],
+      "correctIndex": 1,
+      "explanation": "上下のmarginは相殺される場合がある。条件により30pxとなる。"
+    },
+    {
+      "id": "holiday-review-2026-50",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 50,
+      "type": "multiple_choice",
+      "question": "DNSの主な役割として適切なものはどれか。",
+      "options": [
+        "HTMLの構造を検証する",
+        "ドメイン名とIPアドレスを対応付ける",
+        "Webページの文字色を決める",
+        "通信内容を暗号化する"
+      ],
+      "correctIndex": 1,
+      "explanation": "DNSはドメイン名とIPアドレスの対応を調べる仕組み。"
+    },
+    {
+      "id": "holiday-review-2026-51",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 51,
+      "type": "true_false",
+      "question": "a要素のリンク先は、src属性で指定する。",
+      "options": [
+        "○",
+        "×"
+      ],
+      "correctIndex": 1,
+      "explanation": "a要素のリンク先はhref属性。"
+    },
+    {
+      "id": "holiday-review-2026-52",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 52,
+      "type": "multiple_choice",
+      "question": "MACアドレスが主に識別するものはどれか。",
+      "options": [
+        "ドメイン名の所有者",
+        "HTML文書の言語",
+        "ネットワークインターフェース",
+        "Webページの見出し"
+      ],
+      "correctIndex": 2,
+      "explanation": "MACアドレスはネットワークインターフェースの識別に用いられる。"
+    },
+    {
+      "id": "holiday-review-2026-53",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 53,
+      "type": "true_false",
+      "question": "Cookieは、ブラウザ側に情報を保存する仕組みとして利用される。",
+      "options": [
+        "○",
+        "×"
+      ],
+      "correctIndex": 0,
+      "explanation": "Cookieはブラウザに情報を保持させる仕組み。"
+    },
+    {
+      "id": "holiday-review-2026-54",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 54,
+      "type": "true_false",
+      "question": "PHPは、一般にサーバ側で処理を行うために利用される。",
+      "options": [
+        "○",
+        "×"
+      ],
+      "correctIndex": 0,
+      "explanation": "PHPはサーバサイドで動く言語として利用される。"
+    },
+    {
+      "id": "holiday-review-2026-55",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 55,
+      "type": "multiple_choice",
+      "question": "JIS X 8341-3が対象とする主な内容はどれか。",
+      "options": [
+        "Webサーバの性能",
+        "著作物の保護期間",
+        "ネットワーク機器の配線",
+        "ウェブコンテンツのアクセシビリティ"
+      ],
+      "correctIndex": 3,
+      "explanation": "JIS X 8341-3はウェブコンテンツのアクセシビリティに関する規格。"
+    },
+    {
+      "id": "holiday-review-2026-56",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 56,
+      "type": "multiple_choice",
+      "question": "CSSでmargin: 8px 12px;と指定した場合、左右のmarginはどれか。",
+      "options": [
+        "12px",
+        "8px",
+        "4px",
+        "20px"
+      ],
+      "correctIndex": 0,
+      "explanation": "2値指定は上下、左右の順。"
+    },
+    {
+      "id": "holiday-review-2026-57",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 57,
+      "type": "true_false",
+      "question": "HTTPのステータスコード500は、要求されたリソースが見つからないことを示す。",
+      "options": [
+        "○",
+        "×"
+      ],
+      "correctIndex": 1,
+      "explanation": "500はサーバ内部のエラー。リソースが見つからないのは404。"
+    },
+    {
+      "id": "holiday-review-2026-58",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 58,
+      "type": "true_false",
+      "question": "CSSでvisibility: hidden;を指定すると、通常その要素のレイアウト上の領域もなくなる。",
+      "options": [
+        "○",
+        "×"
+      ],
+      "correctIndex": 1,
+      "explanation": "visibility:hiddenは非表示にするが、領域は通常残る。display:noneとは異なる。"
+    },
+    {
+      "id": "holiday-review-2026-59",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 59,
+      "type": "true_false",
+      "question": "パスワードを2回入力すれば、必ず多要素認証になる。",
+      "options": [
+        "○",
+        "×"
+      ],
+      "correctIndex": 1,
+      "explanation": "同じ知識要素を繰り返しても多要素認証とはいえない。"
+    },
+    {
+      "id": "holiday-review-2026-60",
+      "source": "連休用総合復習60問（自主作成教材）",
+      "sourceQuestionNumber": 60,
+      "type": "true_false",
+      "question": "他人のIDとパスワードを本人に無断で利用してネットワーク経由でアクセスする行為は、不正アクセス 禁止法の対象となり得る。",
+      "options": [
+        "○",
+        "×"
+      ],
+      "correctIndex": 0,
+      "explanation": "不正アクセス行為の禁止等に関する法律は、他人の識別符号を無断で利用する不正アクセスなどを規制する。"
+    }
+  ]
+}
