@@ -190,6 +190,27 @@ try{
  assert.equal(exportCheck.download.name,'web3_study_backup.json','Backup filename must be descriptive');
  assert.ok(exportCheck.download.href.startsWith('data:text/json'),'Backup export should be offline-capable');
  assert.deepEqual(JSON.parse(decodeURIComponent(exportCheck.download.href.split(',').slice(1).join(','))),exportCheck.expected,'Export must preserve progress fields');
+ // Round-trip the actual exported payload through the app's import handler.
+ const roundTrip=await page.evaluate(async exported=>{
+  const original=localStorage.getItem('web3_master_data');
+  const oldAlert=window.alert;
+  window.alert=()=>{};
+  try{
+   const payload=decodeURIComponent(exported.href.slice(exported.href.indexOf(',')+1));
+   const saved=JSON.parse(payload);
+   const file=new File([payload],'roundtrip.json',{type:'application/json'});
+   window.importUserData({target:{files:[file]}});
+   await new Promise(resolve=>setTimeout(resolve,200));
+   const restored=JSON.parse(localStorage.getItem('web3_master_data'));
+   return {saved,restored};
+  }finally{
+   window.alert=oldAlert;
+   if(original===null)localStorage.removeItem('web3_master_data');
+   else localStorage.setItem('web3_master_data',original);
+   window.loadUserData();
+  }
+ },exportCheck.download);
+ assert.deepEqual(roundTrip.restored,roundTrip.saved,'Exported backup must round-trip through import without data loss');
  assert.deepEqual(errors,[]);
  console.log('PASS: standalone file HTML CSS and embedded textbook pagination');
  await context.close();
