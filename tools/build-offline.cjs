@@ -19,7 +19,7 @@ html=html.slice(0,linkStart)+html.slice(linkStart).replace('<a id="textbook-open
 const embeddedReader=JSON.stringify(Buffer.from(readerHtml,'utf8').toString('base64'));
 const pdfData=JSON.stringify(['materials/lesson-01.pdf','materials/lesson-02.pdf'].map(p=>fs.readFileSync(p).toString('base64')));
 const offlineUI=`<div id="offline-reader-overlay" hidden style="position:fixed;inset:0;z-index:99999;background:#0f172a;display:none;flex-direction:column">
-<div style="display:flex;flex-wrap:wrap;gap:6px;padding:8px;background:#1e293b;color:white"><button id="offline-reader-back" type="button" style="padding:8px;background:#334155;color:white">← 戻る</button><button id="offline-pdf-1" type="button" style="padding:8px;background:#2563eb;color:white">第1回 PDF保存</button><button id="offline-pdf-2" type="button" style="padding:8px;background:#2563eb;color:white">第2回 PDF保存</button><span id="offline-pdf-help" role="status" aria-live="polite" style="font-size:12px;align-self:center;color:#cbd5e1">PDFは保存後、Androidの「ダウンロード」から開いてください</span></div>
+<div style="display:flex;flex-wrap:wrap;gap:6px;padding:8px;background:#1e293b;color:white"><button id="offline-reader-back" type="button" style="padding:8px;background:#334155;color:white">← 戻る</button><button id="offline-pdf-1" type="button" style="padding:8px;background:#2563eb;color:white">第1回 PDFを開く</button><button id="offline-pdf-2" type="button" style="padding:8px;background:#2563eb;color:white">第2回 PDFを開く</button><span id="offline-pdf-help" role="status" aria-live="polite" style="font-size:12px;align-self:center;color:#cbd5e1">原資料をアプリ内で閲覧できます</span></div>
 <iframe id="offline-reader-frame" title="オフライン教科書" style="width:100%;flex:1;border:0;background:white"></iframe>
 <div id="offline-pdf-viewer" hidden style="display:none;flex:1;min-height:0;flex-direction:column;background:#334155;color:white">
 <div style="display:flex;align-items:center;justify-content:center;gap:10px;padding:7px;flex-wrap:wrap"><button id="offline-pdf-prev" type="button">前へ</button><span id="offline-pdf-page" role="status">PDF読み込み中</span><button id="offline-pdf-next" type="button">次へ</button><button id="offline-pdf-close" type="button">教科書に戻る</button></div>
@@ -28,7 +28,7 @@ const offlineUI=`<div id="offline-reader-overlay" hidden style="position:fixed;i
 <script>
 (function(){
 const bytes=Uint8Array.from(atob(${embeddedReader}),c=>c.charCodeAt(0));
-const readerSource=new TextDecoder('utf-8').decode(bytes);
+const readerSource=new TextDecoder('utf-8').decode(bytes).replace('</head>','<style>header{position:static!important}header nav a{display:none!important}</style></head>');
 const embeddedPdfs=${pdfData};
 const embeddedPageImages=__EMBEDDED_PDF_PAGE_IMAGES__;
 const inlinePdfDocs=[null,null];
