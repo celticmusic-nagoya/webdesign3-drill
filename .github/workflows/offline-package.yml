@@ -32,6 +32,7 @@ jobs:
           npm install --no-save --no-package-lock tailwindcss@3.4.17
           ./node_modules/.bin/tailwindcss -i /tmp/offline-input.css -o dist/webdesign3-offline/offline.css --content ./index.html --minify
           test -s dist/webdesign3-offline/offline.css
+          node tools/build-offline.cjs --inline-css
       - name: Validate offline links and dependencies
         run: |
           node - <<'NODE'
@@ -44,7 +45,7 @@ jobs:
           assert.doesNotMatch(html,/cdn\.tailwindcss\.com|fonts\.googleapis\.com/);
           assert.match(reader,/\.\/materials\/lesson-01\.pdf/);
           assert.match(reader,/\.\/materials\/lesson-02\.pdf/);
-          for(const file of ['offline.css','materials/lesson-01.pdf','materials/lesson-02.pdf'])assert.ok(fs.statSync(base+file).size>100);
+          for(const file of ['materials/lesson-01.pdf','materials/lesson-02.pdf'])assert.ok(fs.statSync(base+file).size>100);
           console.log('PASS: offline HTML, CSS, links and PDFs');
           NODE
       - name: Upload complete offline package
