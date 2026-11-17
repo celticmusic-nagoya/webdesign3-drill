@@ -235,6 +235,13 @@ try{
   }
  },exportCheck.download);
  assert.deepEqual(roundTrip.restored,roundTrip.saved,'Exported backup must round-trip through import without data loss');
+ // Dashboard's primary study actions must open their intended sections.
+ await page.locator('#tab-dashboard button[onclick="switchTab(\'practice\')"]').click();
+ assert.equal(await page.locator('#tab-practice').isVisible(),true,'Practice CTA should open practice');
+ await page.evaluate(()=>switchTab('dashboard'));
+ await page.locator('#tab-dashboard button[onclick="switchTab(\'exam\')"]').click();
+ assert.equal(await page.locator('#tab-exam').isVisible(),true,'Exam CTA should open exam');
+ await page.evaluate(()=>switchTab('dashboard'));
  assert.deepEqual(errors,[]);
  console.log('PASS: standalone file HTML CSS and embedded textbook pagination');
  await context.close();
