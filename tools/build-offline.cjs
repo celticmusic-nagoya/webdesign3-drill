@@ -28,7 +28,10 @@ const offlineUI=`<div id="offline-reader-overlay" hidden style="position:fixed;i
 <script>
 (function(){
 const bytes=Uint8Array.from(atob(${embeddedReader}),c=>c.charCodeAt(0));
-const readerSource=new TextDecoder('utf-8').decode(bytes).replace('</head>','<style>header{position:static!important}header nav a{display:none!important}</style></head>');
+const readerSource=new TextDecoder('utf-8').decode(bytes)
+ .replace('図解・画像・レイアウトはテキスト抽出版では再現していません。','本文は検索可能なテキスト版です。各ページの下に原資料の図表・レイアウトを画像で掲載しています。')
+ .replace('図表や元のレイアウトを確認する場合は原PDFを開いてください。','各ページ下部に原資料画像を表示します。全ページの確認は上部の「PDFを開く」を使用してください。')
+ .replace('</head>','<style>header{position:static!important}header nav a{display:none!important}</style></head>');
 const embeddedPdfs=${pdfData};
 const embeddedPageImages=__EMBEDDED_PDF_PAGE_IMAGES__;
 const inlinePdfDocs=[null,null];
