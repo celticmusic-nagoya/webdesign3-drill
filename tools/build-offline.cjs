@@ -32,6 +32,7 @@ back.addEventListener('click',function(){overlay.style.display='none';overlay.hi
 })();
 </script>`;
 html=html.replace('</body>',offlineUI+'</body>');
+// Build first; after Tailwind compilation inline all CSS into this same HTML.
 fs.writeFileSync(path.join(out,'index.html'),html);
 fs.copyFileSync('textbook.html',path.join(out,'textbook.html'));
 const manifest=JSON.parse(fs.readFileSync('materials/SOURCE_MANIFEST.json','utf8'));
@@ -43,3 +44,17 @@ for(const item of manifest.source_files){
   fs.copyFileSync(p,path.join(out,p));
 }
 console.log('Offline HTML and original PDFs staged:',out);
+
+function inlineCompiledStyles(){
+  const cssPath=path.join(out,'offline.css');
+  if(!fs.existsSync(cssPath)||fs.statSync(cssPath).size<1000)throw Error('Compiled CSS missing');
+  let page=fs.readFileSync(path.join(out,'index.html'),'utf8');
+  const css=fs.readFileSync(cssPath,'utf8').replace(/<\\/style/gi,'<\\\\/style');
+  if(!page.includes('<link rel="stylesheet" href="./offline.css">'))throw Error('CSS link missing');
+  page=page.replace('<link rel="stylesheet" href="./offline.css">','<style id="offline-tailwind">'+css+'</style>');
+  fs.writeFileSync(path.join(out,'index.html'),page);
+  fs.unlinkSync(cssPath);
+  if(page.includes('href="./offline.css"'))throw Error('CSS not embedded');
+  console.log('PASS: compiled CSS inlined into standalone index.html');
+}
+if(process.argv.includes('--inline-css'))inlineCompiledStyles();
