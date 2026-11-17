@@ -16,8 +16,20 @@ try{
  const errors=[];
  page.on('pageerror',e=>errors.push(e.message));
  await page.goto(pathToFileURL(file).href);
- const display=await page.locator('body').evaluate(el=>getComputedStyle(el).fontFamily);
- assert.ok(display.includes('sans-serif'));
+ const styles=await page.evaluate(()=>{
+  const a=document.querySelector('#offline-textbook-link');
+  const card=document.querySelector('#tab-dashboard .rounded-2xl');
+  return {styleSize:document.querySelector('#offline-tailwind')?.textContent.length,
+    cssRules:[...document.styleSheets].map(x=>{try{return x.cssRules.length}catch(e){return -1}}),
+    linkDisplay:a?getComputedStyle(a).display:null,linkBackground:a?getComputedStyle(a).backgroundColor:null,
+    cardBackground:card?getComputedStyle(card).backgroundColor:null,
+    viewport:document.documentElement.clientWidth,bodyScroll:document.body.scrollWidth,
+    linkMarkup:a?.outerHTML,bodyText:document.body.innerText.slice(0,250)}
+ });
+ console.log('OFFLINE_STYLE_DIAGNOSTIC',JSON.stringify(styles));
+ assert.ok(styles.styleSize>10000,'compiled styles should be embedded');
+ assert.equal(styles.linkDisplay,'inline-flex','textbook link must retain Tailwind styling');
+ assert.notEqual(styles.linkBackground,'rgba(0, 0, 0, 0)','textbook link must have styled background');
  const button=page.locator('#offline-textbook-link');
  if(await button.count()!==1){console.error('OFFLINE_DIAGNOSTIC',JSON.stringify({url:page.url(),title:await page.title(),body:(await page.locator('body').innerText()).slice(0,600),sourceLink:html.includes('id="offline-textbook-link"'),errors}));throw Error('offline textbook link missing in rendered DOM')}
  await button.click();
