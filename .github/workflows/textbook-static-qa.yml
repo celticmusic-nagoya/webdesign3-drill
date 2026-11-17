@@ -6,6 +6,8 @@ on:
       - 'textbook.html'
       - 'materials/SOURCE_MANIFEST.json'
       - 'tools/qa-textbook.cjs'
+      - 'tools/build-offline.cjs'
+      - '.github/workflows/offline-package.yml'
       - '.github/workflows/textbook-static-qa.yml'
   workflow_dispatch:
 permissions:
@@ -21,3 +23,18 @@ jobs:
           node-version: '22'
       - name: Check textbook and app source
         run: node tools/qa-textbook.cjs
+      - name: Stage offline package
+        run: node tools/build-offline.cjs
+      - name: Compile offline Tailwind CSS
+        run: |
+          printf '@tailwind base;\n@tailwind components;\n@tailwind utilities;\n' > /tmp/offline-input.css
+          npm install --no-save --no-package-lock tailwindcss@3.4.17
+          ./node_modules/.bin/tailwindcss -i /tmp/offline-input.css -o dist/webdesign3-offline/offline.css --content ./index.html --minify
+          test -s dist/webdesign3-offline/offline.css
+      - name: Upload offline package
+        uses: actions/upload-artifact@v4
+        with:
+          name: webdesign3-offline-complete
+          path: dist/webdesign3-offline/
+          retention-days: 14
+          if-no-files-found: error
