@@ -254,6 +254,27 @@ try{
  assert.equal(examStart.uniqueIds,25,'Mock exam must not repeat question IDs');
  assert.ok(examStart.seconds>=2698&&examStart.seconds<=2700,'Mock exam timer should begin at 45 minutes');
  assert.equal(examStart.visible,true,'Mock exam should display active question view');
+ // Mock-exam grading must persist the score and show the correct result.
+ const grading=await page.evaluate(()=>{
+  const original=localStorage.getItem('web3_master_data');
+  const before=JSON.parse(JSON.stringify(state.userData));
+  try{
+   state.userData.examHighScore=null;
+   state.exam.questions=QUESTIONS.slice(0,25);
+   state.exam.answers=Object.fromEntries(state.exam.questions.map(q=>[q.id,q.correct]));
+   finishExam();
+   const stored=JSON.parse(localStorage.getItem('web3_master_data'));
+   return {score:document.getElementById('exam-score-text').textContent,storedHigh:stored.examHighScore,resultVisible:!document.getElementById('exam-result').classList.contains('hidden')};
+  }finally{
+   state.userData=before;
+   if(original===null)localStorage.removeItem('web3_master_data');
+   else localStorage.setItem('web3_master_data',original);
+   updateDashboardStats();
+  }
+ });
+ assert.equal(grading.score,'25 / 25','All-correct mock exam should score 25/25');
+ assert.equal(grading.storedHigh,25,'Exam high score must persist to local storage');
+ assert.equal(grading.resultVisible,true,'Exam results must be visible after grading');
  assert.deepEqual(errors,[]);
  console.log('PASS: standalone file HTML CSS and embedded textbook pagination');
  await context.close();
