@@ -39,3 +39,10 @@ jobs:
           path: dist/webdesign3-offline/
           retention-days: 14
           if-no-files-found: error
+      - name: Upload single-file Android offline app
+        uses: actions/upload-artifact@v4
+        with:
+          name: webdesign3-offline-single-html
+          path: dist/webdesign3-offline/index.html
+          retention-days: 14
+          if-no-files-found: error
