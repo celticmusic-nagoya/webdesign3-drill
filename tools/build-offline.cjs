@@ -101,7 +101,7 @@ function inlineCompiledStyles(){
   const workerPath=require.resolve('pdfjs-dist/build/pdf.worker.min.js');
   const pdfjs=fs.readFileSync(pdfjsPath,'utf8');
   const worker=fs.readFileSync(workerPath,'utf8');
-  const setup='<script>'+pdfjs+';pdfjsLib.GlobalWorkerOptions.workerSrc=URL.createObjectURL(new Blob(['+JSON.stringify(worker)+'],{type:"text/javascript"}));<\\/script>';
+  const setup='<script>'+pdfjs+';pdfjsLib.GlobalWorkerOptions.workerSrc=URL.createObjectURL(new Blob(['+JSON.stringify(worker)+'],{type:"text/javascript"}));</script>';
   page=page.replace('</body>',setup+'</body>');
   fs.writeFileSync(path.join(out,'index.html'),page);
   fs.unlinkSync(cssPath);
