@@ -49,7 +49,7 @@ function inlineCompiledStyles(){
   const cssPath=path.join(out,'offline.css');
   if(!fs.existsSync(cssPath)||fs.statSync(cssPath).size<1000)throw Error('Compiled CSS missing');
   let page=fs.readFileSync(path.join(out,'index.html'),'utf8');
-  const css=fs.readFileSync(cssPath,'utf8').replace(/<\\/style/gi,'<\\\\/style');
+  const css=fs.readFileSync(cssPath,'utf8');
   if(!page.includes('<link rel="stylesheet" href="./offline.css">'))throw Error('CSS link missing');
   page=page.replace('<link rel="stylesheet" href="./offline.css">','<style id="offline-tailwind">'+css+'</style>');
   fs.writeFileSync(path.join(out,'index.html'),page);
