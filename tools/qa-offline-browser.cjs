@@ -67,6 +67,13 @@ try{
  assert.ok(canvas.source.startsWith('data:image/png;base64,'),'Full PDF viewer must use Japanese-safe page images');
  await page.locator('#offline-pdf-next').click();
  await page.waitForFunction(()=>document.querySelector('#offline-pdf-page')?.textContent?.startsWith('2 /'),null,{timeout:30000});
+ await page.locator('#offline-pdf-2').click();
+ await page.waitForFunction(()=>document.querySelector('#offline-pdf-page')?.textContent==='1 / 10',null,{timeout:30000});
+ const secondBookImage=await page.locator('#offline-pdf-image').evaluate(el=>({width:el.naturalWidth,height:el.naturalHeight,source:el.currentSrc}));
+ assert.ok(secondBookImage.width>100&&secondBookImage.height>100,'Second source PDF page image should load');
+ assert.ok(secondBookImage.source.startsWith('data:image/png;base64,'),'Second source PDF must preserve Japanese in raster image');
+ await page.locator('#offline-pdf-next').click();
+ assert.equal(await page.locator('#offline-pdf-page').innerText(),'2 / 10');
  await page.locator('#offline-pdf-close').click();
  assert.equal(await page.locator('#offline-pdf-viewer').isVisible(),false);
  await page.locator('#offline-reader-back').click();
