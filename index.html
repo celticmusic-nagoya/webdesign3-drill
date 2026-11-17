@@ -663,7 +663,7 @@
 
         <!-- DASHBOARD TAB -->
         <section id="tab-dashboard" class="tab-content space-y-6">
-            <div class="rounded-2xl border border-blue-700/50 bg-gradient-to-r from-slate-900 to-blue-950 p-5 sm:p-6 shadow-lg" aria-label="教科書で学ぶ"><div class="flex flex-wrap items-center justify-between gap-4"><div class="space-y-2"><h2 class="text-xl font-bold text-white">教科書で学ぶ</h2><p class="text-sm text-slate-300">授業テキスト第1回・第2回｜全23ページ。目次・検索・文字サイズ調整に対応。</p><p id="textbook-resume-label" class="text-xs text-blue-200">学習を始めましょう</p></div><a href="./textbook.html" class="inline-flex min-h-11 items-center rounded-xl bg-blue-600 px-5 py-3 font-bold text-white hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-300">教科書を開く →</a></div></div>
+            <div class="rounded-2xl border border-blue-700/50 bg-gradient-to-r from-slate-900 to-blue-950 p-5 sm:p-6 shadow-lg" aria-label="教科書で学ぶ"><div class="flex flex-wrap items-center justify-between gap-4"><div class="space-y-2"><h2 class="text-xl font-bold text-white">教科書で学ぶ</h2><p class="text-sm text-slate-300">授業テキスト第1回・第2回｜全23ページ。目次・検索・文字サイズ調整に対応。</p><p id="textbook-resume-label" class="text-xs text-blue-200">学習を始めましょう</p></div><a id="textbook-open-link" href="./textbook.html" class="inline-flex min-h-11 items-center rounded-xl bg-blue-600 px-5 py-3 font-bold text-white hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-300">教科書を開く →</a></div></div>
             <div class="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 border border-blue-700/30 rounded-3xl p-6 md:p-8 relative overflow-hidden shadow-2xl">
                 <div class="relative z-10 max-w-2xl space-y-3">
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-500/20 text-blue-300 border border-blue-400/30 rounded-full text-xs font-bold">
@@ -1891,10 +1891,21 @@
             }
         }
 
+        // A standalone index.html downloaded from GitHub may not have its sibling textbook.html.
+        // In file:// mode, prefer the published reader rather than a broken local relative link.
+        function setupTextbookLink(){
+            const link=document.getElementById('textbook-open-link');
+            if(!link)return;
+            if(location.protocol==='file:'){
+                link.href='https://celticmusic-nagoya.github.io/webdesign3-drill/textbook.html';
+                link.title='ローカルファイルからは公開版の教科書を開きます（インターネット接続が必要です）';
+            }
+        }
         function updateTextbookResumeLabel(){try{const p=JSON.parse(localStorage.getItem('web3_textbook_position')||'{}');const label=document.getElementById('textbook-resume-label');if(label&&Number.isInteger(p.book)&&p.book>=0&&p.book<=1&&Number.isInteger(p.page)&&p.page>=0&&p.page<(p.book===0?13:10))label.textContent='前回の続き：第'+(p.book+1)+'回・'+(p.page+1)+'ページ';}catch(e){}}
         window.onload = function() {
             loadUserData();
             updateTextbookResumeLabel();
+            setupTextbookLink();
             switchTab('dashboard');
             setupFlashcardSwipe(); updateWeakUI();
         };
