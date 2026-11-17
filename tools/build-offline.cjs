@@ -114,40 +114,29 @@ async function attachTextbookFigures(){
  render();
 }
 
-let pdfDocument=null,pdfPage=1,pdfBusy=false;
+let pdfBook=0,pdfPage=1;
 const pdfView=document.getElementById('offline-pdf-viewer');
 const pdfFrame=document.getElementById('offline-reader-frame');
 const pdfLabel=document.getElementById('offline-pdf-page');
-async function renderPdfPage(){
- if(!pdfDocument||pdfBusy)return;
- pdfBusy=true;
- try{
-  const page=await pdfDocument.getPage(pdfPage);
-  const container=document.getElementById('offline-pdf-scroll');
-  const base=page.getViewport({scale:1});
-  const scale=Math.min(2,Math.max(.5,(container.clientWidth-24)/base.width))*Math.min(2,window.devicePixelRatio||1);
-  const viewport=page.getViewport({scale});
-  const canvas=document.getElementById('offline-pdf-canvas');
-  canvas.width=Math.ceil(viewport.width);canvas.height=Math.ceil(viewport.height);
-  canvas.style.width=(viewport.width/Math.min(2,window.devicePixelRatio||1))+'px';
-  await page.render({canvasContext:canvas.getContext('2d'),viewport}).promise;
-  pdfLabel.textContent=pdfPage+' / '+pdfDocument.numPages;
- }catch(e){pdfLabel.textContent='PDF表示エラー: '+e.message;}finally{pdfBusy=false;}
+const pdfCanvas=document.getElementById('offline-pdf-canvas');
+const pdfImage=document.createElement('img');
+pdfImage.id='offline-pdf-image';
+pdfImage.alt='原資料のPDFページ画像';
+pdfImage.style.cssText='display:block;max-width:100%;height:auto;margin:auto;background:white';
+pdfCanvas.replaceWith(pdfImage);
+function renderPdfPage(){
+ const pages=embeddedPageImages[pdfBook]||[];
+ if(pdfPage<1||pdfPage>pages.length){pdfLabel.textContent='原資料ページがありません';return;}
+ pdfImage.src=pages[pdfPage-1];
+ pdfLabel.textContent=pdfPage+' / '+pages.length;
 }
-async function openOfflinePdf(i){
+function openOfflinePdf(i){
+ pdfBook=i;pdfPage=1;
  pdfView.hidden=false;pdfView.style.display='flex';pdfFrame.style.display='none';
- pdfLabel.textContent='PDF読み込み中…';
- try{
-  if(!window.pdfjsLib)throw Error('PDF描画ライブラリが読み込めません');
-  const binary=atob(embeddedPdfs[i]);
-  const bytes=Uint8Array.from(binary,c=>c.charCodeAt(0));
-  pdfDocument=await pdfjsLib.getDocument({data:bytes}).promise;
-  pdfPage=1;
-  await renderPdfPage();
- }catch(e){pdfLabel.textContent='PDF表示エラー: '+e.message;}
+ renderPdfPage();
 }
-document.getElementById('offline-pdf-prev').addEventListener('click',()=>{if(pdfDocument&&pdfPage>1&&!pdfBusy){pdfPage--;renderPdfPage();}});
-document.getElementById('offline-pdf-next').addEventListener('click',()=>{if(pdfDocument&&pdfPage<pdfDocument.numPages&&!pdfBusy){pdfPage++;renderPdfPage();}});
+document.getElementById('offline-pdf-prev').addEventListener('click',()=>{if(pdfPage>1){pdfPage--;renderPdfPage();}});
+document.getElementById('offline-pdf-next').addEventListener('click',()=>{if(pdfPage<(embeddedPageImages[pdfBook]||[]).length){pdfPage++;renderPdfPage();}});
 document.getElementById('offline-pdf-close').addEventListener('click',()=>{pdfView.style.display='none';pdfView.hidden=true;pdfFrame.style.display='block';});
 document.getElementById('offline-pdf-1').addEventListener('click',()=>openOfflinePdf(0));
 document.getElementById('offline-pdf-2').addEventListener('click',()=>openOfflinePdf(1));
