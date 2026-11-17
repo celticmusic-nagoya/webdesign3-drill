@@ -70,9 +70,22 @@ try{
  assert.equal(await page.locator('#offline-pdf-image').evaluate(el=>el.style.width),'125%');
  await page.locator('#offline-pdf-zoom-reset').click();
  assert.equal(await page.locator('#offline-pdf-zoom-label').innerText(),'100%');
+ for(let i=0;i<12;i++)await page.locator('#offline-pdf-zoom-in').click();
+ assert.equal(await page.locator('#offline-pdf-zoom-label').innerText(),'300%','PDF zoom must cap at 300%');
+ await page.locator('#offline-pdf-zoom-in').click();
+ assert.equal(await page.locator('#offline-pdf-zoom-label').innerText(),'300%');
+ await page.locator('#offline-pdf-zoom-out').click();
+ assert.equal(await page.locator('#offline-pdf-zoom-label').innerText(),'275%');
+ await page.locator('#offline-pdf-zoom-reset').click();
+ assert.equal(await page.locator('#offline-pdf-zoom-label').innerText(),'100%');
+
  await page.locator('#offline-pdf-next').click();
  await page.waitForFunction(()=>document.querySelector('#offline-pdf-page')?.textContent?.startsWith('2 /'),null,{timeout:30000});
+ await page.locator('#offline-pdf-zoom-in').click();
+ assert.equal(await page.locator('#offline-pdf-zoom-label').innerText(),'125%');
  await page.locator('#offline-pdf-2').click();
+ assert.equal(await page.locator('#offline-pdf-zoom-label').innerText(),'100%','Changing source PDFs resets zoom');
+
  await page.waitForFunction(()=>document.querySelector('#offline-pdf-page')?.textContent==='1 / 10',null,{timeout:30000});
  const secondBookImage=await page.locator('#offline-pdf-image').evaluate(el=>({width:el.naturalWidth,height:el.naturalHeight,source:el.currentSrc}));
  assert.ok(secondBookImage.width>100&&secondBookImage.height>100,'Second source PDF page image should load');
