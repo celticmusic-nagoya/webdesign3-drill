@@ -19,7 +19,7 @@ try{
  const display=await page.locator('body').evaluate(el=>getComputedStyle(el).fontFamily);
  assert.ok(display.includes('sans-serif'));
  const button=page.locator('#offline-textbook-link');
- assert.equal(await button.count(),1);
+ if(await button.count()!==1){console.error('OFFLINE_DIAGNOSTIC',JSON.stringify({url:page.url(),title:await page.title(),body:(await page.locator('body').innerText()).slice(0,600),sourceLink:html.includes('id="offline-textbook-link"'),errors}));throw Error('offline textbook link missing in rendered DOM')}
  await button.click();
  const overlay=page.locator('#offline-reader-overlay');
  await overlay.waitFor({state:'visible'});
