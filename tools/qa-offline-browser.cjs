@@ -47,6 +47,14 @@ try{
  },null,{timeout:30000});
  const embeddedCanvas=await frame.locator('#original-figure-canvas').evaluate(el=>({width:el.width,height:el.height}));
  assert.ok(embeddedCanvas.width>100&&embeddedCanvas.height>100,'Original figure page should render within textbook');
+ await frame.locator('#original-figure-zoom-in').click();
+ assert.equal(await frame.locator('#original-figure-zoom-label').innerText(),'125%');
+ await frame.locator('#original-figure-zoom-reset').click();
+ assert.equal(await frame.locator('#original-figure-zoom-label').innerText(),'100%');
+ await frame.locator('#original-figure-canvas').click();
+ assert.equal(await frame.locator('#original-figure-zoom-label').innerText(),'200%');
+ await frame.locator('#original-figure-zoom-reset').click();
+
 
  await page.locator('#offline-pdf-1').click();
  await page.locator('#offline-pdf-viewer').waitFor({state:'visible'});
