@@ -58,7 +58,7 @@ try{
 
 
  // Search across both books and navigate directly to the matching lesson page.
- await frame.locator('#global-search').fill('クリエイティブ・コモンズ');
+ await frame.locator('#global-search').fill('Creative Commons License');
  await frame.locator('#search-results [data-result]').first().waitFor({state:'visible'});
  await frame.locator('#search-results [data-result]').first().click();
  assert.match(await frame.locator('#page-label').innerText(),/10 \/ 10/,'Cross-book search should navigate to the matched page');
