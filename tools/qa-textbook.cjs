@@ -15,6 +15,8 @@ const books=JSON.parse(m[1]);
 assert.deepEqual(books.map(b=>b.pages.length),[13,10]);
 for(const book of books){assert.ok(book.title&&book.source);book.pages.forEach((p,i)=>{assert.equal(p.number,i+1);assert.ok(p.text.length>0);assert.ok(p.title.length>0)})}
 assert.ok(app.includes('href="./textbook.html"'),'dashboard link missing');
+assert.ok(app.includes("location.protocol==='file:'")&&app.includes('setupTextbookLink()'),'local file fallback missing');
+assert.ok(reader.includes('publishedPdfBase')&&reader.includes("location.protocol==='file:'"),'local PDF fallback missing');
 assert.ok(app.includes('textbook-resume-label'),'resume UI missing');
 assert.ok(reader.includes('function searchAll()'),'cross-book search missing');
 assert.ok(reader.includes('function updatePdfLink()'),'PDF fallback missing');
