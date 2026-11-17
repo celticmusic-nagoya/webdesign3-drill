@@ -242,6 +242,18 @@ try{
  await page.locator('#tab-dashboard button[onclick="switchTab(\'exam\')"]').click();
  assert.equal(await page.locator('#tab-exam').isVisible(),true,'Exam CTA should open exam');
  await page.evaluate(()=>switchTab('dashboard'));
+ // Mock exam must select exactly 25 questions and initialize a 45-minute timer.
+ const examStart=await page.evaluate(()=>{
+  startExam();
+  const result={questions:state.exam.questions.length,uniqueIds:new Set(state.exam.questions.map(q=>q.id)).size,seconds:state.exam.timeLeft,visible:!document.getElementById('exam-active').classList.contains('hidden')};
+  clearInterval(state.exam.timer);
+  state.exam.timer=null;
+  return result;
+ });
+ assert.equal(examStart.questions,25,'Mock exam must contain 25 questions');
+ assert.equal(examStart.uniqueIds,25,'Mock exam must not repeat question IDs');
+ assert.ok(examStart.seconds>=2698&&examStart.seconds<=2700,'Mock exam timer should begin at 45 minutes');
+ assert.equal(examStart.visible,true,'Mock exam should display active question view');
  assert.deepEqual(errors,[]);
  console.log('PASS: standalone file HTML CSS and embedded textbook pagination');
  await context.close();
