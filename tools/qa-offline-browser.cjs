@@ -57,6 +57,13 @@ try{
  await frame.locator('#original-figure-zoom-reset').click();
 
 
+ // Search across both books and navigate directly to the matching lesson page.
+ await frame.locator('#global-search').fill('クリエイティブ・コモンズ');
+ await frame.locator('#search-results [data-result]').first().waitFor({state:'visible'});
+ await frame.locator('#search-results [data-result]').first().click();
+ assert.match(await frame.locator('#page-label').innerText(),/10 \/ 10/,'Cross-book search should navigate to the matched page');
+ assert.match(await frame.locator('#page-title').innerText(),/クリエイティブ・コモンズ/);
+ await frame.locator('#global-search').fill('');
  await frame.locator('#book').selectOption('1');
  await frame.locator('#chapters button[data-page="5"]').click();
  await frame.locator('#original-figure-focus-image').waitFor({state:'visible',timeout:30000});
