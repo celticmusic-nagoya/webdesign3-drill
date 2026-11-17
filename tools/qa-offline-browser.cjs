@@ -45,8 +45,9 @@ try{
   const doc=document.querySelector('#offline-reader-frame')?.contentDocument;
   return doc?.querySelector('#original-figure-status')?.textContent?.includes('原資料 第1回・2ページ');
  },null,{timeout:30000});
- const embeddedCanvas=await frame.locator('#original-figure-canvas').evaluate(el=>({width:el.width,height:el.height}));
+ const embeddedCanvas=await frame.locator('#original-figure-canvas').evaluate(el=>({width:el.naturalWidth,height:el.naturalHeight,source:el.currentSrc}));
  assert.ok(embeddedCanvas.width>100&&embeddedCanvas.height>100,'Original figure page should render within textbook');
+ assert.ok(embeddedCanvas.source.startsWith('data:image/png;base64,'),'Japanese text should be preserved in pre-rendered PNG');
  await frame.locator('#original-figure-zoom-in').click();
  assert.equal(await frame.locator('#original-figure-zoom-label').innerText(),'125%');
  await frame.locator('#original-figure-zoom-reset').click();
