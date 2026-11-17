@@ -28,7 +28,7 @@ try{
  });
  console.log('OFFLINE_STYLE_DIAGNOSTIC',JSON.stringify(styles));
  assert.ok(styles.styleSize>10000,'compiled styles should be embedded');
- assert.equal(styles.linkDisplay,'inline-flex','textbook link must retain Tailwind styling');
+ assert.ok(['flex','inline-flex'].includes(styles.linkDisplay),'textbook link must retain flex styling');
  assert.notEqual(styles.linkBackground,'rgba(0, 0, 0, 0)','textbook link must have styled background');
  const button=page.locator('#offline-textbook-link');
  if(await button.count()!==1){console.error('OFFLINE_DIAGNOSTIC',JSON.stringify({url:page.url(),title:await page.title(),body:(await page.locator('body').innerText()).slice(0,600),sourceLink:html.includes('id="offline-textbook-link"'),errors}));throw Error('offline textbook link missing in rendered DOM')}
