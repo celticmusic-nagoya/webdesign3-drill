@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "source": "materials/lesson-02.pdf",
+  "review_method": "Rendered contact sheet visually inspected; page-level descriptions only, no crop coordinates approved",
+  "pages": [
+    {
+      "page": 6,
+      "title": "知覚可能の達成基準",
+      "visual_content": "WCAG達成基準の比較図、画像の代替テキスト、時間依存メディアなどの事例",
+      "placement": "本文の該当ページ直下",
+      "crop": "full_page",
+      "review": "VISUALLY_REVIEWED"
+    },
+    {
+      "page": 7,
+      "title": "操作可能・理解可能・堅ろうの達成基準",
+      "visual_content": "達成基準番号、NG例と改善例を並べた一覧図表",
+      "placement": "本文の該当ページ直下",
+      "crop": "full_page",
+      "review": "VISUALLY_REVIEWED"
+    }
+  ],
+  "limitations": [
+    "ページ全体の図解として確認。図表の細分化・個別切り抜きは未承認",
+    "小さい注釈の読みやすさはAndroid実機で未検証",
+    "原資料と本文の意味的な一致は詳細照合未完了"
+  ]
+}
