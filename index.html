@@ -1891,21 +1891,10 @@
             }
         }
 
-        // A standalone index.html downloaded from GitHub may not have its sibling textbook.html.
-        // In file:// mode, prefer the published reader rather than a broken local relative link.
-        function setupTextbookLink(){
-            const link=document.getElementById('textbook-open-link');
-            if(!link)return;
-            if(location.protocol==='file:'){
-                link.href='https://celticmusic-nagoya.github.io/webdesign3-drill/textbook.html';
-                link.title='ローカルファイルからは公開版の教科書を開きます（インターネット接続が必要です）';
-            }
-        }
         function updateTextbookResumeLabel(){try{const p=JSON.parse(localStorage.getItem('web3_textbook_position')||'{}');const label=document.getElementById('textbook-resume-label');if(label&&Number.isInteger(p.book)&&p.book>=0&&p.book<=1&&Number.isInteger(p.page)&&p.page>=0&&p.page<(p.book===0?13:10))label.textContent='前回の続き：第'+(p.book+1)+'回・'+(p.page+1)+'ページ';}catch(e){}}
         window.onload = function() {
             loadUserData();
             updateTextbookResumeLabel();
-            setupTextbookLink();
             switchTab('dashboard');
             setupFlashcardSwipe(); updateWeakUI();
         };
