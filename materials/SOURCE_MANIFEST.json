@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "status": "SOURCE_VERIFIED_NOT_PUBLISHED",
+  "status": "SOURCE_PDFS_INTEGRATED_IN_DRAFT_PR",
   "source_files": [
     {
       "source": "テキスト1回目.pdf",
@@ -16,9 +16,8 @@
     }
   ],
   "notes": [
-    "The two original PDF files are not included in this PR.",
-    "Do not publish source PDFs without verifying distribution permission.",
-    "Before enabling original PDF links, verify bytes against SHA-256 and page count.",
-    "Android browser and regression QA remain NOT_RUN."
+    "Both original PDF files are committed in this draft PR; verify SHA-256 during CI.",
+    "Public distribution permission was stated by the user; independently verifiable license terms are not recorded.",
+    "Android device QA remains NOT_RUN."
   ]
 }
