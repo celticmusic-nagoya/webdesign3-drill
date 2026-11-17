@@ -7,6 +7,7 @@ on:
       - 'materials/SOURCE_MANIFEST.json'
       - 'tools/qa-textbook.cjs'
       - 'tools/build-offline.cjs'
+      - 'tools/build-pwa.cjs'
       - '.github/workflows/offline-package.yml'
       - '.github/workflows/textbook-static-qa.yml'
   workflow_dispatch:
@@ -32,6 +33,15 @@ jobs:
           ./node_modules/.bin/tailwindcss -i /tmp/offline-input.css -o dist/webdesign3-offline/offline.css --content ./index.html --minify
           test -s dist/webdesign3-offline/offline.css
           node tools/build-offline.cjs --inline-css
+      - name: Build installable PWA package
+        run: node tools/build-pwa.cjs
+      - name: Upload installable PWA package
+        uses: actions/upload-artifact@v4
+        with:
+          name: webdesign3-pwa-https-deploy
+          path: dist/webdesign3-pwa/
+          retention-days: 14
+          if-no-files-found: error
       - name: Upload offline package
         uses: actions/upload-artifact@v4
         with:
