@@ -34,7 +34,7 @@ jobs:
       - name: Compile offline Tailwind CSS
         run: |
           printf '@tailwind base;\n@tailwind components;\n@tailwind utilities;\n' > /tmp/offline-input.css
-          npm install --no-save --no-package-lock tailwindcss@3.4.17 pdfjs-dist@3.11.174
+          npm install --no-save --no-package-lock tailwindcss@3.4.17
           ./node_modules/.bin/tailwindcss -i /tmp/offline-input.css -o dist/webdesign3-offline/offline.css --content ./index.html --minify
           test -s dist/webdesign3-offline/offline.css
           node tools/build-offline.cjs --inline-css
