@@ -48,7 +48,7 @@ try{
  const canvas=await page.locator('#offline-pdf-canvas').evaluate(el=>({width:el.width,height:el.height}));
  assert.ok(canvas.width>100&&canvas.height>100,'PDF page must render to canvas');
  await page.locator('#offline-pdf-next').click();
- await page.waitForFunction(()=>document.querySelector('#offline-pdf-page')?.textContent?.startsWith('2 /'),{timeout:30000});
+ await page.waitForFunction(()=>document.querySelector('#offline-pdf-page')?.textContent?.startsWith('2 /'),null,{timeout:30000});
  await page.locator('#offline-pdf-close').click();
  assert.equal(await page.locator('#offline-pdf-viewer').isVisible(),false);
  await page.locator('#offline-reader-back').click();
