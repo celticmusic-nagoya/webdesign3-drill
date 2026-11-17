@@ -275,6 +275,27 @@ try{
  assert.equal(grading.score,'25 / 25','All-correct mock exam should score 25/25');
  assert.equal(grading.storedHigh,25,'Exam high score must persist to local storage');
  assert.equal(grading.resultVisible,true,'Exam results must be visible after grading');
+ // A lower subsequent score must not overwrite the highest result.
+ const highScoreGuard=await page.evaluate(()=>{
+  const original=localStorage.getItem('web3_master_data');
+  const before=JSON.parse(JSON.stringify(state.userData));
+  try{
+   state.userData.examHighScore=24;
+   state.exam.questions=QUESTIONS.slice(0,25);
+   state.exam.answers={};
+   finishExam();
+   const stored=JSON.parse(localStorage.getItem('web3_master_data'));
+   return {score:document.getElementById('exam-score-text').textContent,high:stored.examHighScore,unanswered:document.getElementById('exam-review-list').textContent.includes('未解答')};
+  }finally{
+   state.userData=before;
+   if(original===null)localStorage.removeItem('web3_master_data');
+   else localStorage.setItem('web3_master_data',original);
+   updateDashboardStats();
+  }
+ });
+ assert.equal(highScoreGuard.score,'0 / 25','Unanswered questions must score zero');
+ assert.equal(highScoreGuard.high,24,'Lower scores must not overwrite the existing high score');
+ assert.equal(highScoreGuard.unanswered,true,'Review should identify unanswered questions');
  assert.deepEqual(errors,[]);
  console.log('PASS: standalone file HTML CSS and embedded textbook pagination');
  await context.close();
