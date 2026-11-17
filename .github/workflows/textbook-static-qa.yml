@@ -8,6 +8,7 @@ on:
       - 'tools/qa-textbook.cjs'
       - 'tools/build-offline.cjs'
       - 'tools/build-pwa.cjs'
+      - 'tools/inventory-pdf-figures.cjs'
       - '.github/workflows/offline-package.yml'
       - '.github/workflows/textbook-static-qa.yml'
   workflow_dispatch:
@@ -40,6 +41,15 @@ jobs:
         with:
           name: webdesign3-pwa-https-deploy
           path: dist/webdesign3-pwa/
+          retention-days: 14
+          if-no-files-found: error
+      - name: Inventory source PDF diagram candidates
+        run: node tools/inventory-pdf-figures.cjs
+      - name: Upload figure inventory for independent art review
+        uses: actions/upload-artifact@v4
+        with:
+          name: textbook-pdf-figure-inventory
+          path: dist/figure-inventory.json
           retention-days: 14
           if-no-files-found: error
       - name: Upload offline package
