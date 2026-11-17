@@ -185,7 +185,7 @@ function inlineCompiledStyles(){
   const rasterized=['materials/lesson-01.pdf','materials/lesson-02.pdf'].map(file=>{
     const pdf=path.resolve(file);
     const info=execFileSync('pdfinfo',[pdf],{encoding:'utf8'});
-    const count=Number(info.match(/^Pages:\\s*(\\d+)/m)?.[1]);
+    const count=Number(info.match(/^Pages:\s*(\d+)/m)?.[1]);
     if(!Number.isInteger(count)||count<1||count>100)throw Error('Invalid PDF page count: '+file);
     return Array.from({length:count},(_,i)=>{
       const output=path.join(out,'pdf-page-'+path.basename(file,'.pdf')+'-'+(i+1));
