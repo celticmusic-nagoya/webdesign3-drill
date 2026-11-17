@@ -65,5 +65,39 @@
     "ページ画像の日本語は目視で読めるが、個別領域のピクセル単位のクロップ検証は未実施",
     "切り抜き提案は本文との詳細な意味対応およびAndroid最終表示サイズのQA前のため未採用",
     "原資料のフルページ画像表示は維持"
-  ]
+  ],
+  "crop_qa": {
+    "date": "2026-11-17",
+    "source_preview_resolution": {
+      "width": 785,
+      "height": 1100
+    },
+    "method": "Pillow crop of Poppler-rendered page previews; independently visually inspected cropped PNGs; source PDFs unchanged",
+    "results": [
+      {
+        "id": "lesson02-p06-perceivable",
+        "output_size": {
+          "width": 690,
+          "height": 891
+        },
+        "content_integrity": "PASS",
+        "finding": "①知覚可能の達成基準、5行の比較図、下部の「これは覚える」が残る",
+        "final_android_legibility": "NOT_RUN",
+        "adoption": "HOLD"
+      },
+      {
+        "id": "lesson02-p07-operable",
+        "output_size": {
+          "width": 667,
+          "height": 923
+        },
+        "content_integrity": "FAIL",
+        "finding": "②操作可能・理解可能・堅ろうの達成基準の緑色タイトル見出しが切り落とされる。候補y=0.09は不適切",
+        "required_change": "タイトル見出しを含むようyを上方へ修正して再検証",
+        "final_android_legibility": "NOT_RUN",
+        "adoption": "REJECT_CURRENT_CROP"
+      }
+    ],
+    "decision": "No crops adopted. Preserve full-page images until crop QA and mobile legibility pass."
+  }
 }
