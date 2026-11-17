@@ -17,13 +17,28 @@ const linkStart=html.indexOf('<a id="textbook-open-link" href="./textbook.html"'
 if(linkStart<0)throw Error('Actual textbook anchor not found');
 html=html.slice(0,linkStart)+html.slice(linkStart).replace('<a id="textbook-open-link" href="./textbook.html"','<a id="offline-textbook-link" href="#offline-textbook"');
 const embeddedReader=JSON.stringify(Buffer.from(readerHtml,'utf8').toString('base64'));
+const pdfData=JSON.stringify(['materials/lesson-01.pdf','materials/lesson-02.pdf'].map(p=>fs.readFileSync(p).toString('base64')));
 const offlineUI=`<div id="offline-reader-overlay" hidden style="position:fixed;inset:0;z-index:99999;background:#0f172a;display:none;flex-direction:column">
-<button id="offline-reader-back" type="button" style="flex:0 0 auto;padding:12px;background:#1e293b;color:white;font-size:16px;text-align:left">← 問題演習に戻る</button>
+<div style="display:flex;flex-wrap:wrap;gap:6px;padding:8px;background:#1e293b;color:white"><button id="offline-reader-back" type="button" style="padding:8px;background:#334155;color:white">← 戻る</button><button id="offline-pdf-1" type="button" style="padding:8px;background:#2563eb;color:white">第1回 原PDF</button><button id="offline-pdf-2" type="button" style="padding:8px;background:#2563eb;color:white">第2回 原PDF</button></div>
 <iframe id="offline-reader-frame" title="オフライン教科書" style="width:100%;flex:1;border:0;background:white"></iframe></div>
 <script>
 (function(){
 const bytes=Uint8Array.from(atob(${embeddedReader}),c=>c.charCodeAt(0));
 const readerSource=new TextDecoder('utf-8').decode(bytes);
+const embeddedPdfs=${pdfData};
+function openOfflinePdf(i){
+ const binary=atob(embeddedPdfs[i]);
+ const bytes=new Uint8Array(binary.length);
+ for(let j=0;j<binary.length;j++)bytes[j]=binary.charCodeAt(j);
+ const blob=new Blob([bytes],{type:'application/pdf'});
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement('a');
+ a.href=url;a.target='_blank';a.rel='noopener';a.download='lesson-0'+(i+1)+'.pdf';
+ document.body.appendChild(a);a.click();a.remove();
+ // Keep blob URL alive for Android PDF viewers that open asynchronously.
+}
+document.getElementById('offline-pdf-1').addEventListener('click',()=>openOfflinePdf(0));
+document.getElementById('offline-pdf-2').addEventListener('click',()=>openOfflinePdf(1));
 const overlay=document.getElementById('offline-reader-overlay');
 const frame=document.getElementById('offline-reader-frame');
 const open=document.getElementById('offline-textbook-link');
