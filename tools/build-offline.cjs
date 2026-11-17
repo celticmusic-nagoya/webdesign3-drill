@@ -21,7 +21,7 @@ const offlineUI=`<div id="offline-reader-overlay" hidden style="position:fixed;i
 <div style="display:flex;flex-wrap:wrap;gap:6px;padding:8px;background:#1e293b;color:white"><button id="offline-reader-back" type="button" style="padding:8px;background:#334155;color:white">← 戻る</button><button id="offline-pdf-1" type="button" style="padding:8px;background:#2563eb;color:white">第1回 PDFを開く</button><button id="offline-pdf-2" type="button" style="padding:8px;background:#2563eb;color:white">第2回 PDFを開く</button><span id="offline-pdf-help" role="status" aria-live="polite" style="font-size:12px;align-self:center;color:#cbd5e1">原資料をアプリ内で閲覧できます</span></div>
 <iframe id="offline-reader-frame" title="オフライン教科書" style="width:100%;flex:1;border:0;background:white"></iframe>
 <div id="offline-pdf-viewer" hidden style="display:none;flex:1;min-height:0;flex-direction:column;background:#334155;color:white">
-<div style="display:flex;align-items:center;justify-content:center;gap:10px;padding:7px;flex-wrap:wrap"><button id="offline-pdf-prev" type="button">前へ</button><span id="offline-pdf-page" role="status">PDF読み込み中</span><button id="offline-pdf-next" type="button">次へ</button><button id="offline-pdf-close" type="button">教科書に戻る</button></div>
+<div style="display:flex;align-items:center;justify-content:center;gap:10px;padding:7px;flex-wrap:wrap"><button id="offline-pdf-prev" type="button">前へ</button><span id="offline-pdf-page" role="status">PDF読み込み中</span><button id="offline-pdf-next" type="button">次へ</button><button id="offline-pdf-zoom-in" type="button">拡大 ＋</button><button id="offline-pdf-zoom-out" type="button">縮小 −</button><button id="offline-pdf-zoom-reset" type="button">画面幅</button><span id="offline-pdf-zoom-label" role="status">100%</span><button id="offline-pdf-close" type="button">教科書に戻る</button></div>
 <div id="offline-pdf-scroll" style="overflow:auto;flex:1;text-align:center;padding:12px"><canvas id="offline-pdf-canvas" style="max-width:100%;height:auto;background:white"></canvas></div>
 </div></div>
 <script>
@@ -122,7 +122,12 @@ const pdfCanvas=document.getElementById('offline-pdf-canvas');
 const pdfImage=document.createElement('img');
 pdfImage.id='offline-pdf-image';
 pdfImage.alt='原資料のPDFページ画像';
-pdfImage.style.cssText='display:block;max-width:100%;height:auto;margin:auto;background:white';
+pdfImage.style.cssText='display:block;width:100%;max-width:none;height:auto;margin:auto;background:white';
+let pdfZoom=1;
+function applyPdfZoom(){pdfImage.style.width=(pdfZoom*100)+'%';document.getElementById('offline-pdf-zoom-label').textContent=Math.round(pdfZoom*100)+'%';}
+document.getElementById('offline-pdf-zoom-in').addEventListener('click',()=>{pdfZoom=Math.min(3,Math.round((pdfZoom+.25)*100)/100);applyPdfZoom();});
+document.getElementById('offline-pdf-zoom-out').addEventListener('click',()=>{pdfZoom=Math.max(1,Math.round((pdfZoom-.25)*100)/100);applyPdfZoom();});
+document.getElementById('offline-pdf-zoom-reset').addEventListener('click',()=>{pdfZoom=1;applyPdfZoom();});
 pdfCanvas.replaceWith(pdfImage);
 function renderPdfPage(){
  const pages=embeddedPageImages[pdfBook]||[];
@@ -131,7 +136,7 @@ function renderPdfPage(){
  pdfLabel.textContent=pdfPage+' / '+pages.length;
 }
 function openOfflinePdf(i){
- pdfBook=i;pdfPage=1;
+ pdfBook=i;pdfPage=1;pdfZoom=1;applyPdfZoom();
  pdfView.hidden=false;pdfView.style.display='flex';pdfFrame.style.display='none';
  renderPdfPage();
 }
