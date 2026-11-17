@@ -52,7 +52,37 @@ async function attachTextbookFigures(){
  const status=doc.createElement('p');
  status.id='original-figure-status';
  status.style.cssText='font-size:.85rem;margin:8px 0 0';
- panel.append(heading,hint,canvas,status);
+ const zoomControls=doc.createElement('div');
+ zoomControls.style.cssText='display:flex;gap:8px;flex-wrap:wrap;margin:8px 0';
+ const zoomIn=doc.createElement('button');
+ zoomIn.id='original-figure-zoom-in';zoomIn.type='button';zoomIn.textContent='図表を拡大 ＋';
+ const zoomOut=doc.createElement('button');
+ zoomOut.id='original-figure-zoom-out';zoomOut.type='button';zoomOut.textContent='縮小 −';
+ const zoomReset=doc.createElement('button');
+ zoomReset.id='original-figure-zoom-reset';zoomReset.type='button';zoomReset.textContent='画面幅に戻す';
+ const zoomLabel=doc.createElement('span');
+ zoomLabel.id='original-figure-zoom-label';zoomLabel.style.cssText='align-self:center;font-size:.85rem';
+ zoomControls.append(zoomIn,zoomOut,zoomReset,zoomLabel);
+ const scrollArea=doc.createElement('div');
+ scrollArea.id='original-figure-scroll';
+ scrollArea.style.cssText='overflow:auto;max-width:100%;overscroll-behavior:contain';
+ scrollArea.append(canvas);
+ panel.append(heading,hint,zoomControls,scrollArea,status);
+ let zoom=1;
+ const applyZoom=()=>{
+  canvas.style.width=(zoom*100)+'%';
+  canvas.style.maxWidth='none';
+  zoomLabel.textContent=Math.round(zoom*100)+'%';
+ };
+ zoomIn.addEventListener('click',()=>{zoom=Math.min(3,Math.round((zoom+.25)*100)/100);applyZoom();});
+ zoomOut.addEventListener('click',()=>{zoom=Math.max(1,Math.round((zoom-.25)*100)/100);applyZoom();});
+ zoomReset.addEventListener('click',()=>{zoom=1;applyZoom();});
+ canvas.addEventListener('click',()=>{zoom=zoom===1?2:1;applyZoom();});
+ canvas.tabIndex=0;
+ canvas.setAttribute('role','button');
+ canvas.setAttribute('aria-label','図表をタップして拡大・縮小');
+ canvas.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();zoom=zoom===1?2:1;applyZoom();}});
+ applyZoom();
  pageText.insertAdjacentElement('afterend',panel);
  const getPage=()=>{
   const book=Number(doc.getElementById('book')?.value||0);
