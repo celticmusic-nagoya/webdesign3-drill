@@ -13,7 +13,7 @@ if(html.includes('cdn.tailwindcss.com')||html.includes('fonts.googleapis.com'))t
 // Embed the reader in the entrypoint and show it in a sandboxed same-origin iframe.
 const readerHtml=fs.readFileSync('textbook.html','utf8');
 if(!html.includes('href="./textbook.html"'))throw Error('Reader navigation link missing');
-html=html.replace('href="./textbook.html"','href="#offline-textbook" id="offline-textbook-link"');
+html=html.replace(/<a\\b([^>]*?)href="\\.\\/textbook\\.html"([^>]*)>/g,'<a$1href="#offline-textbook" id="offline-textbook-link"$2>');
 const embeddedReader=JSON.stringify(Buffer.from(readerHtml,'utf8').toString('base64'));
 const offlineUI=`<div id="offline-reader-overlay" hidden style="position:fixed;inset:0;z-index:99999;background:#0f172a;display:none;flex-direction:column">
 <button id="offline-reader-back" type="button" style="flex:0 0 auto;padding:12px;background:#1e293b;color:white;font-size:16px;text-align:left">← 問題演習に戻る</button>
