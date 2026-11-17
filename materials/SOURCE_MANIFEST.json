@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "status": "SOURCE_VERIFIED_NOT_PUBLISHED",
+  "source_files": [
+    {
+      "source": "テキスト1回目.pdf",
+      "expected_repository_path": "materials/lesson-01.pdf",
+      "pages": 13,
+      "sha256": "41f8fd82d320972dba930fbdc383de9ced5b7ae83326c9f6a0b8a22cd6db230f"
+    },
+    {
+      "source": "テキスト2回目.pdf",
+      "expected_repository_path": "materials/lesson-02.pdf",
+      "pages": 10,
+      "sha256": "291d6092166381e0372475861f7d6b7049c0151f0d973e972713d52ac7637f6b"
+    }
+  ],
+  "notes": [
+    "The two original PDF files are not included in this PR.",
+    "Do not publish source PDFs without verifying distribution permission.",
+    "Before enabling original PDF links, verify bytes against SHA-256 and page count.",
+    "Android browser and regression QA remain NOT_RUN."
+  ]
+}
