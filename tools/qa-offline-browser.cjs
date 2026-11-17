@@ -168,6 +168,28 @@ try{
   }
  });
  assert.equal(resetCheck.afterCancel,resetCheck.sentinel,'Cancelling reset must preserve progress');
+ // Exported backup must faithfully contain the current study progress.
+ const exportCheck=await page.evaluate(()=>{
+  const original=localStorage.getItem('web3_master_data');
+  const backup={totalAnswered:34,correctCount:28,examHighScore:21,bookmarks:[1],masteredCards:[2],wrongQuestionIds:[3],categoryStats:{},examHistory:[],daily:{date:'',answered:4}};
+  const oldClick=HTMLAnchorElement.prototype.click;
+  let download=null;
+  try{
+   localStorage.setItem('web3_master_data',JSON.stringify(backup));
+   window.loadUserData();
+   HTMLAnchorElement.prototype.click=function(){download={name:this.download,href:this.href};};
+   window.exportUserData();
+   return {download,expected:backup};
+  }finally{
+   HTMLAnchorElement.prototype.click=oldClick;
+   if(original===null)localStorage.removeItem('web3_master_data');
+   else localStorage.setItem('web3_master_data',original);
+   window.loadUserData();
+  }
+ });
+ assert.equal(exportCheck.download.name,'web3_study_backup.json','Backup filename must be descriptive');
+ assert.ok(exportCheck.download.href.startsWith('data:text/json'),'Backup export should be offline-capable');
+ assert.deepEqual(JSON.parse(decodeURIComponent(exportCheck.download.href.split(',').slice(1).join(','))),exportCheck.expected,'Export must preserve progress fields');
  assert.deepEqual(errors,[]);
  console.log('PASS: standalone file HTML CSS and embedded textbook pagination');
  await context.close();
