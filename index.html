@@ -1874,8 +1874,37 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
-                    state.userData = JSON.parse(e.target.result);
-                    saveUserData();
+                    const imported = JSON.parse(e.target.result);
+                    const object = value => value !== null && typeof value === 'object' && !Array.isArray(value);
+                    const count = value => Number.isSafeInteger(value) && value >= 0;
+                    if (!object(imported) ||
+                        !count(imported.totalAnswered) ||
+                        !count(imported.correctCount) ||
+                        imported.correctCount > imported.totalAnswered ||
+                        (imported.examHighScore !== null && imported.examHighScore !== undefined && !count(imported.examHighScore)) ||
+                        !Array.isArray(imported.bookmarks) ||
+                        !Array.isArray(imported.masteredCards) ||
+                        !Array.isArray(imported.wrongQuestionIds) ||
+                        !object(imported.categoryStats) ||
+                        !Array.isArray(imported.examHistory) ||
+                        (imported.daily !== undefined && (!object(imported.daily) || typeof imported.daily.date !== 'string' || !count(imported.daily.answered)))) {
+                        throw new Error('Invalid study backup');
+                    }
+                    const restored = {
+                        totalAnswered: imported.totalAnswered,
+                        correctCount: imported.correctCount,
+                        examHighScore: imported.examHighScore ?? null,
+                        bookmarks: imported.bookmarks,
+                        masteredCards: imported.masteredCards,
+                        wrongQuestionIds: imported.wrongQuestionIds,
+                        categoryStats: imported.categoryStats,
+                        examHistory: imported.examHistory,
+                        daily: imported.daily || {date:'',answered:0}
+                    };
+                    localStorage.setItem('web3_master_data', JSON.stringify(restored));
+                    state.userData = restored;
+                    updateDashboardStats();
+                    updateWeakUI();
                     alert('データを復元しました。');
                 } catch(err) {
                     alert('ファイルの読み込みに失敗しました。');
