@@ -67,6 +67,19 @@ try{
  await frame.locator('#search-results [data-result]').first().waitFor({state:'visible'});
  await frame.locator('#search-results [data-result]').first().click();
  assert.match(await frame.locator('#page-title').innerText(),/クリエイティブ・コモンズ/,'Search should also match textbook page headings');
+ // Search controls and results must fit the narrow Android viewport.
+ const mobileSearchLayout=await frame.locator('body').evaluate(body=>{
+  const doc=body.ownerDocument,view=doc.documentElement.clientWidth;
+  const ids=['global-search','search-results'];
+  return {view,bodyWidth:body.scrollWidth,controls:ids.map(id=>{
+   const el=doc.getElementById(id),r=el.getBoundingClientRect();
+   return {id,left:r.left,right:r.right,width:r.width};
+  })};
+ });
+ assert.ok(mobileSearchLayout.bodyWidth<=mobileSearchLayout.view+2,'Textbook search should not cause horizontal page overflow');
+ for(const control of mobileSearchLayout.controls){
+  assert.ok(control.left>=-2&&control.right<=mobileSearchLayout.view+2,'Search element '+control.id+' must fit mobile viewport');
+ }
  await frame.locator('#global-search').fill('');
  await frame.locator('#book').selectOption('1');
  await frame.locator('#chapters button[data-page="5"]').click();
