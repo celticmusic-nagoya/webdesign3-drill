@@ -103,17 +103,17 @@ try{
  await page.locator('#offline-pdf-2').click();
  assert.equal(await page.locator('#offline-pdf-zoom-label').innerText(),'100%','Changing source PDFs resets zoom');
 
- await page.waitForFunction(()=>document.querySelector('#offline-pdf-page')?.textContent==='1 / 10',null,{timeout:30000});
+ await page.waitForFunction(()=>document.querySelector('#offline-pdf-page')?.textContent==='8 / 10',null,{timeout:30000});
  const secondBookImage=await page.locator('#offline-pdf-image').evaluate(el=>({width:el.naturalWidth,height:el.naturalHeight,source:el.currentSrc}));
  assert.ok(secondBookImage.width>100&&secondBookImage.height>100,'Second source PDF page image should load');
  assert.ok(secondBookImage.source.startsWith('data:image/png;base64,'),'Second source PDF must preserve Japanese in raster image');
  await page.locator('#offline-pdf-next').click();
- assert.equal(await page.locator('#offline-pdf-page').innerText(),'2 / 10');
+ assert.equal(await page.locator('#offline-pdf-page').innerText(),'9 / 10');
  await page.locator('#offline-pdf-close').click();
  assert.equal(await page.locator('#offline-pdf-viewer').isVisible(),false);
- assert.match(await frame.locator('#page-label').innerText(),/2 \/ 10/,'Returning from source should open matching textbook page');
+ assert.match(await frame.locator('#page-label').innerText(),/9 \/ 10/,'Returning from source should open matching textbook page');
  await page.locator('#offline-pdf-2').click();
- assert.equal(await page.locator('#offline-pdf-page').innerText(),'2 / 10','Opening source should preserve current textbook page');
+ assert.equal(await page.locator('#offline-pdf-page').innerText(),'9 / 10','Opening source should preserve current textbook page');
  await page.locator('#offline-pdf-close').click();
  await page.locator('#offline-reader-back').click();
  assert.equal(await overlay.isVisible(),false);
