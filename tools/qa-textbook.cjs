@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 'use strict';
-const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict'),crypto=require('node:crypto');
 const read=p=>fs.readFileSync(p,'utf8');
 const app=read('index.html'),reader=read('textbook.html');
 const scripts=html=>[...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].map(m=>m[1]).filter(Boolean);
@@ -20,8 +20,13 @@ assert.ok(reader.includes('function searchAll()'),'cross-book search missing');
 assert.ok(reader.includes('function updatePdfLink()'),'PDF fallback missing');
 assert.ok(reader.includes('web3_textbook_position'),'resume persistence missing');
 const manifest=JSON.parse(read('materials/SOURCE_MANIFEST.json'));
-assert.equal(manifest.status,'SOURCE_VERIFIED_NOT_PUBLISHED');
+assert.equal(manifest.status,'SOURCE_PDFS_INTEGRATED_IN_DRAFT_PR');
 assert.deepEqual(manifest.source_files.map(x=>x.pages),[13,10]);
-for(const source of manifest.source_files)assert.match(source.sha256,/^[a-f0-9]{64}$/);
-console.log('PASS: inline JS syntax, 23 textbook pages, dashboard link, navigation/search/persistence, source manifest');
-console.log('NOT_RUN: real browser, Android, PDF rendering, source rights review');
+for(const source of manifest.source_files){
+  assert.match(source.sha256,/^[a-f0-9]{64}$/);
+  const data=fs.readFileSync(source.expected_repository_path);
+  assert.equal(data.subarray(0,5).toString('ascii'),'%PDF-','PDF header invalid: '+source.expected_repository_path);
+  assert.equal(crypto.createHash('sha256').update(data).digest('hex'),source.sha256,'PDF checksum mismatch: '+source.expected_repository_path);
+}
+console.log('PASS: inline JS syntax, 23 textbook pages, dashboard link, navigation/search/persistence, original PDF SHA-256 (2/2)');
+console.log('NOT_RUN: Android device, visual PDF rendering, independent source rights review');
