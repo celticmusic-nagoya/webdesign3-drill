@@ -151,6 +151,23 @@ try{
  assert.equal(backupCheck.afterValid.correctCount,17,'Valid backup must restore correct answer count');
  assert.ok(backupCheck.alerts.some(x=>x.includes('失敗')),'Invalid backup should explain failure');
  assert.ok(backupCheck.alerts.some(x=>x.includes('復元しました')),'Valid backup should confirm restoration');
+ // Cancelling the destructive reset must retain all saved progress.
+ const resetCheck=await page.evaluate(()=>{
+  const original=localStorage.getItem('web3_master_data');
+  const sentinel=JSON.stringify({totalAnswered:27,correctCount:20});
+  const oldConfirm=window.confirm;
+  try{
+   localStorage.setItem('web3_master_data',sentinel);
+   window.confirm=()=>false;
+   window.resetUserData();
+   return {afterCancel:localStorage.getItem('web3_master_data'),sentinel};
+  }finally{
+   window.confirm=oldConfirm;
+   if(original===null)localStorage.removeItem('web3_master_data');
+   else localStorage.setItem('web3_master_data',original);
+  }
+ });
+ assert.equal(resetCheck.afterCancel,resetCheck.sentinel,'Cancelling reset must preserve progress');
  assert.deepEqual(errors,[]);
  console.log('PASS: standalone file HTML CSS and embedded textbook pagination');
  await context.close();
