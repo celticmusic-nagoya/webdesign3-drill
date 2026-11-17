@@ -65,6 +65,11 @@ try{
  const canvas=await page.locator('#offline-pdf-image').evaluate(el=>({width:el.naturalWidth,height:el.naturalHeight,source:el.currentSrc}));
  assert.ok(canvas.width>100&&canvas.height>100,'PDF page must render to image');
  assert.ok(canvas.source.startsWith('data:image/png;base64,'),'Full PDF viewer must use Japanese-safe page images');
+ await page.locator('#offline-pdf-zoom-in').click();
+ assert.equal(await page.locator('#offline-pdf-zoom-label').innerText(),'125%');
+ assert.equal(await page.locator('#offline-pdf-image').evaluate(el=>el.style.width),'125%');
+ await page.locator('#offline-pdf-zoom-reset').click();
+ assert.equal(await page.locator('#offline-pdf-zoom-label').innerText(),'100%');
  await page.locator('#offline-pdf-next').click();
  await page.waitForFunction(()=>document.querySelector('#offline-pdf-page')?.textContent?.startsWith('2 /'),null,{timeout:30000});
  await page.locator('#offline-pdf-2').click();
