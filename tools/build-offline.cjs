@@ -30,6 +30,66 @@ const offlineUI=`<div id="offline-reader-overlay" hidden style="position:fixed;i
 const bytes=Uint8Array.from(atob(${embeddedReader}),c=>c.charCodeAt(0));
 const readerSource=new TextDecoder('utf-8').decode(bytes);
 const embeddedPdfs=${pdfData};
+const inlinePdfDocs=[null,null];
+let figureRenderToken=0;
+async function attachTextbookFigures(){
+ const doc=frame.contentDocument;
+ if(!doc||doc.getElementById('original-figure-panel'))return;
+ const pageText=doc.getElementById('page-text');
+ if(!pageText||!window.pdfjsLib)return;
+ const panel=doc.createElement('section');
+ panel.id='original-figure-panel';
+ panel.style.cssText='margin:24px 0;padding:14px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;color:#1e293b';
+ const heading=doc.createElement('h3');
+ heading.textContent='原資料の図表・レイアウト';
+ heading.style.cssText='margin:0 0 8px;font-size:1.05rem';
+ const hint=doc.createElement('p');
+ hint.style.cssText='margin:0 0 12px;font-size:.86rem;line-height:1.6';
+ hint.textContent='本文と同じ原資料ページを表示します。図表の位置・内容は原本のままです。';
+ const canvas=doc.createElement('canvas');
+ canvas.id='original-figure-canvas';
+ canvas.style.cssText='display:block;width:100%;height:auto;background:white;border-radius:6px';
+ const status=doc.createElement('p');
+ status.id='original-figure-status';
+ status.style.cssText='font-size:.85rem;margin:8px 0 0';
+ panel.append(heading,hint,canvas,status);
+ pageText.insertAdjacentElement('afterend',panel);
+ const getPage=()=>{
+  const book=Number(doc.getElementById('book')?.value||0);
+  const match=(doc.getElementById('page-label')?.textContent||'').match(/(\\d+)\\s*\\/\\s*\\d+/);
+  return {book,page:match?Number(match[1]):1};
+ };
+ async function render(){
+  const token=++figureRenderToken;
+  const {book,page}=getPage();
+  if(book<0||book>1)return;
+  status.textContent='原資料の図表を読み込み中…';
+  try{
+   if(!inlinePdfDocs[book]){
+    const binary=atob(embeddedPdfs[book]);
+    inlinePdfDocs[book]=await pdfjsLib.getDocument({data:Uint8Array.from(binary,c=>c.charCodeAt(0))}).promise;
+   }
+   const pdf=inlinePdfDocs[book];
+   if(token!==figureRenderToken)return;
+   if(page<1||page>pdf.numPages)throw Error('原資料ページの対応がありません');
+   const sourcePage=await pdf.getPage(page);
+   if(token!==figureRenderToken)return;
+   const base=sourcePage.getViewport({scale:1});
+   const width=Math.max(250,Math.min(900,panel.clientWidth-28));
+   const ratio=Math.min(1.8,window.devicePixelRatio||1);
+   const viewport=sourcePage.getViewport({scale:width/base.width*ratio});
+   canvas.width=Math.ceil(viewport.width);canvas.height=Math.ceil(viewport.height);
+   const ctx=canvas.getContext('2d');
+   await sourcePage.render({canvasContext:ctx,viewport}).promise;
+   if(token===figureRenderToken)status.textContent='原資料 第'+(book+1)+'回・'+page+'ページ（図表を含む全ページ）';
+  }catch(err){if(token===figureRenderToken)status.textContent='図表を表示できません: '+err.message;}
+ }
+ const observer=new MutationObserver(()=>{render();});
+ observer.observe(doc.getElementById('page-label'),{childList:true,characterData:true,subtree:true});
+ doc.getElementById('book')?.addEventListener('change',()=>setTimeout(render,0));
+ render();
+}
+
 let pdfDocument=null,pdfPage=1,pdfBusy=false;
 const pdfView=document.getElementById('offline-pdf-viewer');
 const pdfFrame=document.getElementById('offline-reader-frame');
@@ -72,6 +132,7 @@ const frame=document.getElementById('offline-reader-frame');
 const open=document.getElementById('offline-textbook-link');
 const back=document.getElementById('offline-reader-back');
 if(!open||!overlay||!frame||!back)return;
+frame.addEventListener('load',()=>attachTextbookFigures().catch(e=>console.warn('Original figures unavailable',e)));
 open.addEventListener('click',function(e){e.preventDefault();frame.srcdoc=readerSource;overlay.hidden=false;overlay.style.display='flex';document.body.style.overflow='hidden'});
 back.addEventListener('click',function(){pdfView.style.display='none';pdfView.hidden=true;pdfFrame.style.display='block';overlay.style.display='none';overlay.hidden=true;frame.removeAttribute('srcdoc');document.body.style.overflow=''});
 })();
