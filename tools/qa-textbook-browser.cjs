@@ -2,6 +2,7 @@
 'use strict';
 const { chromium } = require('playwright');
 const { spawn } = require('node:child_process');
+const http=require('node:http');
 const assert = require('node:assert/strict');
 const port = 18937;
 const server = spawn('python3',['-m','http.server',String(port),'--bind','127.0.0.1'],{stdio:'ignore'});
@@ -9,7 +10,7 @@ const base = 'http://127.0.0.1:'+port;
 const sleep = ms => new Promise(resolve=>setTimeout(resolve,ms));
 async function waitServer(){
   for(let i=0;i<40;i++){
-    try { const r=await fetch(base+'/textbook.html'); if(r.ok)return; } catch(e){}
+    try { const ok=await new Promise(resolve=>{const req=http.get(base+'/textbook.html',res=>{res.resume();resolve(res.statusCode===200)});req.on('error',()=>resolve(false));req.setTimeout(1000,()=>{req.destroy();resolve(false)})});if(ok)return; } catch(e){}
     await sleep(250);
   }
   throw Error('HTTP test server unavailable');
