@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 'use strict';
-const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
+const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto'),{execFileSync}=require('node:child_process');
 const out=path.resolve('dist/webdesign3-offline');
 fs.mkdirSync(path.join(out,'materials'),{recursive:true});
 const source=fs.readFileSync('index.html','utf8');
@@ -30,6 +30,7 @@ const offlineUI=`<div id="offline-reader-overlay" hidden style="position:fixed;i
 const bytes=Uint8Array.from(atob(${embeddedReader}),c=>c.charCodeAt(0));
 const readerSource=new TextDecoder('utf-8').decode(bytes);
 const embeddedPdfs=${pdfData};
+const embeddedPageImages=__EMBEDDED_PDF_PAGE_IMAGES__;
 const inlinePdfDocs=[null,null];
 let figureRenderToken=0;
 async function attachTextbookFigures(){
@@ -46,7 +47,7 @@ async function attachTextbookFigures(){
  const hint=doc.createElement('p');
  hint.style.cssText='margin:0 0 12px;font-size:.86rem;line-height:1.6';
  hint.textContent='本文と同じ原資料ページを表示します。図表の位置・内容は原本のままです。';
- const canvas=doc.createElement('canvas');
+ const canvas=doc.createElement('img');
  canvas.id='original-figure-canvas';
  canvas.style.cssText='display:block;width:100%;height:auto;background:white;border-radius:6px';
  const status=doc.createElement('p');
@@ -78,6 +79,7 @@ async function attachTextbookFigures(){
  zoomOut.addEventListener('click',()=>{zoom=Math.max(1,Math.round((zoom-.25)*100)/100);applyZoom();});
  zoomReset.addEventListener('click',()=>{zoom=1;applyZoom();});
  canvas.addEventListener('click',()=>{zoom=zoom===1?2:1;applyZoom();});
+ canvas.alt='原資料の図表（日本語文字を含むページ画像）';
  canvas.tabIndex=0;
  canvas.setAttribute('role','button');
  canvas.setAttribute('aria-label','図表をタップして拡大・縮小');
@@ -95,23 +97,15 @@ async function attachTextbookFigures(){
   if(book<0||book>1)return;
   status.textContent='原資料の図表を読み込み中…';
   try{
-   if(!inlinePdfDocs[book]){
-    const binary=atob(embeddedPdfs[book]);
-    inlinePdfDocs[book]=await pdfjsLib.getDocument({data:Uint8Array.from(binary,c=>c.charCodeAt(0))}).promise;
-   }
-   const pdf=inlinePdfDocs[book];
-   if(token!==figureRenderToken)return;
-   if(page<1||page>pdf.numPages)throw Error('原資料ページの対応がありません');
-   const sourcePage=await pdf.getPage(page);
-   if(token!==figureRenderToken)return;
-   const base=sourcePage.getViewport({scale:1});
-   const width=Math.max(250,Math.min(900,panel.clientWidth-28));
-   const ratio=Math.min(1.8,window.devicePixelRatio||1);
-   const viewport=sourcePage.getViewport({scale:width/base.width*ratio});
-   canvas.width=Math.ceil(viewport.width);canvas.height=Math.ceil(viewport.height);
-   const ctx=canvas.getContext('2d');
-   await sourcePage.render({canvasContext:ctx,viewport}).promise;
-   if(token===figureRenderToken)status.textContent='原資料 第'+(book+1)+'回・'+page+'ページ（図表を含む全ページ）';
+   const image=embeddedPageImages[book]?.[page-1];
+   if(!image)throw Error('原資料のページ画像がありません');
+   await new Promise((resolve,reject)=>{
+    const loaded=new Image();
+    loaded.onload=()=>{if(token===figureRenderToken){canvas.src=image;}resolve();};
+    loaded.onerror=()=>reject(new Error('ページ画像の読み込みに失敗'));
+    loaded.src=image;
+   });
+   if(token===figureRenderToken)status.textContent='原資料 第'+(book+1)+'回・'+page+'ページ（日本語文字を画像として保持）';
   }catch(err){if(token===figureRenderToken)status.textContent='図表を表示できません: '+err.message;}
  }
  const observer=new MutationObserver(()=>{render();});
@@ -188,6 +182,23 @@ function inlineCompiledStyles(){
   const css=fs.readFileSync(cssPath,'utf8');
   if(!page.includes('<link rel="stylesheet" href="./offline.css">'))throw Error('CSS link missing');
   page=page.replace('<link rel="stylesheet" href="./offline.css">','<style id="offline-tailwind">'+css+'</style>');
+  const rasterized=['materials/lesson-01.pdf','materials/lesson-02.pdf'].map(file=>{
+    const pdf=path.resolve(file);
+    const info=execFileSync('pdfinfo',[pdf],{encoding:'utf8'});
+    const count=Number(info.match(/^Pages:\\s*(\\d+)/m)?.[1]);
+    if(!Number.isInteger(count)||count<1||count>100)throw Error('Invalid PDF page count: '+file);
+    return Array.from({length:count},(_,i)=>{
+      const output=path.join(out,'pdf-page-'+path.basename(file,'.pdf')+'-'+(i+1));
+      execFileSync('pdftoppm',['-f',String(i+1),'-l',String(i+1),'-scale-to','1200','-png','-singlefile',pdf,output],{timeout:45000});
+      const png=fs.readFileSync(output+'.png');
+      fs.unlinkSync(output+'.png');
+      if(png.length<1000)throw Error('PDF rasterization failed: '+file+' page '+(i+1));
+      return 'data:image/png;base64,'+png.toString('base64');
+    });
+  });
+  page=page.replace('__EMBEDDED_PDF_PAGE_IMAGES__',JSON.stringify(rasterized));
+  if(page.includes('__EMBEDDED_PDF_PAGE_IMAGES__'))throw Error('PDF raster images not embedded');
+  console.log('PASS: PDF pages rasterized with embedded fonts:',rasterized.map(x=>x.length));
   const pdfjsPath=require.resolve('pdfjs-dist/build/pdf.min.js');
   const workerPath=require.resolve('pdfjs-dist/build/pdf.worker.min.js');
   const pdfjs=fs.readFileSync(pdfjsPath,'utf8');
