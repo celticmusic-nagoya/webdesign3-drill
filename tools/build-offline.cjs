@@ -68,7 +68,22 @@ async function attachTextbookFigures(){
  scrollArea.id='original-figure-scroll';
  scrollArea.style.cssText='overflow:auto;max-width:100%;overscroll-behavior:contain';
  scrollArea.append(canvas);
- panel.append(heading,hint,zoomControls,scrollArea,status);
+ const focusPanel=doc.createElement('section');
+ focusPanel.id='original-figure-focus-panel';
+ focusPanel.hidden=true;
+ focusPanel.style.cssText='margin:12px 0;padding:12px;background:#fff;border:1px solid #cbd5e1;border-radius:8px';
+ const focusHeading=doc.createElement('h4');
+ focusHeading.textContent='重要図解を拡大して確認';
+ focusHeading.style.cssText='margin:0 0 6px;font-size:1rem';
+ const focusHint=doc.createElement('p');
+ focusHint.textContent='原資料の一部を拡大表示しています。図全体は下の原資料ページで確認できます。';
+ focusHint.style.cssText='font-size:.82rem;line-height:1.6;margin:0 0 8px';
+ const focusImage=doc.createElement('img');
+ focusImage.id='original-figure-focus-image';
+ focusImage.alt='原資料の重要図解（拡大表示）';
+ focusImage.style.cssText='display:block;width:100%;height:auto';
+ focusPanel.append(focusHeading,focusHint,focusImage);
+ panel.append(heading,hint,focusPanel,zoomControls,scrollArea,status);
  let zoom=1;
  const applyZoom=()=>{
   canvas.style.width=(zoom*100)+'%';
@@ -105,7 +120,25 @@ async function attachTextbookFigures(){
     loaded.onerror=()=>reject(new Error('ページ画像の読み込みに失敗'));
     loaded.src=image;
    });
-   if(token===figureRenderToken)status.textContent='原資料 第'+(book+1)+'回・'+page+'ページ（日本語文字を画像として保持）';
+   if(token===figureRenderToken){
+    focusPanel.hidden=true;
+    focusImage.removeAttribute('src');
+    const region=book===1&&page===6?{x:.055,y:.158,w:.88,h:.81}:book===1&&page===7?{x:.058,y:.038,w:.88,h:.905}:null;
+    if(region){
+     const img=new Image();
+     img.onload=()=>{
+      if(token!==figureRenderToken)return;
+      const crop=doc.createElement('canvas');
+      crop.width=Math.round(img.naturalWidth*region.w);
+      crop.height=Math.round(img.naturalHeight*region.h);
+      crop.getContext('2d').drawImage(img,img.naturalWidth*region.x,img.naturalHeight*region.y,crop.width,crop.height,0,0,crop.width,crop.height);
+      focusImage.src=crop.toDataURL('image/png');
+      focusPanel.hidden=false;
+     };
+     img.src=image;
+    }
+    status.textContent='原資料 第'+(book+1)+'回・'+page+'ページ（日本語文字を画像として保持）';
+   }
   }catch(err){if(token===figureRenderToken)status.textContent='図表を表示できません: '+err.message;}
  }
  const observer=new MutationObserver(()=>{render();});
