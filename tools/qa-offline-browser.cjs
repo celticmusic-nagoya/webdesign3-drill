@@ -171,7 +171,7 @@ try{
  // Exported backup must faithfully contain the current study progress.
  const exportCheck=await page.evaluate(()=>{
   const original=localStorage.getItem('web3_master_data');
-  const backup={totalAnswered:34,correctCount:28,examHighScore:21,bookmarks:[1],masteredCards:[2],wrongQuestionIds:[3],categoryStats:{},examHistory:[],daily:{date:'',answered:4}};
+  const backup={totalAnswered:34,correctCount:28,examHighScore:21,bookmarks:[1],masteredCards:[2],wrongQuestionIds:[],categoryStats:{},examHistory:[],daily:{date:'',answered:4}};
   const oldClick=HTMLAnchorElement.prototype.click;
   let download=null;
   try{
