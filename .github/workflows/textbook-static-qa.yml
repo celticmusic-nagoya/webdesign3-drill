@@ -31,6 +31,7 @@ jobs:
           npm install --no-save --no-package-lock tailwindcss@3.4.17
           ./node_modules/.bin/tailwindcss -i /tmp/offline-input.css -o dist/webdesign3-offline/offline.css --content ./index.html --minify
           test -s dist/webdesign3-offline/offline.css
+          node tools/build-offline.cjs --inline-css
       - name: Upload offline package
         uses: actions/upload-artifact@v4
         with:
