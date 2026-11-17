@@ -72,6 +72,11 @@ try{
  assert.equal(await page.locator('#offline-pdf-zoom-label').innerText(),'100%');
  for(let i=0;i<12;i++)await page.locator('#offline-pdf-zoom-in').click();
  assert.equal(await page.locator('#offline-pdf-zoom-label').innerText(),'300%','PDF zoom must cap at 300%');
+ const zoomedLayout=await page.locator('#offline-pdf-scroll').evaluate(el=>({scrollWidth:el.scrollWidth,clientWidth:el.clientWidth,scrollHeight:el.scrollHeight,clientHeight:el.clientHeight}));
+ assert.ok(zoomedLayout.scrollWidth>zoomedLayout.clientWidth,'300% PDF must allow horizontal scrolling on mobile');
+ await page.locator('#offline-pdf-scroll').evaluate(el=>{el.scrollLeft=el.scrollWidth;});
+ assert.ok(await page.locator('#offline-pdf-scroll').evaluate(el=>el.scrollLeft)>0,'PDF horizontal scroll should be operable');
+
  await page.locator('#offline-pdf-zoom-in').click();
  assert.equal(await page.locator('#offline-pdf-zoom-label').innerText(),'300%');
  await page.locator('#offline-pdf-zoom-out').click();
