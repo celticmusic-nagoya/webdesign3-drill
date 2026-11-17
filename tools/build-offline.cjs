@@ -14,13 +14,14 @@ if(html.includes('cdn.tailwindcss.com')||html.includes('fonts.googleapis.com'))t
 const readerHtml=fs.readFileSync('textbook.html','utf8');
 if(!html.includes('href="./textbook.html"'))throw Error('Reader navigation link missing');
 html=html.replace('href="./textbook.html"','href="#offline-textbook" id="offline-textbook-link"');
-const embeddedReader=JSON.stringify(readerHtml).replace(/<\\/script/gi,'<\\\\/script');
+const embeddedReader=JSON.stringify(Buffer.from(readerHtml,'utf8').toString('base64'));
 const offlineUI=`<div id="offline-reader-overlay" hidden style="position:fixed;inset:0;z-index:99999;background:#0f172a;display:none;flex-direction:column">
 <button id="offline-reader-back" type="button" style="flex:0 0 auto;padding:12px;background:#1e293b;color:white;font-size:16px;text-align:left">← 問題演習に戻る</button>
 <iframe id="offline-reader-frame" title="オフライン教科書" style="width:100%;flex:1;border:0;background:white"></iframe></div>
 <script>
 (function(){
-const readerSource=${embeddedReader};
+const bytes=Uint8Array.from(atob(${embeddedReader}),c=>c.charCodeAt(0));
+const readerSource=new TextDecoder('utf-8').decode(bytes);
 const overlay=document.getElementById('offline-reader-overlay');
 const frame=document.getElementById('offline-reader-frame');
 const open=document.getElementById('offline-textbook-link');
