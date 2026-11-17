@@ -48,7 +48,9 @@ jobs:
           retention-days: 14
           if-no-files-found: error
       - name: Inventory source PDF diagram candidates
-        run: node tools/inventory-pdf-figures.cjs
+        run: |
+          npm install --no-save --no-package-lock pdfjs-dist@3.11.174
+          node tools/inventory-pdf-figures.cjs
       - name: Upload figure inventory for independent art review
         uses: actions/upload-artifact@v4
         with:
