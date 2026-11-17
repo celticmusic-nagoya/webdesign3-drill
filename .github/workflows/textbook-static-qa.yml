@@ -40,6 +40,33 @@ jobs:
           node tools/build-offline.cjs --inline-css
       - name: Build installable PWA package
         run: node tools/build-pwa.cjs
+      - name: Verify distributable package integrity
+        run: |
+          node - <<'NODE'
+          const fs=require('node:fs'),assert=require('node:assert/strict'),crypto=require('node:crypto');
+          const base='dist/webdesign3-offline/',pwa='dist/webdesign3-pwa/';
+          const single=fs.readFileSync(base+'index.html','utf8');
+          assert.ok(single.includes('id="offline-tailwind"'),'Standalone CSS not embedded');
+          assert.ok(single.includes('id="offline-reader-overlay"'),'Standalone textbook missing');
+          assert.ok(!single.includes('__EMBEDDED_PDF_PAGE_IMAGES__'),'Source page images not embedded');
+          assert.ok(!single.includes('cdn.tailwindcss.com'),'Standalone still requires Tailwind CDN');
+          const pwaHtml=fs.readFileSync(pwa+'index.html','utf8');
+          assert.ok(pwaHtml.includes('manifest.webmanifest'),'PWA manifest link missing');
+          const manifest=JSON.parse(fs.readFileSync(pwa+'manifest.webmanifest','utf8'));
+          assert.equal(manifest.display,'standalone');
+          const sw=fs.readFileSync(pwa+'sw.js','utf8');
+          for(const asset of ['./index.html','./textbook.html','./materials/lesson-01.pdf','./materials/lesson-02.pdf','./manifest.webmanifest']){
+            assert.ok(sw.includes(asset),'PWA precache missing '+asset);
+          }
+          const sources=JSON.parse(fs.readFileSync('materials/SOURCE_MANIFEST.json','utf8')).source_files;
+          for(const source of sources){
+            for(const dir of [base,pwa]){
+              const bytes=fs.readFileSync(dir+source.expected_repository_path);
+              assert.equal(crypto.createHash('sha256').update(bytes).digest('hex'),source.sha256,'PDF mismatch in '+dir);
+            }
+          }
+          console.log('PASS: standalone HTML, PWA precache manifest, original PDF integrity in both packages');
+          NODE
       - name: Upload installable PWA package
         uses: actions/upload-artifact@v4
         with:
