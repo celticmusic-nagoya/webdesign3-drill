@@ -3,13 +3,13 @@
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const read=p=>fs.readFileSync(p,'utf8');
 const app=read('index.html'),reader=read('textbook.html');
-const scripts=html=>[...html.matchAll(/<script(?:\\s[^>]*)?>([\\s\\S]*?)<\\/script>/g)].map(m=>m[1]).filter(Boolean);
+const scripts=html=>[...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].map(m=>m[1]).filter(Boolean);
 for(const [name,html] of [['index.html',app],['textbook.html',reader]]){
   const js=scripts(html);
   assert.ok(js.length>0,name+' missing inline JS');
   js.forEach((src,i)=>new vm.Script(src,{filename:name+':inline-'+i}));
 }
-const m=reader.match(/const BOOKS=(\\[[\\s\\S]*?\\]);\\s*const el=/);
+const m=reader.match(/const BOOKS=(\[[\s\S]*?\]);\s*const el=/);
 assert.ok(m,'reader data missing');
 const books=JSON.parse(m[1]);
 assert.deepEqual(books.map(b=>b.pages.length),[13,10]);
