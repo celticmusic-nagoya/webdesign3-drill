@@ -1,28 +1,69 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "source": "materials/lesson-02.pdf",
-  "review_method": "Rendered contact sheet visually inspected; page-level descriptions only, no crop coordinates approved",
+  "source_sha256": "291d6092166381e0372475861f7d6b7049c0151f0d973e972713d52ac7637f6b",
+  "review_method": "Rendered PDF pages 6 and 7 using Poppler pdftoppm; visually inspected page images at 1100px maximum dimension on 2026-11-17.",
+  "coordinate_system": "normalized page fractions x,y,width,height; crop proposals are not production-approved",
   "pages": [
     {
       "page": 6,
-      "title": "知覚可能の達成基準",
-      "visual_content": "WCAG達成基準の比較図、画像の代替テキスト、時間依存メディアなどの事例",
-      "placement": "本文の該当ページ直下",
+      "title": "STEP5 達成基準を詳しく見てみよう／① 知覚可能の達成基準",
+      "verified_examples": [
+        "1.1.1 非テキストコンテンツ：画像の代替テキスト",
+        "1.2.2 キャプション（収録済み）",
+        "1.3.1 情報及び関係性：見出しのHTML構造",
+        "1.4.1 色の使用",
+        "1.4.3 コントラスト（最低限）"
+      ],
+      "placement": "本文の第2回6ページに対応",
       "crop": "full_page",
-      "review": "VISUALLY_REVIEWED"
+      "review": "VISUALLY_REVIEWED",
+      "proposed_regions": [
+        {
+          "id": "lesson02-p06-perceivable",
+          "description": "知覚可能の5つの改善前後比較と下部の要点まとめ",
+          "x": 0.055,
+          "y": 0.158,
+          "width": 0.88,
+          "height": 0.81,
+          "status": "PROPOSED_NOT_APPROVED"
+        }
+      ]
     },
     {
       "page": 7,
-      "title": "操作可能・理解可能・堅ろうの達成基準",
-      "visual_content": "達成基準番号、NG例と改善例を並べた一覧図表",
-      "placement": "本文の該当ページ直下",
+      "title": "② 操作可能・理解可能・堅ろうの達成基準",
+      "verified_examples": [
+        "2.1.1 キーボード",
+        "2.1.2 キーボードトラップなし",
+        "2.1.4 文字キーのショートカット",
+        "2.2.1 タイミング調整可能",
+        "2.2.2 一時停止・停止及び非表示",
+        "2.3.1 3回のせん（閃）光又はしきい値以下",
+        "2.4.1 ブロックスキップ",
+        "2.4.2 ページタイトル",
+        "2.4.3 フォーカス順序",
+        "2.4.4 リンクの目的（コンテキスト内）"
+      ],
+      "placement": "本文の第2回7ページに対応",
       "crop": "full_page",
-      "review": "VISUALLY_REVIEWED"
+      "review": "VISUALLY_REVIEWED",
+      "proposed_regions": [
+        {
+          "id": "lesson02-p07-operable",
+          "description": "操作可能を中心とした10項目の改善前後比較",
+          "x": 0.06,
+          "y": 0.09,
+          "width": 0.85,
+          "height": 0.84,
+          "status": "PROPOSED_NOT_APPROVED"
+        }
+      ]
     }
   ],
   "limitations": [
-    "ページ全体の図解として確認。図表の細分化・個別切り抜きは未承認",
-    "小さい注釈の読みやすさはAndroid実機で未検証",
-    "原資料と本文の意味的な一致は詳細照合未完了"
+    "ページ画像の日本語は目視で読めるが、個別領域のピクセル単位のクロップ検証は未実施",
+    "切り抜き提案は本文との詳細な意味対応およびAndroid最終表示サイズのQA前のため未採用",
+    "原資料のフルページ画像表示は維持"
   ]
 }
