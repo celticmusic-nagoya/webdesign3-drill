@@ -40,6 +40,14 @@ try{
  assert.match(await frame.locator('#page-label').innerText(),/1 \/ 13/);
  await frame.locator('#next').click();
  assert.match(await frame.locator('#page-label').innerText(),/2 \/ 13/);
+ await frame.locator('#original-figure-canvas').waitFor({state:'visible',timeout:30000});
+ await page.waitForFunction(()=>{
+  const doc=document.querySelector('#offline-reader-frame')?.contentDocument;
+  return doc?.querySelector('#original-figure-status')?.textContent?.includes('原資料 第1回・2ページ');
+ },null,{timeout:30000});
+ const embeddedCanvas=await frame.locator('#original-figure-canvas').evaluate(el=>({width:el.width,height:el.height}));
+ assert.ok(embeddedCanvas.width>100&&embeddedCanvas.height>100,'Original figure page should render within textbook');
+
  await page.locator('#offline-pdf-1').click();
  await page.locator('#offline-pdf-viewer').waitFor({state:'visible'});
  await page.waitForFunction(()=>document.querySelector('#offline-pdf-page')?.textContent?.startsWith('1 /'),null,{timeout:30000});
