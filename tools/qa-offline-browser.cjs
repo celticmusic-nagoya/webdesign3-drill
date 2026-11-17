@@ -122,6 +122,35 @@ try{
  assert.match(await frame.locator('#page-label').innerText(),/9 \/ 10/,'Textbook should resume its last reading position');
  await page.locator('#offline-reader-back').click();
  assert.equal(await overlay.isVisible(),false);
+ // Backup validation: malformed data must never replace a student's existing progress.
+ const backupCheck=await page.evaluate(async()=>{
+  const original=localStorage.getItem('web3_master_data');
+  const baseline={totalAnswered:12,correctCount:9,examHighScore:null,bookmarks:[],masteredCards:[],wrongQuestionIds:[],categoryStats:{},examHistory:[],daily:{date:'',answered:0}};
+  const alerts=[];
+  const oldAlert=window.alert;
+  window.alert=message=>alerts.push(message);
+  try{
+   localStorage.setItem('web3_master_data',JSON.stringify(baseline));
+   const invalid=new File([JSON.stringify({totalAnswered:'bad'})],'invalid.json',{type:'application/json'});
+   window.importUserData({target:{files:[invalid]}});
+   await new Promise(resolve=>setTimeout(resolve,150));
+   const afterInvalid=localStorage.getItem('web3_master_data');
+   const valid=new File([JSON.stringify({...baseline,totalAnswered:20,correctCount:17})],'valid.json',{type:'application/json'});
+   window.importUserData({target:{files:[valid]}});
+   await new Promise(resolve=>setTimeout(resolve,150));
+   const afterValid=JSON.parse(localStorage.getItem('web3_master_data'));
+   return {afterInvalid,expected:JSON.stringify(baseline),afterValid,alerts};
+  }finally{
+   window.alert=oldAlert;
+   if(original===null)localStorage.removeItem('web3_master_data');
+   else localStorage.setItem('web3_master_data',original);
+  }
+ });
+ assert.equal(backupCheck.afterInvalid,backupCheck.expected,'Invalid backup must preserve existing progress');
+ assert.equal(backupCheck.afterValid.totalAnswered,20,'Valid backup must restore progress');
+ assert.equal(backupCheck.afterValid.correctCount,17,'Valid backup must restore correct answer count');
+ assert.ok(backupCheck.alerts.some(x=>x.includes('失敗')),'Invalid backup should explain failure');
+ assert.ok(backupCheck.alerts.some(x=>x.includes('復元しました')),'Valid backup should confirm restoration');
  assert.deepEqual(errors,[]);
  console.log('PASS: standalone file HTML CSS and embedded textbook pagination');
  await context.close();
