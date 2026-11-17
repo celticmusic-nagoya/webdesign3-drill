@@ -98,6 +98,23 @@
         "adoption": "REJECT_CURRENT_CROP"
       }
     ],
-    "decision": "No crops adopted. Preserve full-page images until crop QA and mobile legibility pass."
+    "decision": "No crops adopted. Preserve full-page images until crop QA and mobile legibility pass.",
+    "revised_page7": {
+      "id": "lesson02-p07-operable-revised",
+      "normalized_crop": {
+        "x": 0.058,
+        "y": 0.038,
+        "width": 0.88,
+        "height": 0.905
+      },
+      "output_size": {
+        "width": 691,
+        "height": 996
+      },
+      "visual_content_integrity": "PASS",
+      "evidence": "Green section heading and all ten comparison rows are visible in revised crop PNG",
+      "mobile_readability": "NOT_RUN",
+      "adoption": "HOLD"
+    }
   }
 }
