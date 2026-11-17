@@ -57,6 +57,18 @@ try{
  await frame.locator('#original-figure-zoom-reset').click();
 
 
+ await frame.locator('#book').selectOption('1');
+ await frame.locator('#chapters button[data-page="5"]').click();
+ await frame.locator('#original-figure-focus-image').waitFor({state:'visible',timeout:30000});
+ const focus6=await frame.locator('#original-figure-focus-image').evaluate(el=>({width:el.naturalWidth,height:el.naturalHeight,src:el.currentSrc}));
+ assert.ok(focus6.width>200&&focus6.height>200&&focus6.src.startsWith('data:image/png;base64,'),'Lesson 2 page 6 should show a source-derived detail');
+ await frame.locator('#chapters button[data-page="6"]').click();
+ await page.waitForFunction(()=>document.querySelector('#offline-reader-frame')?.contentDocument?.querySelector('#original-figure-status')?.textContent?.includes('第2回・7ページ'),null,{timeout:30000});
+ await page.waitForFunction(()=>document.querySelector('#offline-reader-frame')?.contentDocument?.querySelector('#original-figure-focus-image')?.naturalWidth>200,null,{timeout:30000});
+ assert.equal(await frame.locator('#original-figure-focus-panel').isVisible(),true,'Lesson 2 page 7 detail should display');
+ await frame.locator('#chapters button[data-page="7"]').click();
+ await page.waitForFunction(()=>document.querySelector('#offline-reader-frame')?.contentDocument?.querySelector('#original-figure-status')?.textContent?.includes('第2回・8ページ'),null,{timeout:30000});
+ assert.equal(await frame.locator('#original-figure-focus-panel').isVisible(),false,'Unreviewed pages must not show cropped detail');
  await page.locator('#offline-pdf-1').click();
  await page.locator('#offline-pdf-viewer').waitFor({state:'visible'});
  await page.waitForFunction(()=>document.querySelector('#offline-pdf-page')?.textContent?.startsWith('1 /'),null,{timeout:30000});
