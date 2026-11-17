@@ -25,6 +25,10 @@ jobs:
           node-version: '22'
       - name: Check textbook and app source
         run: node tools/qa-textbook.cjs
+      - name: Install PDF rasterizer
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends poppler-utils
       - name: Stage offline package
         run: node tools/build-offline.cjs
       - name: Compile offline Tailwind CSS
