@@ -17,7 +17,6 @@ const linkStart=html.indexOf('<a id="textbook-open-link" href="./textbook.html"'
 if(linkStart<0)throw Error('Actual textbook anchor not found');
 html=html.slice(0,linkStart)+html.slice(linkStart).replace('<a id="textbook-open-link" href="./textbook.html"','<a id="offline-textbook-link" href="#offline-textbook"');
 const embeddedReader=JSON.stringify(Buffer.from(readerHtml,'utf8').toString('base64'));
-const pdfData=JSON.stringify(['materials/lesson-01.pdf','materials/lesson-02.pdf'].map(p=>fs.readFileSync(p).toString('base64')));
 const offlineUI=`<div id="offline-reader-overlay" hidden style="position:fixed;inset:0;z-index:99999;background:#0f172a;display:none;flex-direction:column">
 <div style="display:flex;flex-wrap:wrap;gap:6px;padding:8px;background:#1e293b;color:white"><button id="offline-reader-back" type="button" style="padding:8px;background:#334155;color:white">← 戻る</button><button id="offline-pdf-1" type="button" style="padding:8px;background:#2563eb;color:white">第1回 PDFを開く</button><button id="offline-pdf-2" type="button" style="padding:8px;background:#2563eb;color:white">第2回 PDFを開く</button><span id="offline-pdf-help" role="status" aria-live="polite" style="font-size:12px;align-self:center;color:#cbd5e1">原資料をアプリ内で閲覧できます</span></div>
 <iframe id="offline-reader-frame" title="オフライン教科書" style="width:100%;flex:1;border:0;background:white"></iframe>
@@ -32,15 +31,13 @@ const readerSource=new TextDecoder('utf-8').decode(bytes)
  .replace('図解・画像・レイアウトはテキスト抽出版では再現していません。','本文は検索可能なテキスト版です。各ページの下に原資料の図表・レイアウトを画像で掲載しています。')
  .replace('図表や元のレイアウトを確認する場合は原PDFを開いてください。','各ページ下部に原資料画像を表示します。全ページの確認は上部の「PDFを開く」を使用してください。')
  .replace('</head>','<style>header{position:static!important}header nav a{display:none!important}</style></head>');
-const embeddedPdfs=${pdfData};
 const embeddedPageImages=__EMBEDDED_PDF_PAGE_IMAGES__;
-const inlinePdfDocs=[null,null];
 let figureRenderToken=0;
 async function attachTextbookFigures(){
  const doc=frame.contentDocument;
  if(!doc||doc.getElementById('original-figure-panel'))return;
  const pageText=doc.getElementById('page-text');
- if(!pageText||!window.pdfjsLib)return;
+ if(!pageText)return;
  const panel=doc.createElement('section');
  panel.id='original-figure-panel';
  panel.style.cssText='margin:24px 0;padding:14px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;color:#1e293b';
@@ -191,12 +188,6 @@ function inlineCompiledStyles(){
   page=page.replace('__EMBEDDED_PDF_PAGE_IMAGES__',JSON.stringify(rasterized));
   if(page.includes('__EMBEDDED_PDF_PAGE_IMAGES__'))throw Error('PDF raster images not embedded');
   console.log('PASS: PDF pages rasterized with embedded fonts:',rasterized.map(x=>x.length));
-  const pdfjsPath=require.resolve('pdfjs-dist/build/pdf.min.js');
-  const workerPath=require.resolve('pdfjs-dist/build/pdf.worker.min.js');
-  const pdfjs=fs.readFileSync(pdfjsPath,'utf8');
-  const worker=fs.readFileSync(workerPath,'utf8');
-  const setup='<script>'+pdfjs+';pdfjsLib.GlobalWorkerOptions.workerSrc=URL.createObjectURL(new Blob(['+JSON.stringify(worker)+'],{type:"text/javascript"}));</script>';
-  page=page.replace('</body>',setup+'</body>');
   fs.writeFileSync(path.join(out,'index.html'),page);
   fs.unlinkSync(cssPath);
   if(page.includes('href="./offline.css"'))throw Error('CSS not embedded');
