@@ -19,7 +19,7 @@ html=html.slice(0,linkStart)+html.slice(linkStart).replace('<a id="textbook-open
 const embeddedReader=JSON.stringify(Buffer.from(readerHtml,'utf8').toString('base64'));
 const pdfData=JSON.stringify(['materials/lesson-01.pdf','materials/lesson-02.pdf'].map(p=>fs.readFileSync(p).toString('base64')));
 const offlineUI=`<div id="offline-reader-overlay" hidden style="position:fixed;inset:0;z-index:99999;background:#0f172a;display:none;flex-direction:column">
-<div style="display:flex;flex-wrap:wrap;gap:6px;padding:8px;background:#1e293b;color:white"><button id="offline-reader-back" type="button" style="padding:8px;background:#334155;color:white">← 戻る</button><button id="offline-pdf-1" type="button" style="padding:8px;background:#2563eb;color:white">第1回 原PDF</button><button id="offline-pdf-2" type="button" style="padding:8px;background:#2563eb;color:white">第2回 原PDF</button></div>
+<div style="display:flex;flex-wrap:wrap;gap:6px;padding:8px;background:#1e293b;color:white"><button id="offline-reader-back" type="button" style="padding:8px;background:#334155;color:white">← 戻る</button><button id="offline-pdf-1" type="button" style="padding:8px;background:#2563eb;color:white">第1回 PDF保存</button><button id="offline-pdf-2" type="button" style="padding:8px;background:#2563eb;color:white">第2回 PDF保存</button><span id="offline-pdf-help" role="status" aria-live="polite" style="font-size:12px;align-self:center;color:#cbd5e1">PDFは保存後、Androidの「ダウンロード」から開いてください</span></div>
 <iframe id="offline-reader-frame" title="オフライン教科書" style="width:100%;flex:1;border:0;background:white"></iframe></div>
 <script>
 (function(){
@@ -33,9 +33,11 @@ function openOfflinePdf(i){
  const blob=new Blob([bytes],{type:'application/pdf'});
  const url=URL.createObjectURL(blob);
  const a=document.createElement('a');
- a.href=url;a.target='_blank';a.rel='noopener';a.download='lesson-0'+(i+1)+'.pdf';
+ a.href=url;a.download='lesson-0'+(i+1)+'.pdf';
  document.body.appendChild(a);a.click();a.remove();
- // Keep blob URL alive for Android PDF viewers that open asynchronously.
+ const help=document.getElementById('offline-pdf-help');
+ if(help)help.textContent='PDFの保存を要求しました。Chromeのダウンロード履歴を確認してください。';
+ // Keep blob URL alive for Android download managers that fetch asynchronously.
 }
 document.getElementById('offline-pdf-1').addEventListener('click',()=>openOfflinePdf(0));
 document.getElementById('offline-pdf-2').addEventListener('click',()=>openOfflinePdf(1));
