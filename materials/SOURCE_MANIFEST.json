@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "status": "SOURCE_PDFS_INTEGRATED_IN_DRAFT_PR",
+  "source_files": [
+    {
+      "source": "テキスト1回目.pdf",
+      "expected_repository_path": "materials/lesson-01.pdf",
+      "pages": 13,
+      "sha256": "41f8fd82d320972dba930fbdc383de9ced5b7ae83326c9f6a0b8a22cd6db230f"
+    },
+    {
+      "source": "テキスト2回目.pdf",
+      "expected_repository_path": "materials/lesson-02.pdf",
+      "pages": 10,
+      "sha256": "291d6092166381e0372475861f7d6b7049c0151f0d973e972713d52ac7637f6b"
+    }
+  ],
+  "notes": [
+    "Both original PDF files are committed in this draft PR; verify SHA-256 during CI.",
+    "Public distribution permission was stated by the user; independently verifiable license terms are not recorded.",
+    "Android device QA remains NOT_RUN."
+  ]
+}
