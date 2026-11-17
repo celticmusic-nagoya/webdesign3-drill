@@ -40,6 +40,12 @@ try{
  assert.match(await frame.locator('#page-label').innerText(),/1 \/ 13/);
  await frame.locator('#next').click();
  assert.match(await frame.locator('#page-label').innerText(),/2 \/ 13/);
+ const downloadPromise=page.waitForEvent('download');
+ await page.locator('#offline-pdf-1').click();
+ const download=await downloadPromise;
+ assert.equal(download.suggestedFilename(),'lesson-01.pdf');
+ const stream=fs.readFileSync(await download.path());
+ assert.equal(stream.subarray(0,5).toString(),'%PDF-');
  await page.locator('#offline-reader-back').click();
  assert.equal(await overlay.isVisible(),false);
  assert.deepEqual(errors,[]);
