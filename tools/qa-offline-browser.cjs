@@ -42,9 +42,9 @@ try{
  assert.match(await frame.locator('#page-label').innerText(),/2 \/ 13/);
  await page.locator('#offline-pdf-1').click();
  await page.locator('#offline-pdf-viewer').waitFor({state:'visible'});
- await page.waitForFunction(()=>document.querySelector('#offline-pdf-page')?.textContent?.match(/^1 \\/ \\d+$/),{timeout:30000});
+ await page.waitForFunction(()=>document.querySelector('#offline-pdf-page')?.textContent?.startsWith('1 /'),null,{timeout:30000});
  const firstPage=await page.locator('#offline-pdf-page').innerText();
- assert.match(firstPage,/^1 \\/ \\d+$/);
+ assert.ok(firstPage.startsWith('1 /'),'PDF first page should render');
  const canvas=await page.locator('#offline-pdf-canvas').evaluate(el=>({width:el.width,height:el.height}));
  assert.ok(canvas.width>100&&canvas.height>100,'PDF page must render to canvas');
  await page.locator('#offline-pdf-next').click();
