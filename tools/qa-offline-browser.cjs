@@ -111,6 +111,10 @@ try{
  assert.equal(await page.locator('#offline-pdf-page').innerText(),'2 / 10');
  await page.locator('#offline-pdf-close').click();
  assert.equal(await page.locator('#offline-pdf-viewer').isVisible(),false);
+ assert.match(await frame.locator('#page-label').innerText(),/2 \\/ 10/,'Returning from source should open matching textbook page');
+ await page.locator('#offline-pdf-2').click();
+ assert.equal(await page.locator('#offline-pdf-page').innerText(),'2 / 10','Opening source should preserve current textbook page');
+ await page.locator('#offline-pdf-close').click();
  await page.locator('#offline-reader-back').click();
  assert.equal(await overlay.isVisible(),false);
  assert.deepEqual(errors,[]);
