@@ -117,6 +117,11 @@ try{
  await page.locator('#offline-pdf-close').click();
  await page.locator('#offline-reader-back').click();
  assert.equal(await overlay.isVisible(),false);
+ await page.locator('#offline-textbook-link').click();
+ await frame.locator('#page-label').waitFor({state:'visible'});
+ assert.match(await frame.locator('#page-label').innerText(),/9 \/ 10/,'Textbook should resume its last reading position');
+ await page.locator('#offline-reader-back').click();
+ assert.equal(await overlay.isVisible(),false);
  assert.deepEqual(errors,[]);
  console.log('PASS: standalone file HTML CSS and embedded textbook pagination');
  await context.close();
