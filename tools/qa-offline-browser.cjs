@@ -296,6 +296,28 @@ try{
  assert.equal(highScoreGuard.score,'0 / 25','Unanswered questions must score zero');
  assert.equal(highScoreGuard.high,24,'Lower scores must not overwrite the existing high score');
  assert.equal(highScoreGuard.unanswered,true,'Review should identify unanswered questions');
+ // Real reload of the standalone file must retain saved study progress.
+ const reloadBaseline=await page.evaluate(()=>{
+  const original=localStorage.getItem('web3_master_data');
+  const data=JSON.parse(JSON.stringify(state.userData));
+  data.totalAnswered=37;
+  data.correctCount=29;
+  data.examHighScore=24;
+  localStorage.setItem('web3_master_data',JSON.stringify(data));
+  return {original};
+ });
+ try{
+  await page.reload();
+  await page.locator('#stat-total-answered').waitFor({state:'visible'});
+  assert.equal(await page.locator('#stat-total-answered').innerText(),'37','Answered count must survive a standalone HTML reload');
+  assert.equal(await page.locator('#stat-exam-high').innerText(),'24 / 25','Exam high score must survive a standalone HTML reload');
+ }finally{
+  await page.evaluate(original=>{
+   if(original===null)localStorage.removeItem('web3_master_data');
+   else localStorage.setItem('web3_master_data',original);
+   loadUserData();
+  },reloadBaseline.original);
+ }
  assert.deepEqual(errors,[]);
  console.log('PASS: standalone file HTML CSS and embedded textbook pagination');
  await context.close();
