@@ -29,8 +29,16 @@ async function run(){
     await link.click();
     await page.waitForURL('**/textbook.html');
     assert.match(await page.locator('#page-label').innerText(),/1 \/ 13/);
+    await page.locator('#source-page-canvas').waitFor({state:'visible',timeout:30000});
+    const firstCanvas=await page.locator('#source-page-canvas').evaluate(c=>({width:c.width,height:c.height}));
+    assert.ok(firstCanvas.width>200&&firstCanvas.height>200,'Source PDF page must render into visible canvas');
     await page.locator('#next').click();
     assert.match(await page.locator('#page-label').innerText(),/2 \/ 13/);
+    await page.waitForFunction(()=>document.querySelector('#source-render-status')?.textContent?.includes('2ページ'),null,{timeout:30000});
+    await page.locator('#source-zoom-in').click();
+    assert.equal(await page.locator('#source-zoom-label').innerText(),'125%');
+    await page.waitForFunction(()=>document.querySelector('#source-render-status')?.textContent?.includes('2ページ'),null,{timeout:30000});
+    assert.equal(await page.locator('#source-page-canvas').isVisible(),true,'Zoomed original PDF page must remain visible');
     await page.locator('#search').fill('web');
     await page.locator('#next').click();
     assert.equal(await page.locator('#search').inputValue(),'web','search persists');
