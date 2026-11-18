@@ -1,0 +1,120 @@
+{
+  "schema_version": 2,
+  "source": "materials/lesson-02.pdf",
+  "source_sha256": "291d6092166381e0372475861f7d6b7049c0151f0d973e972713d52ac7637f6b",
+  "review_method": "Rendered PDF pages 6 and 7 using Poppler pdftoppm; visually inspected page images at 1100px maximum dimension on 2026-11-17.",
+  "coordinate_system": "normalized page fractions x,y,width,height; crop proposals are not production-approved",
+  "pages": [
+    {
+      "page": 6,
+      "title": "STEP5 達成基準を詳しく見てみよう／① 知覚可能の達成基準",
+      "verified_examples": [
+        "1.1.1 非テキストコンテンツ：画像の代替テキスト",
+        "1.2.2 キャプション（収録済み）",
+        "1.3.1 情報及び関係性：見出しのHTML構造",
+        "1.4.1 色の使用",
+        "1.4.3 コントラスト（最低限）"
+      ],
+      "placement": "本文の第2回6ページに対応",
+      "crop": "full_page",
+      "review": "VISUALLY_REVIEWED",
+      "proposed_regions": [
+        {
+          "id": "lesson02-p06-perceivable",
+          "description": "知覚可能の5つの改善前後比較と下部の要点まとめ",
+          "x": 0.055,
+          "y": 0.158,
+          "width": 0.88,
+          "height": 0.81,
+          "status": "PROPOSED_NOT_APPROVED"
+        }
+      ]
+    },
+    {
+      "page": 7,
+      "title": "② 操作可能・理解可能・堅ろうの達成基準",
+      "verified_examples": [
+        "2.1.1 キーボード",
+        "2.1.2 キーボードトラップなし",
+        "2.1.4 文字キーのショートカット",
+        "2.2.1 タイミング調整可能",
+        "2.2.2 一時停止・停止及び非表示",
+        "2.3.1 3回のせん（閃）光又はしきい値以下",
+        "2.4.1 ブロックスキップ",
+        "2.4.2 ページタイトル",
+        "2.4.3 フォーカス順序",
+        "2.4.4 リンクの目的（コンテキスト内）"
+      ],
+      "placement": "本文の第2回7ページに対応",
+      "crop": "full_page",
+      "review": "VISUALLY_REVIEWED",
+      "proposed_regions": [
+        {
+          "id": "lesson02-p07-operable",
+          "description": "操作可能を中心とした10項目の改善前後比較",
+          "x": 0.06,
+          "y": 0.09,
+          "width": 0.85,
+          "height": 0.84,
+          "status": "PROPOSED_NOT_APPROVED"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "ページ画像の日本語は目視で読めるが、個別領域のピクセル単位のクロップ検証は未実施",
+    "切り抜き提案は本文との詳細な意味対応およびAndroid最終表示サイズのQA前のため未採用",
+    "原資料のフルページ画像表示は維持"
+  ],
+  "crop_qa": {
+    "date": "2026-11-17",
+    "source_preview_resolution": {
+      "width": 785,
+      "height": 1100
+    },
+    "method": "Pillow crop of Poppler-rendered page previews; independently visually inspected cropped PNGs; source PDFs unchanged",
+    "results": [
+      {
+        "id": "lesson02-p06-perceivable",
+        "output_size": {
+          "width": 690,
+          "height": 891
+        },
+        "content_integrity": "PASS",
+        "finding": "①知覚可能の達成基準、5行の比較図、下部の「これは覚える」が残る",
+        "final_android_legibility": "NOT_RUN",
+        "adoption": "HOLD"
+      },
+      {
+        "id": "lesson02-p07-operable",
+        "output_size": {
+          "width": 667,
+          "height": 923
+        },
+        "content_integrity": "FAIL",
+        "finding": "②操作可能・理解可能・堅ろうの達成基準の緑色タイトル見出しが切り落とされる。候補y=0.09は不適切",
+        "required_change": "タイトル見出しを含むようyを上方へ修正して再検証",
+        "final_android_legibility": "NOT_RUN",
+        "adoption": "REJECT_CURRENT_CROP"
+      }
+    ],
+    "decision": "No crops adopted. Preserve full-page images until crop QA and mobile legibility pass.",
+    "revised_page7": {
+      "id": "lesson02-p07-operable-revised",
+      "normalized_crop": {
+        "x": 0.058,
+        "y": 0.038,
+        "width": 0.88,
+        "height": 0.905
+      },
+      "output_size": {
+        "width": 691,
+        "height": 996
+      },
+      "visual_content_integrity": "PASS",
+      "evidence": "Green section heading and all ten comparison rows are visible in revised crop PNG",
+      "mobile_readability": "NOT_RUN",
+      "adoption": "HOLD"
+    }
+  }
+}

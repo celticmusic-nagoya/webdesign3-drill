@@ -6,6 +6,10 @@ on:
       - 'textbook.html'
       - 'materials/SOURCE_MANIFEST.json'
       - 'tools/qa-textbook.cjs'
+      - 'tools/build-offline.cjs'
+      - 'tools/build-pwa.cjs'
+      - 'tools/inventory-pdf-figures.cjs'
+      - '.github/workflows/offline-package.yml'
       - '.github/workflows/textbook-static-qa.yml'
   workflow_dispatch:
 permissions:
@@ -21,3 +25,77 @@ jobs:
           node-version: '22'
       - name: Check textbook and app source
         run: node tools/qa-textbook.cjs
+      - name: Install PDF rasterizer
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends poppler-utils
+      - name: Stage offline package
+        run: node tools/build-offline.cjs
+      - name: Compile offline Tailwind CSS
+        run: |
+          printf '@tailwind base;\n@tailwind components;\n@tailwind utilities;\n' > /tmp/offline-input.css
+          npm install --no-save --no-package-lock tailwindcss@3.4.17
+          ./node_modules/.bin/tailwindcss -i /tmp/offline-input.css -o dist/webdesign3-offline/offline.css --content ./index.html --minify
+          test -s dist/webdesign3-offline/offline.css
+          node tools/build-offline.cjs --inline-css
+      - name: Build installable PWA package
+        run: node tools/build-pwa.cjs
+      - name: Verify distributable package integrity
+        run: |
+          node - <<'NODE'
+          const fs=require('node:fs'),assert=require('node:assert/strict'),crypto=require('node:crypto');
+          const base='dist/webdesign3-offline/',pwa='dist/webdesign3-pwa/';
+          const single=fs.readFileSync(base+'index.html','utf8');
+          assert.ok(single.includes('id="offline-tailwind"'),'Standalone CSS not embedded');
+          assert.ok(single.includes('id="offline-reader-overlay"'),'Standalone textbook missing');
+          assert.ok(!single.includes('__EMBEDDED_PDF_PAGE_IMAGES__'),'Source page images not embedded');
+          assert.ok(!single.includes('cdn.tailwindcss.com'),'Standalone still requires Tailwind CDN');
+          const pwaHtml=fs.readFileSync(pwa+'index.html','utf8');
+          assert.ok(pwaHtml.includes('manifest.webmanifest'),'PWA manifest link missing');
+          const manifest=JSON.parse(fs.readFileSync(pwa+'manifest.webmanifest','utf8'));
+          assert.equal(manifest.display,'standalone');
+          const sw=fs.readFileSync(pwa+'sw.js','utf8');
+          for(const asset of ['./index.html','./textbook.html','./materials/lesson-01.pdf','./materials/lesson-02.pdf','./manifest.webmanifest']){
+            assert.ok(sw.includes(asset),'PWA precache missing '+asset);
+          }
+          const sources=JSON.parse(fs.readFileSync('materials/SOURCE_MANIFEST.json','utf8')).source_files;
+          for(const source of sources){
+            for(const dir of [base,pwa]){
+              const bytes=fs.readFileSync(dir+source.expected_repository_path);
+              assert.equal(crypto.createHash('sha256').update(bytes).digest('hex'),source.sha256,'PDF mismatch in '+dir);
+            }
+          }
+          console.log('PASS: standalone HTML, PWA precache manifest, original PDF integrity in both packages');
+          NODE
+      - name: Upload installable PWA package
+        uses: actions/upload-artifact@v4
+        with:
+          name: webdesign3-pwa-https-deploy
+          path: dist/webdesign3-pwa/
+          retention-days: 14
+          if-no-files-found: error
+      - name: Inventory source PDF diagram candidates
+        run: |
+          npm install --no-save --no-package-lock pdfjs-dist@3.11.174
+          node tools/inventory-pdf-figures.cjs
+      - name: Upload figure inventory for independent art review
+        uses: actions/upload-artifact@v4
+        with:
+          name: textbook-pdf-figure-inventory
+          path: dist/figure-inventory.json
+          retention-days: 14
+          if-no-files-found: error
+      - name: Upload offline package
+        uses: actions/upload-artifact@v4
+        with:
+          name: webdesign3-offline-complete
+          path: dist/webdesign3-offline/
+          retention-days: 14
+          if-no-files-found: error
+      - name: Upload single-file Android offline app
+        uses: actions/upload-artifact@v4
+        with:
+          name: webdesign3-offline-single-html
+          path: dist/webdesign3-offline/index.html
+          retention-days: 14
+          if-no-files-found: error

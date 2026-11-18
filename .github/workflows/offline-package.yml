@@ -1,0 +1,57 @@
+name: Build fully offline study package
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - fix/local-textbook-link-20261117
+    paths:
+      - index.html
+      - textbook.html
+      - materials/**
+      - tools/build-offline.cjs
+      - .github/workflows/offline-package.yml
+permissions:
+  contents: read
+jobs:
+  package:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate textbook and original PDF checksums
+        run: node tools/qa-textbook.cjs
+      - name: Stage offline package
+        run: node tools/build-offline.cjs
+      - name: Compile Tailwind CSS locally for offline runtime
+        run: |
+          printf '@tailwind base;\n@tailwind components;\n@tailwind utilities;\n' > /tmp/offline-input.css
+          npm install --no-save --no-package-lock tailwindcss@3.4.17
+          ./node_modules/.bin/tailwindcss -i /tmp/offline-input.css -o dist/webdesign3-offline/offline.css --content ./index.html --minify
+          test -s dist/webdesign3-offline/offline.css
+          node tools/build-offline.cjs --inline-css
+      - name: Validate offline links and dependencies
+        run: |
+          node - <<'NODE'
+          const fs=require('node:fs'),assert=require('node:assert/strict');
+          const base='dist/webdesign3-offline/';
+          const html=fs.readFileSync(base+'index.html','utf8');
+          const reader=fs.readFileSync(base+'textbook.html','utf8');
+          assert.match(html,/href="\.\/textbook\.html"/);
+          assert.match(html,/href="\.\/offline\.css"/);
+          assert.doesNotMatch(html,/cdn\.tailwindcss\.com|fonts\.googleapis\.com/);
+          assert.match(reader,/\.\/materials\/lesson-01\.pdf/);
+          assert.match(reader,/\.\/materials\/lesson-02\.pdf/);
+          for(const file of ['materials/lesson-01.pdf','materials/lesson-02.pdf'])assert.ok(fs.statSync(base+file).size>100);
+          console.log('PASS: offline HTML, CSS, links and PDFs');
+          NODE
+      - name: Upload complete offline package
+        uses: actions/upload-artifact@v4
+        with:
+          name: webdesign3-offline-complete
+          path: dist/webdesign3-offline/
+          retention-days: 14
+          if-no-files-found: error
