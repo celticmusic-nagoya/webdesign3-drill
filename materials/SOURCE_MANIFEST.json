@@ -17,7 +17,9 @@
   ],
   "notes": [
     "Both original PDF files are committed in this draft PR; verify SHA-256 during CI.",
-    "Public distribution permission was stated by the user; independently verifiable license terms are not recorded.",
-    "Android device QA remains NOT_RUN."
+    "The user reports that the PDFs were produced and distributed by their vocational training school/instructor, that the app was shared with them, and that permission to distribute the PDF-containing app to future students and the general public was explicitly granted. This is user-attested permission; written permission, scope, attribution requirements, and third-party content rights have not been independently inspected.",
+    "Android device QA: user-confirmed PASS for download/extraction, textbook viewing, practice, airplane-mode offline use, and study-progress retention after reopening.",
+    "Android device mock-exam interaction: NOT_RUN (browser automation PASS).",
+    "Do not merge to main or publish without explicit user approval."
   ]
 }
