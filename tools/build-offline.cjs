@@ -212,6 +212,8 @@ html=html.replace('</body>',offlineUI+'</body>');
 // Build first; after Tailwind compilation inline all CSS into this same HTML.
 fs.writeFileSync(path.join(out,'index.html'),html);
 fs.copyFileSync('textbook.html',path.join(out,'textbook.html'));
+fs.mkdirSync(path.join(out,'vendor/pdfjs'),{recursive:true});
+for(const file of ['pdf.min.js','pdf.worker.min.js'])fs.copyFileSync(path.join('vendor/pdfjs',file),path.join(out,'vendor/pdfjs',file));
 const manifest=JSON.parse(fs.readFileSync('materials/SOURCE_MANIFEST.json','utf8'));
 for(const item of manifest.source_files){
   const p=item.expected_repository_path;
