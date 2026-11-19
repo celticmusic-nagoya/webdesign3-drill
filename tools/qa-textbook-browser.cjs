@@ -20,6 +20,7 @@ async function run(){
   const browser=await chromium.launch({headless:true});
   try{
     const context=await browser.newContext({viewport:{width:390,height:844}});
+    await context.route(/^https?:\/\/(?!127\.0\.0\.1:18937)/,route=>route.abort());
     const page=await context.newPage();
     const errors=[];
     page.on('pageerror',e=>errors.push(e.message));
@@ -48,6 +49,14 @@ async function run(){
     assert.match(await page.locator('#page-label').innerText(),/1 \/ 10/);
     await page.reload();
     assert.match(await page.locator('#page-label').innerText(),/1 \/ 10/);
+    await page.goto(base+'/textbook.html');
+    await page.waitForFunction(()=>navigator.serviceWorker?.controller!==null,null,{timeout:30000});
+    await page.locator('#source-page-canvas').waitFor({state:'visible',timeout:30000});
+    await context.setOffline(true);
+    await page.reload();
+    await page.locator('#source-page-canvas').waitFor({state:'visible',timeout:30000});
+    assert.match(await page.locator('#source-render-status').innerText(),/図表・画像を含む/,'Offline original PDF figure render');
+    await context.setOffline(false);
     await page.goto(base+'/index.html');
     assert.match(await page.locator('#textbook-resume-label').innerText(),/第2回・1ページ/);
     assert.deepEqual(errors,[],'browser runtime errors');

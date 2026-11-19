@@ -4,6 +4,8 @@ on:
     paths:
       - 'index.html'
       - 'textbook.html'
+      - 'sw-textbook.js'
+      - 'vendor/pdfjs/**'
       - 'materials/SOURCE_MANIFEST.json'
       - 'tools/qa-textbook.cjs'
       - 'tools/build-offline.cjs'
