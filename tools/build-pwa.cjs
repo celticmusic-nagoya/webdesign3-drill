@@ -2,8 +2,9 @@
 'use strict';
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const src=path.resolve('dist/webdesign3-offline'),out=path.resolve('dist/webdesign3-pwa');
-const files=['index.html','textbook.html','materials/lesson-01.pdf','materials/lesson-02.pdf'];
+const files=['index.html','textbook.html','materials/lesson-01.pdf','materials/lesson-02.pdf','vendor/pdfjs/pdf.min.js','vendor/pdfjs/pdf.worker.min.js'];
 fs.mkdirSync(path.join(out,'materials'),{recursive:true});
+fs.mkdirSync(path.join(out,'vendor/pdfjs'),{recursive:true});
 for(const name of files){const from=path.join(src,name);if(!fs.existsSync(from))throw Error('Missing offline asset: '+name);fs.copyFileSync(from,path.join(out,name));}
 let html=fs.readFileSync(path.join(out,'index.html'),'utf8');
 if(!html.includes('id="offline-tailwind"'))throw Error('PWA requires self-contained compiled CSS');
@@ -17,7 +18,7 @@ fs.writeFileSync(path.join(out,'index.html'),html);
 const version=crypto.createHash('sha256').update(html).digest('hex').slice(0,16);
 const manifest={id:'./',name:'Webデザイン技能検定3級 学科試験対策',short_name:'Webデザイン3級',lang:'ja',start_url:'./index.html',scope:'./',display:'standalone',background_color:'#0f172a',theme_color:'#0f172a'};
 fs.writeFileSync(path.join(out,'manifest.webmanifest'),JSON.stringify(manifest,null,2));
-const assets=['./','./index.html','./textbook.html','./materials/lesson-01.pdf','./materials/lesson-02.pdf','./manifest.webmanifest'];
+const assets=['./','./index.html','./textbook.html','./materials/lesson-01.pdf','./materials/lesson-02.pdf','./vendor/pdfjs/pdf.min.js','./vendor/pdfjs/pdf.worker.min.js','./manifest.webmanifest'];
 const sw=`'use strict';
 const CACHE='webdesign3-pwa-${version}';
 const ASSETS=${JSON.stringify(assets)};
