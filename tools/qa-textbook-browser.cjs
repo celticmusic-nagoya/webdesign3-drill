@@ -33,10 +33,16 @@ async function run(){
       b:QUESTIONS.filter(q=>q.category==='LECTURE_3_4_REVIEW').length
     }));
     assert.equal(imported.a,60);assert.equal(imported.b,60);
-    const catalogLink=page.locator('a[href="./additional-materials.html"]').first();
-    assert.ok(await catalogLink.count()>0,'Additional materials link missing');
-    await page.goto(base+'/additional-materials.html');
+    const hubLink=page.locator('a[href="./textbook.html"]').first();
+    assert.ok(await hubLink.count()>0,'Unified textbook hub link missing');
+    await page.goto(base+'/textbook.html');
+    assert.equal(await page.locator('#lesson-shortcut-1').count(),1);
+    assert.equal(await page.locator('#lesson-shortcut-2').count(),1);
+    assert.equal(await page.locator('a[href="./additional-materials.html?book=0"]').count(),1);
+    assert.equal(await page.locator('a[href="./additional-materials.html?book=1"]').count(),1);
+    await page.goto(base+'/additional-materials.html?book=1');
     assert.equal(await page.locator('#source option').count(),8);
+    assert.equal(await page.locator('#source').inputValue(),'1');
     await page.locator('#source').selectOption('7');
     assert.match(await page.locator('#open').getAttribute('href'),/review-03-04-answers\.pdf$/);
     await page.goto(base+'/index.html');
