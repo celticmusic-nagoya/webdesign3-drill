@@ -79,7 +79,6 @@ async function run(){
     assert.match(await page.locator('#position').innerText(),/1 \/ 51/);
     assert.equal(await page.locator('#choices input').count(),4);
     await page.locator('#choices label').first().click();
-    await page.locator('#submit').click();
     assert.equal(await page.locator('#feedback').isVisible(),true);
     await page.locator('#next').click();
     assert.match(await page.locator('#position').innerText(),/2 \/ 51/);
