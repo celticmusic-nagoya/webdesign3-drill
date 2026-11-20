@@ -36,10 +36,11 @@ async function run(){
     const hubLink=page.locator('a[href="./textbook.html"]').first();
     assert.ok(await hubLink.count()>0,'Unified textbook hub link missing');
     await page.goto(base+'/textbook.html');
-    assert.equal(await page.locator('#lesson-shortcut-1').count(),1);
-    assert.equal(await page.locator('#lesson-shortcut-2').count(),1);
-    assert.equal(await page.locator('a[href="./additional-materials.html?book=0"]').count(),1);
-    assert.equal(await page.locator('a[href="./additional-materials.html?book=1"]').count(),1);
+    assert.equal(await page.locator('#book option').count(),4);
+    assert.equal(await page.locator('#book').inputValue(),'0');
+    await page.locator('#book').selectOption('3');
+    await page.waitForURL('**/additional-materials.html?book=1');
+    assert.equal(await page.locator('#source').inputValue(),'1');
     await page.goto(base+'/additional-materials.html?book=1');
     assert.equal(await page.locator('#source option').count(),8);
     assert.equal(await page.locator('#source').inputValue(),'1');
