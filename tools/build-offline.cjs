@@ -224,7 +224,27 @@ open.addEventListener('click',function(e){e.preventDefault();frame.srcdoc=reader
 back.addEventListener('click',function(){pdfView.style.display='none';pdfView.hidden=true;pdfFrame.style.display='block';overlay.style.display='none';overlay.hidden=true;frame.removeAttribute('srcdoc');document.body.style.overflow=''});
 })();
 </script>`;
-html=html.replace('</body>',offlineUI+'</body>');
+// Embed both drills for Android content:// entrypoints, while retaining extracted HTML copies.
+const drillSources=Object.fromEntries(['textbook-original','homework-drill'].map(name=>{
+ const source=fs.readFileSync(name+'.html','utf8');
+ const tag='<script src="./materials/'+name+'.js"></script>';
+ if(!source.includes(tag))throw Error('Missing drill bank: '+name);
+ const embedded=source.replace(tag,()=>'<script>'+fs.readFileSync('materials/'+name+'.js','utf8')+'</script>');
+ return [name,Buffer.from(embedded,'utf8').toString('base64')];
+}));
+const drillUI=`<div id="offline-drill-overlay" hidden style="position:fixed;inset:0;z-index:99998;background:#0f172a;display:none;flex-direction:column"><button id="offline-drill-back" type="button" style="padding:12px;background:#334155;color:white">← アプリのトップへ</button><iframe id="offline-drill-frame" title="オフライン問題集" style="width:100%;flex:1;min-height:0;border:0"></iframe></div>
+<script>
+(function(){
+ const sources=${JSON.stringify(drillSources)};
+ const overlay=document.getElementById('offline-drill-overlay'),frame=document.getElementById('offline-drill-frame');
+ function close(){overlay.hidden=true;overlay.style.display='none';frame.removeAttribute('srcdoc');document.body.style.overflow=''}
+ document.getElementById('offline-drill-back').onclick=close;
+ function open(name){frame.srcdoc=new TextDecoder().decode(Uint8Array.from(atob(sources[name]),c=>c.charCodeAt(0)));overlay.hidden=false;overlay.style.display='flex';document.body.style.overflow='hidden'}
+ for(const name of Object.keys(sources))document.querySelectorAll('a[href="./'+name+'.html"]').forEach(a=>{a.addEventListener('click',e=>{e.preventDefault();open(name)})});
+ frame.addEventListener('load',()=>{const doc=frame.contentDocument;if(!doc)return;doc.querySelectorAll('a[href="./index.html"]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();close()}));doc.querySelectorAll('a[href="./textbook.html"]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();document.getElementById('offline-textbook-link').click()}))});
+})();
+</script>`;
+html=html.replace('</body>',offlineUI+drillUI+'</body>');
 // Build first; after Tailwind compilation inline all CSS into this same HTML.
 fs.writeFileSync(path.join(out,'index.html'),html);
 fs.copyFileSync('textbook.html',path.join(out,'textbook.html'));

@@ -330,6 +330,15 @@ try{
    loadUserData();
   },reloadBaseline.original);
  }
+ for(const [name,bank,count] of [['homework-drill','HOMEWORK_DRILL',200],['textbook-original','TEXTBOOK_ORIGINAL',158]]){
+  await page.locator('a[href="./'+name+'.html"]').first().click();
+  const drill=page.frameLocator('#offline-drill-frame');
+  await drill.locator('#practice').waitFor({state:'visible'});
+  assert.equal(await drill.locator('body').evaluate((el,key)=>el.ownerDocument.defaultView[key].length,bank),count);
+  await drill.locator('#practice').click();
+  assert.match(await drill.locator('#position').innerText(),/1 \/ /);
+  await page.locator('#offline-drill-back').click();
+ }
  await page.goto(pathToFileURL(path.join(path.dirname(file),'textbook-original.html')).href);
  await context.setOffline(true);
  assert.equal(await page.evaluate(()=>window.TEXTBOOK_ORIGINAL.length),158);
