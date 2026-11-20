@@ -35,6 +35,13 @@ jobs:
           node-version: '22'
       - name: Validate textbook and original PDF checksums
         run: node tools/qa-textbook.cjs
+      - name: Install PDF rendering dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends poppler-utils fonts-noto-cjk
+          command -v pdfinfo
+          command -v pdftoppm
+          pdfinfo -v
       - name: Stage offline package
         run: node tools/build-offline.cjs
       - name: Compile Tailwind CSS locally for offline runtime
