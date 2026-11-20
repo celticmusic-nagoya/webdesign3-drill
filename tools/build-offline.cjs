@@ -216,6 +216,7 @@ html=html.replace('</body>',offlineUI+'</body>');
 // Build first; after Tailwind compilation inline all CSS into this same HTML.
 fs.writeFileSync(path.join(out,'index.html'),html);
 fs.copyFileSync('textbook.html',path.join(out,'textbook.html'));
+for(const name of ["textbook-original.html","homework-drill.html","materials/textbook-original.js","materials/homework-drill.js"])fs.copyFileSync(name,path.join(out,name));
 fs.copyFileSync('additional-materials.html',path.join(out,'additional-materials.html'));
 fs.copyFileSync('materials/question-sets-03-04.js',path.join(out,'materials/question-sets-03-04.js'));
 for(const name of ['lesson-03.pdf','lesson-04.pdf','homework-03.pdf','homework-04.pdf','review-01-04-questions.pdf','review-01-04-answers.pdf','review-03-04-questions.pdf','review-03-04-answers.pdf'])fs.copyFileSync(path.join('materials',name),path.join(out,'materials',name));
