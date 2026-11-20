@@ -52,6 +52,16 @@ async function run(){
     await link.click();
     await page.waitForURL('**/textbook.html');
     assert.match(await page.locator('#page-label').innerText(),/1 \/ 13/);
+    assert.equal(await page.locator('#jump-to-reader').count(),1);
+    assert.equal(await page.locator('#jump-to-top').count(),1);
+    assert.equal(await page.locator('#page-jump option').count(),13);
+    await page.locator('#page-jump').selectOption('2');
+    assert.match(await page.locator('#page-label').innerText(),/3 \/ 13/);
+    await page.locator('#page-jump').selectOption('0');
+    assert.match(await page.locator('#page-label').innerText(),/1 \/ 13/);
+    await page.locator('#jump-to-reader').click();
+    assert.equal(await page.locator('#reader-start').count(),1);
+
     await page.locator('#source-page-canvas').waitFor({state:'visible',timeout:30000});
     const firstCanvas=await page.locator('#source-page-canvas').evaluate(c=>({width:c.width,height:c.height}));
     assert.ok(firstCanvas.width>200&&firstCanvas.height>200,'Source PDF page must render into visible canvas');
