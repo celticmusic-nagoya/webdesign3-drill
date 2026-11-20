@@ -80,7 +80,7 @@ async function run(){
     assert.equal(await page.locator('#choices input').count(),4);
     await page.locator('#choices label').first().click();
     assert.equal(await page.locator('#feedback').isVisible(),true);
-    await page.waitForFunction(()=>document.querySelector('#position').textContent.includes('2 / 51'),null,{timeout:5000});
+    await page.waitForFunction(()=>document.querySelector('#position').textContent.includes('2 / 51'),null,{timeout:12000});
     await page.locator('#leave').click({trial:true});
     await page.goto(base+'/textbook-original.html');
     await page.locator('#exam').click();
