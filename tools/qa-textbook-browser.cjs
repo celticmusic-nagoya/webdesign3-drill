@@ -90,6 +90,46 @@ async function run(){
       await page.locator('#submit').click();
     }
     assert.match(await page.locator('#result').innerText(),/40 \/ 40問（100点）/);
+    await page.getByRole('button',{name:'学習メニューへ'}).click();
+    assert.match(await page.locator('#last').innerText(),/40 \/ 40問/);
+    await page.reload();
+    assert.match(await page.locator('#last').innerText(),/40 \/ 40問/);
+    await page.locator('#exam').click();
+    const distribution=await page.evaluate(()=>[1,2,3,4].map(n=>list.filter(q=>q.lesson===n).length));
+    assert.deepEqual(distribution,[10,10,10,10]);
+    const missedId=await page.evaluate(()=>list[0].id);
+    for(let i=0;i<40;i++){
+      await page.locator('#choices input[value="'+(i===0?1:0)+'"]').check();
+      await page.locator('#submit').click();
+    }
+    assert.match(await page.locator('#result').innerText(),/39 \/ 40問/);
+    assert.equal(await page.locator('#result .correct-answer').count(),1);
+    await page.getByRole('button',{name:/誤答だけ再演習/}).click();
+    assert.match(await page.locator('#position').innerText(),/1 \/ 1問/);
+    assert.equal(await page.evaluate(()=>list[0].id),missedId);
+    await page.locator('#choices input[value="1"]').check();
+    await page.locator('#submit').click();
+    assert.match(await page.locator('#feedback').innerText(),/不正解/);
+    assert.equal(await page.locator('#feedback .correct-answer').isVisible(),true);
+    assert.ok(await page.locator('#feedback a').getAttribute('href'));
+    await page.locator('#next').click();
+    await page.getByRole('button',{name:/誤答だけ再演習/}).click();
+    await page.locator('#choices input[value="0"]').check();
+    await page.locator('#submit').click();
+    await page.locator('#next').click();
+    assert.match(await page.locator('#result').innerText(),/全問正解/);
+    await page.getByRole('button',{name:'学習メニューへ'}).click();
+    await page.locator('#scope').selectOption('3');
+    await page.locator('#practice').click();
+    assert.match(await page.locator('#position').innerText(),/1 \/ 43問/);
+    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+    await context.setOffline(true);
+    await page.locator('#choices input[value="0"]').check();
+    await page.locator('#submit').click();
+    assert.match(await page.locator('#feedback').innerText(),/正解/);
+    await page.locator('#next').click();
+    assert.match(await page.locator('#position').innerText(),/2 \/ 43問/);
+    await context.setOffline(false);
     assert.deepEqual(errors,[],'browser runtime errors');
     console.log('PASS: mobile viewport, dashboard navigation, pagination, search persistence, cross-book search, lesson switch, reload resume, dashboard resume, no runtime errors');
     await context.close();
