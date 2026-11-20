@@ -108,14 +108,13 @@ async function run(){
     assert.match(await page.locator('#position').innerText(),/1 \/ 1問/);
     assert.equal(await page.evaluate(()=>list[0].id),missedId);
     await page.locator('#choices input[value="1"]').check();
-    await page.locator('#submit').click();
+    await page.locator('#explain').click();
     assert.match(await page.locator('#feedback').innerText(),/不正解/);
-    assert.equal(await page.locator('#feedback .correct-answer').isVisible(),true);
-    assert.ok(await page.locator('#feedback a').getAttribute('href'));
+    assert.equal(await page.locator('#explanation .correct-answer').isVisible(),true);
+    assert.ok(await page.locator('#explanation a').getAttribute('href'));
     await page.locator('#next').click();
     await page.getByRole('button',{name:/誤答だけ再演習/}).click();
     await page.locator('#choices input[value="0"]').check();
-    await page.locator('#submit').click();
     await page.locator('#next').click();
     assert.match(await page.locator('#result').innerText(),/全問正解/);
     await page.getByRole('button',{name:'学習メニューへ'}).click();
@@ -124,8 +123,8 @@ async function run(){
     assert.match(await page.locator('#position').innerText(),/1 \/ 43問/);
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
     await context.setOffline(true);
+    await page.locator('#auto').uncheck();
     await page.locator('#choices input[value="0"]').check();
-    await page.locator('#submit').click();
     assert.match(await page.locator('#feedback').innerText(),/正解/);
     await page.locator('#next').click();
     assert.match(await page.locator('#position').innerText(),/2 \/ 43問/);

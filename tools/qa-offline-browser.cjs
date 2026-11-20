@@ -350,7 +350,6 @@ try{
  assert.match(await page.locator('#result').innerText(),/39 \/ 40問/);
  await page.getByRole('button',{name:/誤答だけ再演習/}).click();
  await page.locator('#choices input[value="0"]').check();
- await page.locator('#submit').click();
  await page.locator('#next').click();
  assert.match(await page.locator('#result').innerText(),/全問正解/);
  await context.setOffline(false);
