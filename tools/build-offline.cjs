@@ -173,7 +173,7 @@ function renderPdfPage(){
  pdfLabel.textContent=pdfPage+' / '+pages.length;
  if(pdfBook>=2){try{localStorage.setItem('web3_offline_pdf_page_'+pdfBook,String(pdfPage))}catch(e){}}
 }
-function openOfflinePdf(i){
+function openOfflinePdf(i,requestedPage){
  pdfBook=i;pdfPage=1;
  if(i>=2){try{const stored=Number(localStorage.getItem('web3_offline_pdf_page_'+i));if(Number.isInteger(stored)&&stored>=1&&stored<=embeddedPageImages[i].length)pdfPage=stored}catch(e){}}
  document.getElementById('offline-pdf-close').textContent=i>=2?'教科書メニューへ':'教科書の同じページへ';
@@ -185,6 +185,7 @@ function openOfflinePdf(i){
    if(match)pdfPage=Math.max(1,Math.min(embeddedPageImages[i].length,Number(match[1])));
   }
  }catch(e){}
+ if(Number.isInteger(requestedPage)&&requestedPage>=1&&requestedPage<=embeddedPageImages[i].length)pdfPage=requestedPage;
  pdfZoom=1;applyPdfZoom();
  pdfView.hidden=false;pdfView.style.display='flex';pdfFrame.style.display='none';
  renderPdfPage();
@@ -221,7 +222,8 @@ frame.addEventListener('load',()=>{
  },true);
 });
 open.addEventListener('click',function(e){e.preventDefault();frame.srcdoc=readerSource;overlay.hidden=false;overlay.style.display='flex';document.body.style.overflow='hidden'});
-back.addEventListener('click',function(){pdfView.style.display='none';pdfView.hidden=true;pdfFrame.style.display='block';overlay.style.display='none';overlay.hidden=true;frame.removeAttribute('srcdoc');document.body.style.overflow=''});
+window.openDrillReference=function(book,page){overlay.hidden=false;overlay.style.display='flex';document.body.style.overflow='hidden';back.textContent='← 問題に戻る';openOfflinePdf(book,page);document.getElementById('offline-pdf-close').hidden=true};
+back.addEventListener('click',function(){back.textContent='← 戻る';document.getElementById('offline-pdf-close').hidden=false;pdfView.style.display='none';pdfView.hidden=true;pdfFrame.style.display='block';overlay.style.display='none';overlay.hidden=true;frame.removeAttribute('srcdoc');document.body.style.overflow=document.getElementById('offline-drill-overlay')?.hidden===false?'hidden':''});
 })();
 </script>`;
 // Embed both drills for Android content:// entrypoints, while retaining extracted HTML copies.
@@ -241,7 +243,7 @@ const drillUI=`<div id="offline-drill-overlay" hidden style="position:fixed;inse
  document.getElementById('offline-drill-back').onclick=close;
  function open(name){frame.srcdoc=new TextDecoder().decode(Uint8Array.from(atob(sources[name]),c=>c.charCodeAt(0)));overlay.hidden=false;overlay.style.display='flex';document.body.style.overflow='hidden'}
  for(const name of Object.keys(sources))document.querySelectorAll('a[href="./'+name+'.html"]').forEach(a=>{a.addEventListener('click',e=>{e.preventDefault();open(name)})});
- frame.addEventListener('load',()=>{const doc=frame.contentDocument;if(!doc)return;doc.querySelectorAll('a[href="./index.html"]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();close()}));doc.querySelectorAll('a[href="./textbook.html"]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();document.getElementById('offline-textbook-link').click()}))});
+ frame.addEventListener('load',()=>{const doc=frame.contentDocument;if(!doc)return;doc.addEventListener('click',e=>{const a=e.target.closest('a[data-lesson][data-page]');if(!a)return;const book=Number(a.dataset.lesson)-1,page=Number(a.dataset.page);if(!Number.isInteger(book)||book<0||book>3||!Number.isInteger(page)||page<1)return;e.preventDefault();window.openDrillReference(book,page)});doc.querySelectorAll('a[href="./index.html"]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();close()}));doc.querySelectorAll('a[href="./textbook.html"]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();document.getElementById('offline-textbook-link').click()}))});
 })();
 </script>`;
 html=html.replace('</body>',offlineUI+drillUI+'</body>');
