@@ -8,6 +8,10 @@ if(!source.includes('https://cdn.tailwindcss.com'))throw Error('Tailwind CDN scr
 let html=source.replace(/<script src="https:\/\/cdn\.tailwindcss\.com"><\/script>/,'<link rel="stylesheet" href="./offline.css">');
 html=html.replace(/<script>\s*tailwind\.config\s*=\s*\{[\s\S]*?<\/script>/,'');
 html=html.replace(/<link href="https:\/\/fonts\.googleapis\.com[^"]*" rel="stylesheet">/,'');
+// Inline the additional 120 questions in the standalone HTML (file:// needs no sibling JS).
+const extraQuestions=fs.readFileSync('materials/question-sets-03-04.js','utf8');
+if(!extraQuestions.includes('window.ADDITIONAL_LECTURE_QUESTIONS = ['))throw Error('Additional questions not imported');
+html=html.replace('<script src="./materials/question-sets-03-04.js"></script>','<script>'+extraQuestions+'</script>');
 if(html.includes('cdn.tailwindcss.com')||html.includes('fonts.googleapis.com'))throw Error('Online style dependency remains');
 // file:// and Android content:// URLs cannot reliably resolve sibling HTML files.
 // Embed the reader in the entrypoint and show it in a sandboxed same-origin iframe.
@@ -212,6 +216,9 @@ html=html.replace('</body>',offlineUI+'</body>');
 // Build first; after Tailwind compilation inline all CSS into this same HTML.
 fs.writeFileSync(path.join(out,'index.html'),html);
 fs.copyFileSync('textbook.html',path.join(out,'textbook.html'));
+fs.copyFileSync('additional-materials.html',path.join(out,'additional-materials.html'));
+fs.copyFileSync('materials/question-sets-03-04.js',path.join(out,'materials/question-sets-03-04.js'));
+for(const name of ['lesson-03.pdf','lesson-04.pdf','homework-03.pdf','homework-04.pdf','review-01-04-questions.pdf','review-01-04-answers.pdf','review-03-04-questions.pdf','review-03-04-answers.pdf'])fs.copyFileSync(path.join('materials',name),path.join(out,'materials',name));
 const manifest=JSON.parse(fs.readFileSync('materials/SOURCE_MANIFEST.json','utf8'));
 for(const item of manifest.source_files){
   const p=item.expected_repository_path;

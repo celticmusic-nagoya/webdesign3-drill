@@ -1,0 +1,23 @@
+name: New lesson materials QA
+on:
+  push:
+    branches: [feature/lesson-03-04-materials-20261120]
+  pull_request:
+    paths:
+      - 'materials/**'
+      - 'index.html'
+      - 'additional-materials.html'
+      - 'tools/qa-new-materials.cjs'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node tools/qa-new-materials.cjs
+      - run: node tools/qa-textbook.cjs

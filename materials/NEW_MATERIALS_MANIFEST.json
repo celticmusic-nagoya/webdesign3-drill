@@ -1,0 +1,50 @@
+{
+  "テキスト3回目.pdf": {
+    "filename": "テキスト3回目.pdf",
+    "pages": 23,
+    "sha256": "5fbc937c203b0932a7dfe0df4bf5b1066dafff1b0278e87fcbf7cca5ab353ad8",
+    "bytes": 2149581
+  },
+  "テキスト4回目.pdf": {
+    "filename": "テキスト4回目.pdf",
+    "pages": 20,
+    "sha256": "60e58130ec96fbc721868c63dae9cc889f34561f4db17d24fd7fb95f831c52fa",
+    "bytes": 2339311
+  },
+  "第3回_自宅学習_穴埋め.pdf": {
+    "filename": "第3回_自宅学習_穴埋め.pdf",
+    "pages": 4,
+    "sha256": "1a764250ee55515b403aa72cf27d7a3b85e73186fb50f0f43d1fe0d893cac53c",
+    "bytes": 10472
+  },
+  "第4回_自宅学習_穴埋め.pdf": {
+    "filename": "第4回_自宅学習_穴埋め.pdf",
+    "pages": 4,
+    "sha256": "272982813a26f1da397b8681addb3b561ec027f17e5d0da5b67400cafdc60d7c",
+    "bytes": 31571
+  },
+  "第1〜4回_総合復習60問_過去問収録.pdf": {
+    "filename": "第1〜4回_総合復習60問_過去問収録.pdf",
+    "pages": 7,
+    "sha256": "1fad84e3c6e73b284866dbb89a6fde0bc31513444c6f16698cd420d9c2218fad",
+    "bytes": 42854
+  },
+  "第1〜4回_総合復習60問_解答・解説.pdf": {
+    "filename": "第1〜4回_総合復習60問_解答・解説.pdf",
+    "pages": 3,
+    "sha256": "a61b21640ba39daea040f0a9197d15a3d3d90f635a1d40c328d7d8144e8fc82e",
+    "bytes": 33093
+  },
+  "第3・4回_総合復習60問_問題冊子.pdf": {
+    "filename": "第3・4回_総合復習60問_問題冊子.pdf",
+    "pages": 7,
+    "sha256": "61da63c231407f46ff0237322c8a9b94dad8779f9eaee8509cdb33dc9445cd0d",
+    "bytes": 41128
+  },
+  "第3・4回_総合復習60問_解答・解説.pdf": {
+    "filename": "第3・4回_総合復習60問_解答・解説.pdf",
+    "pages": 3,
+    "sha256": "db843b6e8295f4c3a388d69c20d936255f2f1df2580e3bd8d0810d6ca9efc92e",
+    "bytes": 32998
+  }
+}
