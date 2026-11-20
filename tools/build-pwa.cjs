@@ -2,7 +2,7 @@
 'use strict';
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const src=path.resolve('dist/webdesign3-offline'),out=path.resolve('dist/webdesign3-pwa');
-const files=['index.html','textbook.html','additional-materials.html','materials/question-sets-03-04.js','materials/lesson-01.pdf','materials/lesson-02.pdf',...['lesson-03.pdf','lesson-04.pdf','homework-03.pdf','homework-04.pdf','review-01-04-questions.pdf','review-01-04-answers.pdf','review-03-04-questions.pdf','review-03-04-answers.pdf'].map(x=>'materials/'+x)];
+const files=["textbook-original.html","homework-drill.html","materials/textbook-original.js","materials/homework-drill.js",'index.html','textbook.html','additional-materials.html','materials/question-sets-03-04.js','materials/lesson-01.pdf','materials/lesson-02.pdf',...['lesson-03.pdf','lesson-04.pdf','homework-03.pdf','homework-04.pdf','review-01-04-questions.pdf','review-01-04-answers.pdf','review-03-04-questions.pdf','review-03-04-answers.pdf'].map(x=>'materials/'+x)];
 fs.mkdirSync(path.join(out,'materials'),{recursive:true});
 for(const name of files){const from=path.join(src,name);if(!fs.existsSync(from))throw Error('Missing offline asset: '+name);fs.copyFileSync(from,path.join(out,name));}
 let html=fs.readFileSync(path.join(out,'index.html'),'utf8');
