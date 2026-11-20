@@ -73,6 +73,24 @@ async function run(){
     assert.match(await page.locator('#page-label').innerText(),/1 \/ 10/);
     await page.goto(base+'/index.html');
     assert.match(await page.locator('#textbook-resume-label').innerText(),/第2回・1ページ/);
+    await page.goto(base+'/homework-drill.html');
+    await page.locator('#scope').selectOption('3');
+    await page.locator('#practice').click();
+    assert.match(await page.locator('#position').innerText(),/1 \/ 51/);
+    assert.equal(await page.locator('#choices input').count(),4);
+    await page.locator('#choices label').first().click();
+    await page.locator('#submit').click();
+    assert.equal(await page.locator('#feedback').isVisible(),true);
+    await page.locator('#next').click();
+    assert.match(await page.locator('#position').innerText(),/2 \/ 51/);
+    await page.goto(base+'/textbook-original.html');
+    await page.locator('#exam').click();
+    assert.match(await page.locator('#position').innerText(),/1 \/ 40/);
+    for(let i=0;i<40;i++){
+      await page.locator('#choices input[value="0"]').check();
+      await page.locator('#submit').click();
+    }
+    assert.match(await page.locator('#result').innerText(),/40 \/ 40問（100点）/);
     assert.deepEqual(errors,[],'browser runtime errors');
     console.log('PASS: mobile viewport, dashboard navigation, pagination, search persistence, cross-book search, lesson switch, reload resume, dashboard resume, no runtime errors');
     await context.close();
