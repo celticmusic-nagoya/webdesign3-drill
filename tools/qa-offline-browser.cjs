@@ -318,6 +318,21 @@ try{
    loadUserData();
   },reloadBaseline.original);
  }
+ await page.goto(pathToFileURL(path.join(path.dirname(file),'textbook-original.html')).href);
+ await context.setOffline(true);
+ assert.equal(await page.evaluate(()=>window.TEXTBOOK_ORIGINAL.length),158);
+ await page.locator('#exam').click();
+ for(let i=0;i<40;i++){
+  await page.locator('#choices input[value="'+(i===0?1:0)+'"]').check();
+  await page.locator('#submit').click();
+ }
+ assert.match(await page.locator('#result').innerText(),/39 \/ 40問/);
+ await page.getByRole('button',{name:/誤答だけ再演習/}).click();
+ await page.locator('#choices input[value="0"]').check();
+ await page.locator('#submit').click();
+ await page.locator('#next').click();
+ assert.match(await page.locator('#result').innerText(),/全問正解/);
+ await context.setOffline(false);
  assert.deepEqual(errors,[]);
  console.log('PASS: standalone file HTML CSS and embedded textbook pagination');
  await context.close();
