@@ -146,6 +146,18 @@ try{
  assert.match(await frame.locator('#page-label').innerText(),/9 \/ 10/,'Textbook should resume its last reading position');
  await page.locator('#offline-reader-back').click();
  assert.equal(await overlay.isVisible(),false);
+ await page.locator('#offline-textbook-link').click();
+ await frame.locator('#book').waitFor({state:'visible'});
+ await frame.locator('#book').selectOption('2');
+ assert.equal(await page.locator('#offline-pdf-page').innerText(),'1 / 23');
+ await page.locator('#offline-pdf-next').click();
+ assert.equal(await page.locator('#offline-pdf-page').innerText(),'2 / 23');
+ await page.locator('#offline-pdf-4').click();
+ assert.equal(await page.locator('#offline-pdf-page').innerText(),'1 / 20');
+ await page.locator('#offline-pdf-3').click();
+ assert.equal(await page.locator('#offline-pdf-page').innerText(),'2 / 23');
+ await page.locator('#offline-pdf-close').click();
+ await page.locator('#offline-reader-back').click();
  // Backup validation: malformed data must never replace a student's existing progress.
  const backupCheck=await page.evaluate(async()=>{
   const original=localStorage.getItem('web3_master_data');
