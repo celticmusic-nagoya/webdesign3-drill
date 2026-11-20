@@ -1,0 +1,30 @@
+name: Import approved lesson PDFs and questions
+on:
+  push:
+    branches: [feature/lesson-03-04-materials-20261120]
+    paths:
+      - imports/webdesign3_new_materials.zip
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/lesson-03-04-materials-20261120
+          persist-credentials: true
+      - name: Validate and import eight PDFs and 120 questions
+        run: python3 tools/import-new-materials.py imports/webdesign3_new_materials.zip
+      - name: Verify generated question JS
+        run: |
+          node --check materials/question-sets-03-04.js
+          node -e "global.window={};require('./materials/question-sets-03-04.js');if(window.ADDITIONAL_LECTURE_QUESTIONS.length!==120)process.exit(1)"
+      - name: Commit validated materials to existing branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add materials/
+          git diff --cached --quiet || (git commit -m 'assets: import eight verified PDFs and 120 review questions' && git push)
