@@ -24,6 +24,22 @@ async function run(){
     const errors=[];
     page.on('pageerror',e=>errors.push(e.message));
     await page.goto(base+'/index.html');
+    // Both new review categories must be available and their questions loaded in the live app.
+    assert.equal(await page.locator('#practice-category-select option[value="LECTURE_1_4_REVIEW"]').count(),1);
+    assert.equal(await page.locator('#practice-category-select option[value="LECTURE_3_4_REVIEW"]').count(),1);
+    const imported=await page.evaluate(()=>({
+      total:QUESTIONS.length,
+      a:QUESTIONS.filter(q=>q.category==='LECTURE_1_4_REVIEW').length,
+      b:QUESTIONS.filter(q=>q.category==='LECTURE_3_4_REVIEW').length
+    }));
+    assert.equal(imported.a,60);assert.equal(imported.b,60);
+    const catalogLink=page.locator('a[href="./additional-materials.html"]').first();
+    assert.ok(await catalogLink.count()>0,'Additional materials link missing');
+    await page.goto(base+'/additional-materials.html');
+    assert.equal(await page.locator('#source option').count(),8);
+    await page.locator('#source').selectOption('7');
+    assert.match(await page.locator('#open').getAttribute('href'),/review-03-04-answers\.pdf$/);
+    await page.goto(base+'/index.html');
     const link=page.getByRole('link',{name:/教科書を開く/});
     assert.equal(await link.count(),1,'dashboard textbook link');
     await link.click();
