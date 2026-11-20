@@ -28,9 +28,9 @@ def main(archive):
    assert manifest[source]['pages']==pages
   for source,dest,_ in SOURCES:
    (ROOT/'materials'/dest).write_bytes(z.read('pdf/'+source))
-  js='// Generated from supplied original PDF question/answer booklets; do not edit by hand.\\nwindow.ADDITIONAL_LECTURE_QUESTIONS = '+json.dumps(questions,ensure_ascii=False,separators=(',',':'))+';\\n'
+  js='// Generated from supplied original PDF question/answer booklets; do not edit by hand.\nwindow.ADDITIONAL_LECTURE_QUESTIONS = '+json.dumps(questions,ensure_ascii=False,separators=(',',':'))+';\n'
   (ROOT/'materials/question-sets-03-04.js').write_text(js,encoding='utf-8')
-  (ROOT/'materials/NEW_MATERIALS_MANIFEST.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\\n',encoding='utf-8')
+  (ROOT/'materials/NEW_MATERIALS_MANIFEST.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
   print('PASS: eight SHA-256 verified PDFs and 120 unique questions imported')
 if __name__=='__main__':
  if len(sys.argv)!=2: raise SystemExit('Usage: python3 tools/import-new-materials.py ZIP')
