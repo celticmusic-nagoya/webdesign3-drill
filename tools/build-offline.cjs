@@ -22,7 +22,7 @@ if(linkStart<0)throw Error('Actual textbook anchor not found');
 html=html.slice(0,linkStart)+html.slice(linkStart).replace('<a id="textbook-open-link" href="./textbook.html"','<a id="offline-textbook-link" href="#offline-textbook"');
 const embeddedReader=JSON.stringify(Buffer.from(readerHtml,'utf8').toString('base64'));
 const offlineUI=`<div id="offline-reader-overlay" hidden style="position:fixed;inset:0;z-index:99999;background:#0f172a;display:none;flex-direction:column">
-<div style="display:flex;flex-wrap:wrap;gap:6px;padding:8px;background:#1e293b;color:white"><button id="offline-reader-back" type="button" style="padding:8px;background:#334155;color:white">← 戻る</button><button id="offline-pdf-1" type="button" style="padding:8px;background:#2563eb;color:white">第1回 PDFを開く</button><button id="offline-pdf-2" type="button" style="padding:8px;background:#2563eb;color:white">第2回 PDFを開く</button><span id="offline-pdf-help" role="status" aria-live="polite" style="font-size:12px;align-self:center;color:#cbd5e1">原資料をアプリ内で閲覧できます</span></div>
+<div style="display:flex;flex-wrap:wrap;gap:6px;padding:8px;background:#1e293b;color:white"><button id="offline-reader-back" type="button" style="padding:8px;background:#334155;color:white">← 戻る</button><button id="offline-pdf-1" type="button" style="padding:8px;background:#2563eb;color:white">第1回 PDFを開く</button><button id="offline-pdf-2" type="button" style="padding:8px;background:#2563eb;color:white">第2回 PDFを開く</button><button id="offline-pdf-3" type="button" style="padding:8px;background:#2563eb;color:white">第3回 PDFを開く</button><button id="offline-pdf-4" type="button" style="padding:8px;background:#2563eb;color:white">第4回 PDFを開く</button><span id="offline-pdf-help" role="status" aria-live="polite" style="font-size:12px;align-self:center;color:#cbd5e1">原資料をアプリ内で閲覧できます</span></div>
 <iframe id="offline-reader-frame" title="オフライン教科書" style="width:100%;flex:1;border:0;background:white"></iframe>
 <div id="offline-pdf-viewer" hidden style="display:none;flex:1;min-height:0;flex-direction:column;background:#334155;color:white">
 <div style="display:flex;align-items:center;justify-content:center;gap:10px;padding:7px;flex-wrap:wrap"><button id="offline-pdf-prev" type="button">前へ</button><span id="offline-pdf-page" role="status">PDF読み込み中</span><button id="offline-pdf-next" type="button">次へ</button><button id="offline-pdf-zoom-in" type="button">拡大 ＋</button><button id="offline-pdf-zoom-out" type="button">縮小 −</button><button id="offline-pdf-zoom-reset" type="button">画面幅</button><span id="offline-pdf-zoom-label" role="status">100%</span><button id="offline-pdf-close" type="button">教科書の同じページへ</button></div>
@@ -171,9 +171,12 @@ function renderPdfPage(){
  if(pdfPage<1||pdfPage>pages.length){pdfLabel.textContent='原資料ページがありません';return;}
  pdfImage.src=pages[pdfPage-1];
  pdfLabel.textContent=pdfPage+' / '+pages.length;
+ if(pdfBook>=2){try{localStorage.setItem('web3_offline_pdf_page_'+pdfBook,String(pdfPage))}catch(e){}}
 }
-function openOfflinePdf(i){
+function openOfflinePdf(i,requestedPage){
  pdfBook=i;pdfPage=1;
+ if(i>=2){try{const stored=Number(localStorage.getItem('web3_offline_pdf_page_'+i));if(Number.isInteger(stored)&&stored>=1&&stored<=embeddedPageImages[i].length)pdfPage=stored}catch(e){}}
+ document.getElementById('offline-pdf-close').textContent=i>=2?'教科書メニューへ':'教科書の同じページへ';
  try{
   const doc=frame.contentDocument;
   if(Number(doc?.getElementById('book')?.value)===i){
@@ -182,6 +185,7 @@ function openOfflinePdf(i){
    if(match)pdfPage=Math.max(1,Math.min(embeddedPageImages[i].length,Number(match[1])));
   }
  }catch(e){}
+ if(Number.isInteger(requestedPage)&&requestedPage>=1&&requestedPage<=embeddedPageImages[i].length)pdfPage=requestedPage;
  pdfZoom=1;applyPdfZoom();
  pdfView.hidden=false;pdfView.style.display='flex';pdfFrame.style.display='none';
  renderPdfPage();
@@ -192,7 +196,7 @@ document.getElementById('offline-pdf-close').addEventListener('click',()=>{
  try{
   const doc=frame.contentDocument;
   const select=doc?.getElementById('book');
-  if(select){
+  if(select&&pdfBook<2){
    if(Number(select.value)!==pdfBook){select.value=String(pdfBook);select.dispatchEvent(new Event('change',{bubbles:true}));}
    const button=doc.querySelector('#chapters button[data-page="'+(pdfPage-1)+'"]');
    button?.click();
@@ -202,20 +206,59 @@ document.getElementById('offline-pdf-close').addEventListener('click',()=>{
 });
 document.getElementById('offline-pdf-1').addEventListener('click',()=>openOfflinePdf(0));
 document.getElementById('offline-pdf-2').addEventListener('click',()=>openOfflinePdf(1));
+document.getElementById('offline-pdf-3').addEventListener('click',()=>openOfflinePdf(2));
+document.getElementById('offline-pdf-4').addEventListener('click',()=>openOfflinePdf(3));
 const overlay=document.getElementById('offline-reader-overlay');
 const frame=document.getElementById('offline-reader-frame');
 const open=document.getElementById('offline-textbook-link');
 const back=document.getElementById('offline-reader-back');
 if(!open||!overlay||!frame||!back)return;
-frame.addEventListener('load',()=>attachTextbookFigures().catch(e=>console.warn('Original figures unavailable',e)));
+frame.addEventListener('load',()=>{
+ attachTextbookFigures().catch(e=>console.warn('Original figures unavailable',e));
+ const select=frame.contentDocument?.getElementById('book');
+ if(select)select.addEventListener('change',e=>{
+  const n=Number(select.value);
+  if(n>=2){e.stopImmediatePropagation();select.value=String(Number((frame.contentDocument.getElementById('original-figure-status')?.textContent||'').includes('第2回')));openOfflinePdf(n);}
+ },true);
+});
 open.addEventListener('click',function(e){e.preventDefault();frame.srcdoc=readerSource;overlay.hidden=false;overlay.style.display='flex';document.body.style.overflow='hidden'});
-back.addEventListener('click',function(){pdfView.style.display='none';pdfView.hidden=true;pdfFrame.style.display='block';overlay.style.display='none';overlay.hidden=true;frame.removeAttribute('srcdoc');document.body.style.overflow=''});
+window.openDrillReference=function(book,page){overlay.hidden=false;overlay.style.display='flex';document.body.style.overflow='hidden';back.textContent='← 問題に戻る';openOfflinePdf(book,page);document.getElementById('offline-pdf-close').hidden=true};
+back.addEventListener('click',function(){back.textContent='← 戻る';document.getElementById('offline-pdf-close').hidden=false;pdfView.style.display='none';pdfView.hidden=true;pdfFrame.style.display='block';overlay.style.display='none';overlay.hidden=true;frame.removeAttribute('srcdoc');document.body.style.overflow=document.getElementById('offline-drill-overlay')?.hidden===false?'hidden':''});
 })();
 </script>`;
-html=html.replace('</body>',offlineUI+'</body>');
+// Embed both drills for Android content:// entrypoints, while retaining extracted HTML copies.
+const drillSources=Object.fromEntries(['textbook-original','homework-drill'].map(name=>{
+ const source=fs.readFileSync(name+'.html','utf8');
+ const tag='<script src="./materials/'+name+'.js"></script>';
+ if(!source.includes(tag))throw Error('Missing drill bank: '+name);
+ const embedded=source.replace(tag,()=>'<script>'+fs.readFileSync('materials/'+name+'.js','utf8')+'</script>');
+ return [name,Buffer.from(embedded,'utf8').toString('base64')];
+}));
+const drillUI=`<div id="offline-drill-overlay" hidden style="position:fixed;inset:0;z-index:99998;background:#0f172a;display:none;flex-direction:column"><button id="offline-drill-back" type="button" style="padding:12px;background:#334155;color:white">← アプリのトップへ</button><iframe id="offline-drill-frame" title="オフライン問題集" style="width:100%;flex:1;min-height:0;border:0"></iframe></div>
+<script>
+(function(){
+ const sources=${JSON.stringify(drillSources)};
+ const overlay=document.getElementById('offline-drill-overlay'),frame=document.getElementById('offline-drill-frame');
+ function close(){overlay.hidden=true;overlay.style.display='none';frame.removeAttribute('srcdoc');document.body.style.overflow=''}
+ document.getElementById('offline-drill-back').onclick=close;
+ function open(name){frame.srcdoc=new TextDecoder().decode(Uint8Array.from(atob(sources[name]),c=>c.charCodeAt(0)));overlay.hidden=false;overlay.style.display='flex';document.body.style.overflow='hidden'}
+ for(const name of Object.keys(sources))document.querySelectorAll('a[href="./'+name+'.html"]').forEach(a=>{a.addEventListener('click',e=>{e.preventDefault();open(name)})});
+ frame.addEventListener('load',()=>{const doc=frame.contentDocument;if(!doc)return;doc.addEventListener('click',e=>{const a=e.target.closest('a[data-lesson][data-page]');if(!a)return;const book=Number(a.dataset.lesson)-1,page=Number(a.dataset.page);if(!Number.isInteger(book)||book<0||book>3||!Number.isInteger(page)||page<1)return;e.preventDefault();window.openDrillReference(book,page)});doc.querySelectorAll('a[href="./index.html"]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();close()}));doc.querySelectorAll('a[href="./textbook.html"]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();document.getElementById('offline-textbook-link').click()}))});
+})();
+</script>`;
+html=html.replace('</body>',offlineUI+drillUI+'</body>');
 // Build first; after Tailwind compilation inline all CSS into this same HTML.
 fs.writeFileSync(path.join(out,'index.html'),html);
 fs.copyFileSync('textbook.html',path.join(out,'textbook.html'));
+for(const name of ["textbook-original.html","homework-drill.html","materials/textbook-original.js","materials/homework-drill.js"])fs.copyFileSync(name,path.join(out,name));
+// Inline drill banks so extracted local HTML does not depend on sibling script loading.
+for(const name of ['textbook-original','homework-drill']){
+ const file=path.join(out,name+'.html');
+ const tag='<script src="./materials/'+name+'.js"></script>';
+ const source=fs.readFileSync(file,'utf8');
+ if(!source.includes(tag))throw Error('Missing drill script: '+name);
+ fs.writeFileSync(file,source.replace(tag,()=>'<script>'+fs.readFileSync('materials/'+name+'.js','utf8').replace(/<\/script/gi,'<\\/script')+'</script>'));
+}
 fs.copyFileSync('additional-materials.html',path.join(out,'additional-materials.html'));
 fs.copyFileSync('materials/question-sets-03-04.js',path.join(out,'materials/question-sets-03-04.js'));
 for(const name of ['lesson-03.pdf','lesson-04.pdf','homework-03.pdf','homework-04.pdf','review-01-04-questions.pdf','review-01-04-answers.pdf','review-03-04-questions.pdf','review-03-04-answers.pdf'])fs.copyFileSync(path.join('materials',name),path.join(out,'materials',name));
@@ -236,7 +279,7 @@ function inlineCompiledStyles(){
   const css=fs.readFileSync(cssPath,'utf8');
   if(!page.includes('<link rel="stylesheet" href="./offline.css">'))throw Error('CSS link missing');
   page=page.replace('<link rel="stylesheet" href="./offline.css">','<style id="offline-tailwind">'+css+'</style>');
-  const rasterized=['materials/lesson-01.pdf','materials/lesson-02.pdf'].map(file=>{
+  const rasterized=['materials/lesson-01.pdf','materials/lesson-02.pdf','materials/lesson-03.pdf','materials/lesson-04.pdf'].map(file=>{
     const pdf=path.resolve(file);
     const info=execFileSync('pdfinfo',[pdf],{encoding:'utf8'});
     const count=Number(info.match(/^Pages:\s*(\d+)/m)?.[1]);

@@ -1,6 +1,14 @@
 name: Build fully offline study package
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - textbook-original.html
+      - homework-drill.html
+      - materials/**
+      - tools/build-offline.cjs
+      - tools/qa-offline-browser.cjs
+      - .github/workflows/offline-package.yml
   push:
     branches:
       - main
@@ -8,6 +16,9 @@ on:
     paths:
       - index.html
       - textbook.html
+      - textbook-original.html
+      - homework-drill.html
+      - tools/qa-offline-browser.cjs
       - materials/**
       - tools/build-offline.cjs
       - .github/workflows/offline-package.yml
@@ -24,6 +35,13 @@ jobs:
           node-version: '22'
       - name: Validate textbook and original PDF checksums
         run: node tools/qa-textbook.cjs
+      - name: Install PDF rendering dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends poppler-utils fonts-noto-cjk
+          command -v pdfinfo
+          command -v pdftoppm
+          pdfinfo -v
       - name: Stage offline package
         run: node tools/build-offline.cjs
       - name: Compile Tailwind CSS locally for offline runtime
@@ -40,14 +58,19 @@ jobs:
           const base='dist/webdesign3-offline/';
           const html=fs.readFileSync(base+'index.html','utf8');
           const reader=fs.readFileSync(base+'textbook.html','utf8');
-          assert.match(html,/href="\.\/textbook\.html"/);
-          assert.match(html,/href="\.\/offline\.css"/);
+          assert.match(html,/id="offline-textbook-link"/);
+          assert.match(html,/<style id="offline-tailwind">/);
           assert.doesNotMatch(html,/cdn\.tailwindcss\.com|fonts\.googleapis\.com/);
           assert.match(reader,/\.\/materials\/lesson-01\.pdf/);
           assert.match(reader,/\.\/materials\/lesson-02\.pdf/);
           for(const file of ['materials/lesson-01.pdf','materials/lesson-02.pdf'])assert.ok(fs.statSync(base+file).size>100);
           console.log('PASS: offline HTML, CSS, links and PDFs');
           NODE
+      - name: Run extracted-file browser QA
+        run: |
+          npm install --no-save --no-package-lock playwright@1.51.1
+          npx playwright install --with-deps chromium
+          node tools/qa-offline-browser.cjs
       - name: Upload complete offline package
         uses: actions/upload-artifact@v4
         with:

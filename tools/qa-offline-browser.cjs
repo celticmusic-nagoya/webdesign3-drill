@@ -146,6 +146,18 @@ try{
  assert.match(await frame.locator('#page-label').innerText(),/9 \/ 10/,'Textbook should resume its last reading position');
  await page.locator('#offline-reader-back').click();
  assert.equal(await overlay.isVisible(),false);
+ await page.locator('#offline-textbook-link').click();
+ await frame.locator('#book').waitFor({state:'visible'});
+ await frame.locator('#book').selectOption('2');
+ assert.equal(await page.locator('#offline-pdf-page').innerText(),'1 / 23');
+ await page.locator('#offline-pdf-next').click();
+ assert.equal(await page.locator('#offline-pdf-page').innerText(),'2 / 23');
+ await page.locator('#offline-pdf-4').click();
+ assert.equal(await page.locator('#offline-pdf-page').innerText(),'1 / 20');
+ await page.locator('#offline-pdf-3').click();
+ assert.equal(await page.locator('#offline-pdf-page').innerText(),'2 / 23');
+ await page.locator('#offline-pdf-close').click();
+ await page.locator('#offline-reader-back').click();
  // Backup validation: malformed data must never replace a student's existing progress.
  const backupCheck=await page.evaluate(async()=>{
   const original=localStorage.getItem('web3_master_data');
@@ -318,6 +330,47 @@ try{
    loadUserData();
   },reloadBaseline.original);
  }
+ for(const [name,bank,count] of [['homework-drill','HOMEWORK_DRILL',200],['textbook-original','TEXTBOOK_ORIGINAL',158]]){
+  await page.locator('a[href="./'+name+'.html"]').first().click();
+  const drill=page.frameLocator('#offline-drill-frame');
+  await drill.locator('#practice').waitFor({state:'visible'});
+  assert.equal(await drill.locator('body').evaluate((el,key)=>el.ownerDocument.defaultView[key].length,bank),count);
+  await drill.locator('#practice').click();
+  assert.match(await drill.locator('#position').innerText(),/1 \/ /);
+  await drill.locator('#auto').uncheck();
+  const position=await drill.locator('#position').innerText();
+  await drill.locator('#choices input').first().check();
+  await drill.locator('#explain').click();
+  const link=drill.locator('#explanation a[data-lesson][data-page]');
+  const lesson=Number(await link.getAttribute('data-lesson'));
+  const target=Number(await link.getAttribute('data-page'));
+  assert.ok(target>=1&&target<=[13,10,23,20][lesson-1]);
+  const feedback=await drill.locator('#feedback').innerText();
+  await link.click();
+  await page.locator('#offline-pdf-viewer').waitFor({state:'visible'});
+  assert.match(await page.locator('#offline-pdf-page').innerText(),new RegExp('\\b'+target+'\\s*/'));
+  await page.locator('#offline-reader-back').click();
+  assert.equal(await drill.locator('#position').innerText(),position);
+  assert.equal(await drill.locator('#feedback').innerText(),feedback);
+  assert.equal(await drill.locator('#explanation').isVisible(),true);
+  await drill.locator('#next').click();
+  assert.match(await drill.locator('#position').innerText(),/2 \/ /);
+  await page.locator('#offline-drill-back').click();
+ }
+ await page.goto(pathToFileURL(path.join(path.dirname(file),'textbook-original.html')).href);
+ await context.setOffline(true);
+ assert.equal(await page.evaluate(()=>window.TEXTBOOK_ORIGINAL.length),158);
+ await page.locator('#exam').click();
+ for(let i=0;i<40;i++){
+  await page.locator('#choices input[value="'+(i===0?1:0)+'"]').check();
+  await page.locator('#submit').click();
+ }
+ assert.match(await page.locator('#result').innerText(),/39 \/ 40問/);
+ await page.getByRole('button',{name:/誤答だけ再演習/}).click();
+ await page.locator('#choices input[value="0"]').check();
+ await page.locator('#next').click();
+ assert.match(await page.locator('#result').innerText(),/全問正解/);
+ await context.setOffline(false);
  assert.deepEqual(errors,[]);
  console.log('PASS: standalone file HTML CSS and embedded textbook pagination');
  await context.close();
