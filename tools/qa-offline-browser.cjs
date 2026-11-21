@@ -330,6 +330,19 @@ try{
    loadUserData();
   },reloadBaseline.original);
  }
+ await page.locator('#offline-textbook-link').click();
+ const reader=page.frameLocator('#offline-reader-frame');
+ await reader.locator('a[href^="./additional-materials.html"]').click();
+ await page.locator('#offline-material-select').waitFor({state:'visible'});
+ for(const i of [2,3,4,5,6,7,8,9]){
+  await page.locator('#offline-material-select').selectOption(String(i));
+  assert.match(await page.locator('#offline-pdf-page').innerText(),/^1 \/ [1-9]/);
+  assert.ok(await page.locator('#offline-pdf-image').evaluate(el=>el.src.startsWith('data:image/png;base64,')));
+ }
+ await page.locator('#offline-material-back').click();
+ await reader.locator('a[href="./homework-drill.html"]').click();
+ await page.frameLocator('#offline-drill-frame').locator('#practice').waitFor({state:'visible'});
+ await page.locator('#offline-drill-back').click();
  for(const [name,bank,count] of [['homework-drill','HOMEWORK_DRILL',200],['textbook-original','TEXTBOOK_ORIGINAL',158]]){
   await page.locator('a[href="./'+name+'.html"]').first().click();
   const drill=page.frameLocator('#offline-drill-frame');
