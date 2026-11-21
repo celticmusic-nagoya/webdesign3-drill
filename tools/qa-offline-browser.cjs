@@ -337,6 +337,24 @@ try{
   assert.equal(await drill.locator('body').evaluate((el,key)=>el.ownerDocument.defaultView[key].length,bank),count);
   await drill.locator('#practice').click();
   assert.match(await drill.locator('#position').innerText(),/1 \/ /);
+  await drill.locator('#auto').uncheck();
+  const position=await drill.locator('#position').innerText();
+  await drill.locator('#choices input').first().check();
+  await drill.locator('#explain').click();
+  const link=drill.locator('#explanation a[data-lesson][data-page]');
+  const lesson=Number(await link.getAttribute('data-lesson'));
+  const target=Number(await link.getAttribute('data-page'));
+  assert.ok(target>=1&&target<=[13,10,23,20][lesson-1]);
+  const feedback=await drill.locator('#feedback').innerText();
+  await link.click();
+  await page.locator('#offline-pdf-viewer').waitFor({state:'visible'});
+  assert.match(await page.locator('#offline-pdf-page').innerText(),new RegExp('\\b'+target+'\\s*/'));
+  await page.locator('#offline-reader-back').click();
+  assert.equal(await drill.locator('#position').innerText(),position);
+  assert.equal(await drill.locator('#feedback').innerText(),feedback);
+  assert.equal(await drill.locator('#explanation').isVisible(),true);
+  await drill.locator('#next').click();
+  assert.match(await drill.locator('#position').innerText(),/2 \/ /);
   await page.locator('#offline-drill-back').click();
  }
  await page.goto(pathToFileURL(path.join(path.dirname(file),'textbook-original.html')).href);
