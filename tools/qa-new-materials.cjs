@@ -12,7 +12,7 @@ assert.equal(qs.length,120);
 assert.equal(new Set(qs.map(x=>x.id)).size,120);
 for(const [cat,start] of [['LECTURE_1_4_REVIEW',2001],['LECTURE_3_4_REVIEW',2101]]){
  const set=qs.filter(q=>q.category===cat);assert.equal(set.length,60);
- set.forEach((q,i)=>{assert.equal(q.id,start+i);assert.ok(['choice','truefalse'].includes(q.type));assert.ok(q.question&&q.explanation);assert.ok(q.options.length>=2);assert.ok(Number.isInteger(q.correct)&&q.correct>=0&&q.correct<q.options.length)});
+ set.forEach((q,i)=>{assert.equal(q.id,start+i);assert.ok(['choice','tf'].includes(q.type));if(q.type==='tf'){assert.equal(q.options.length,2);assert.deepEqual(Array.from(q.options),['○','×']);assert.doesNotMatch(q.question,/○\s*／\s*×/);assert.match(q.question,/。(?:\s*［[^］]+］)?$/)}assert.ok(q.question&&q.explanation);assert.ok(q.options.length>=2);assert.ok(Number.isInteger(q.correct)&&q.correct>=0&&q.correct<q.options.length)});
 }
 const app=fs.readFileSync('index.html','utf8');
 assert.ok(app.includes('<script src="./materials/question-sets-03-04.js"></script>'));
