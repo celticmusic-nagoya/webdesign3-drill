@@ -751,7 +751,7 @@
                     <span id="practice-session-score" class="text-[11px] font-bold text-slate-500">今回の正答率: --</span>
                     <label class="inline-flex items-center gap-2 text-[11px] font-bold text-slate-400 bg-slate-900/70 border border-slate-700 rounded-xl px-3 py-2">
                         <input id="practice-auto-next-toggle" type="checkbox" checked class="accent-blue-500 w-4 h-4">
-                        <span>回答後に自動で次へ</span>
+                        <span>自動送り（正解5秒・不正解8秒）</span>
                     </label>
                 </div>
 
@@ -1202,7 +1202,7 @@
                 daily: { date: '', answered: 0 }
             },
             practice: { currentCategory: 'ALL', questions: [], currentIndex: 0, answers: {}, mode: 'normal' },
-            exam: { questions: [], currentIndex: 0, answers: {}, timer: null, timeLeft: 2700 },
+            exam: { questions: [], currentIndex: 0, answers: {}, timer: null, timeLeft: 2700, deadline: null },
             flashcards: { activeList: [], currentIndex: 0, isFlipped: false }, practiceAutoNextTimer: null
         };
 
@@ -1465,7 +1465,7 @@
             saveUserData();renderPracticeQuestion();updateWeakUI();
             const t=document.getElementById('practice-auto-next-toggle');
             if(t&&t.checked&&state.practice.currentIndex<state.practice.questions.length-1){
-                state.practiceAutoNextTimer=setTimeout(()=>{state.practiceAutoNextTimer=null;nextPracticeQuestion(true)},ok?650:1150);
+                state.practiceAutoNextTimer=setTimeout(()=>{state.practiceAutoNextTimer=null;nextPracticeQuestion(true)},ok?5000:8000);
             }
         }
 
@@ -1508,6 +1508,7 @@
             state.exam.currentIndex = 0;
             state.exam.answers = {};
             state.exam.timeLeft = 2700;
+            state.exam.deadline = Date.now()+2700000;
 
             clearInterval(state.exam.timer);
             state.exam.timer = setInterval(updateExamTimer, 1000);
@@ -1516,12 +1517,13 @@
         }
 
         function updateExamTimer() {
+            if (!Number.isFinite(state.exam.deadline)) return;
+            state.exam.timeLeft = Math.max(0, Math.min(2700, Math.ceil((state.exam.deadline-Date.now())/1000)));
             if (state.exam.timeLeft <= 0) {
-                clearInterval(state.exam.timer);
+                document.getElementById('exam-timer').innerText = '00:00';
                 finishExam();
                 return;
             }
-            state.exam.timeLeft--;
             const mins = Math.floor(state.exam.timeLeft / 60);
             const secs = state.exam.timeLeft % 60;
             document.getElementById('exam-timer').innerText = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
@@ -1575,6 +1577,7 @@
         }
 
         function answerExam(index) {
+            if(Number.isFinite(state.exam.deadline)&&Date.now()>=state.exam.deadline){updateExamTimer();return;}
             const q = state.exam.questions[state.exam.currentIndex];
             if (!q) return;
             state.exam.answers[q.id] = index;
@@ -1606,7 +1609,8 @@
         }
 
         function finishExam() {
-            clearInterval(state.exam.timer);
+            clearInterval(state.exam.timer);state.exam.timer=null;state.exam.deadline=null;
+            if (!state.exam.questions.length) return;
             let correctCount = 0;
             const categoryResult = {};
 
@@ -1930,11 +1934,15 @@
         }
 
         function updateTextbookResumeLabel(){try{const p=JSON.parse(localStorage.getItem('web3_textbook_position')||'{}');const label=document.getElementById('textbook-resume-label');if(label&&Number.isInteger(p.book)&&p.book>=0&&p.book<=1&&Number.isInteger(p.page)&&p.page>=0&&p.page<(p.book===0?13:10))label.textContent='前回の続き：第'+(p.book+1)+'回・'+(p.page+1)+'ページ';}catch(e){}}
+        document.addEventListener('visibilitychange',()=>{if(document.hidden){clearPracticeAutoNextTimer()}else if(Number.isFinite(state.exam.deadline)){updateExamTimer()}});
         window.onload = function() {
             loadUserData();
             updateTextbookResumeLabel();
             switchTab('dashboard');
             setupFlashcardSwipe(); updateWeakUI();
+            const autoToggle=document.getElementById('practice-auto-next-toggle');
+            try{autoToggle.checked=localStorage.getItem('web3_practice_auto_next')!=='off'}catch(e){}
+            autoToggle.addEventListener('change',()=>{clearPracticeAutoNextTimer();try{localStorage.setItem('web3_practice_auto_next',autoToggle.checked?'on':'off')}catch(e){}});
         };
     </script>
 <script>if('serviceWorker' in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('./sw.js').catch(console.warn);</script>
