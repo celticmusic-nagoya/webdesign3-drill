@@ -73,10 +73,25 @@ try{
  await page.waitForFunction(()=>{const im=document.querySelector('#offline-pdf-image'),sc=document.querySelector('#offline-pdf-scroll');return im.getBoundingClientRect().height<=sc.clientHeight-20});
  const fit=Number((await page.locator('#offline-pdf-zoom-label').innerText()).replace('%',''));
  assert.ok(fit<100,'Wide desktop whole-page fit must shrink the PDF');
+ // Real mouse on the displayed image, not just the outer container edge.
+ const imageEdge=async(side)=>{
+  await page.locator('#offline-pdf-image').evaluate(el=>el.decode());
+  const b=await page.locator('#offline-pdf-image').boundingBox();
+  assert.ok(b&&b.width>20&&b.height>20);
+  await page.mouse.click(b.x+(side==='left'?8:side==='right'?b.width-8:b.width/2),b.y+Math.min(24,b.height/2));
+ };
+ const fitPage=Number((await page.locator('#offline-pdf-page').innerText()).split('/')[0]);
+ await imageEdge('right');assert.equal(await page.locator('#offline-pdf-page').innerText(),(fitPage+1)+' / 11');
+ await imageEdge('left');assert.equal(await page.locator('#offline-pdf-page').innerText(),fitPage+' / 11');
+ await imageEdge('center');assert.equal(await page.locator('#offline-pdf-page').innerText(),fitPage+' / 11');
+ await edge('right');assert.equal(await page.locator('#offline-pdf-page').innerText(),(fitPage+1)+' / 11');
+ await edge('left');assert.equal(await page.locator('#offline-pdf-page').innerText(),fitPage+' / 11');
  await page.locator('#offline-pdf-zoom-reset').click();
  for(let i=0;i<8;i++)await page.locator('#offline-pdf-zoom-out').click();
  assert.equal(await page.locator('#offline-pdf-zoom-label').innerText(),'25%');
  const p0=Number((await page.locator('#offline-pdf-page').innerText()).split('/')[0]);
+ await imageEdge('right');assert.equal(await page.locator('#offline-pdf-page').innerText(),(p0+1)+' / 11');
+ await imageEdge('left');assert.equal(await page.locator('#offline-pdf-page').innerText(),p0+' / 11');
  await edge('right');assert.equal(await page.locator('#offline-pdf-page').innerText(),(p0+1)+' / 11');
  // Inspect original-open link without invoking the native PDF plugin in headless CI.
  const original=await page.evaluate(async()=>{

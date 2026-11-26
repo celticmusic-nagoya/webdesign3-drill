@@ -75,6 +75,15 @@ async function run(){
       await original.locator('img').evaluate(el=>el.decode());
       await pc.locator('#zoom-page').click();
       assert.ok(await original.locator('img').evaluate(el=>el.getBoundingClientRect().height<=innerHeight-115));
+      const visibleImageEdge=async(side)=>{
+        const im=original.locator('img');await im.evaluate(el=>el.decode());
+        await im.evaluate(el=>el.scrollIntoView({block:'center',behavior:'instant'}));
+        const b=await im.boundingBox();assert.ok(b&&b.width>20&&b.height>20);
+        await pc.mouse.click(b.x+(side==='left'?8:side==='right'?b.width-8:b.width/2),b.y+b.height/2);
+      };
+      await visibleImageEdge('right');assert.equal(await pc.locator('#count').innerText(),'2 / 11');
+      await visibleImageEdge('left');assert.equal(await pc.locator('#count').innerText(),'1 / 11');
+      await visibleImageEdge('center');assert.equal(await pc.locator('#count').innerText(),'1 / 11');
       await pc.locator('#zoom-fit').click();
       for(let n=0;n<3;n++)await pc.locator('#zoom-out').click();
       assert.equal(await pc.locator('#pdf-zoom').innerText(),'25%');

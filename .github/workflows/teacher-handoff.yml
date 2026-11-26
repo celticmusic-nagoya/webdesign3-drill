@@ -2,6 +2,12 @@ name: Teacher handoff package
 on:
   pull_request:
     paths:
+      - '*.html'
+      - '*.js'
+      - 'manifest.webmanifest'
+      - 'materials/**'
+      - 'tools/build-offline.cjs'
+      - 'tools/qa-offline-browser.cjs'
       - 'AGENTS.md'
       - 'README.md'
       - 'docs/TEACHER_START.md'
