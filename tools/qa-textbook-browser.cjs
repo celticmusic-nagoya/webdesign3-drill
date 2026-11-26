@@ -46,8 +46,27 @@ async function run(){
     const desktop=await browser.newContext({viewport:{width:1280,height:900}});
     const pc=await desktop.newPage();
     const edge=async(locator,side)=>{
-      const width=await locator.evaluate(el=>el.clientWidth);
-      await locator.click({position:{x:side==='left'?10:side==='right'?width-10:Math.floor(width/2),y:24}});
+      // Tall PDF surfaces may extend behind the sticky navigation. Use an actual
+      // visible, unobstructed point, not a fixed offset near the top of the image.
+      await locator.evaluate(el=>el.scrollIntoView({block:'start',behavior:'instant'}));
+      let point;
+      await pc.waitForFunction(({id,side})=>{
+        const el=document.getElementById(id);if(!el)return false;
+        const rect=el.getBoundingClientRect(),w=el.clientWidth;
+        const x=rect.left+el.clientLeft+(side==='left'?10:side==='right'?w-10:Math.floor(w/2));
+        const top=Math.max(0,rect.top+el.clientTop),bottom=Math.min(innerHeight,rect.top+el.clientTop+el.clientHeight);
+        for(let y=top+16;y<bottom-8;y+=16)if(el.contains(document.elementFromPoint(x,y)))return true;
+        return false;
+      },{id:await locator.getAttribute('id'),side});
+      point=await locator.evaluate((el,side)=>{
+        const rect=el.getBoundingClientRect(),w=el.clientWidth;
+        const x=rect.left+el.clientLeft+(side==='left'?10:side==='right'?w-10:Math.floor(w/2));
+        const top=Math.max(0,rect.top+el.clientTop),bottom=Math.min(innerHeight,rect.top+el.clientTop+el.clientHeight);
+        for(let y=top+16;y<bottom-8;y+=16)if(el.contains(document.elementFromPoint(x,y)))return {x,y};
+        return null;
+      },side);
+      assert.ok(point,'Reader edge must have a visible mouse target');
+      await pc.mouse.click(point.x,point.y);
     };
     try{
       await pc.goto(base+'/exam-guide.html');
@@ -170,6 +189,62 @@ async function run(){
     assert.match(await page.locator('#page-label').innerText(),/1 \/ 10/);
     await page.goto(base+'/index.html');
     assert.match(await page.locator('#textbook-resume-label').innerText(),/第2回・1ページ/);
+    // Study sessions must survive reload without reordering or double-counting answers.
+    for(const [file,key] of [['homework-drill','web3_homework_session_v1'],['textbook-original','web3_original_session_v1']]){
+      await page.goto(base+'/'+file+'.html');
+      await page.evaluate(key=>localStorage.removeItem(key),key);await page.reload();
+      await page.locator('#scope').selectOption('1');
+      await page.locator('#practice').click();
+      await page.locator('#auto').uncheck();
+      const q=await page.locator('#question').innerText();
+      const choices=await page.locator('#choices input').evaluateAll(els=>els.map(x=>x.value));
+      await page.locator('#choices input').first().check();
+      const feedback=await page.locator('#feedback').innerText();
+      await page.locator('#leave').click();
+      await page.locator('#resume').waitFor({state:'visible'});
+      await page.reload();
+      await page.locator('#resume').click();
+      assert.equal(await page.locator('#question').innerText(),q);
+      assert.deepEqual(await page.locator('#choices input').evaluateAll(els=>els.map(x=>x.value)),choices);
+      assert.equal(await page.locator('#feedback').innerText(),feedback);
+      assert.equal(await page.locator('#choices input').first().isChecked(),true);
+      assert.equal(await page.locator('#auto').isChecked(),false);
+      await page.locator('#next').click();
+      assert.match(await page.locator('#position').innerText(),/^2 \/ /);
+      await page.reload();await page.locator('#resume').click();
+      assert.match(await page.locator('#position').innerText(),/^2 \/ /);
+      assert.equal(await page.locator('#choices input:checked').count(),0);
+      await page.evaluate(key=>localStorage.removeItem(key),key);
+      await page.locator('#leave').click();
+      await page.evaluate(key=>localStorage.removeItem(key),key);
+    }
+    await page.goto(base+'/index.html');
+    // Ordinary question bank: exact variant, answer and index persist on reload.
+    const ordinary=await page.evaluate(()=>{
+      localStorage.removeItem('web3_practice_session_v1');
+      switchTab('practice');startPracticeSession('normal');
+      document.getElementById('practice-auto-next-toggle').checked=false;
+      const q=state.practice.questions[0];answerPractice(q.correct);
+      return {question:q.question,options:q.options,answer:q.correct,total:state.userData.totalAnswered};
+    });
+    await page.reload();
+    const restored=await page.evaluate(()=>{
+      switchTab('practice');const q=state.practice.questions[0];
+      const answer=state.practice.answers[q.id];answerPractice(q.correct);
+      return {question:q.question,options:q.options,answer,total:state.userData.totalAnswered};
+    });
+    assert.deepEqual(restored,ordinary,'Reload must preserve the question and not double-count a graded answer');
+    await page.evaluate(()=>{nextPracticeQuestion();});
+    await page.reload();
+    assert.equal(await page.evaluate(()=>{switchTab('practice');return state.practice.currentIndex}),1);
+    await page.evaluate(()=>{localStorage.removeItem('web3_practice_session_v1');});
+    const clock=await page.evaluate(()=>{
+      startExam();clearInterval(state.exam.timer);
+      state.exam.deadline=Date.now()+60000;updateExamTimer();
+      const left=state.exam.timeLeft;
+      state.exam.deadline=null;return left;
+    });
+    assert.ok(clock>=59&&clock<=60,'Mock timer must follow deadline instead of interval count');
     await page.goto(base+'/homework-drill.html');
     await page.locator('#scope').selectOption('3');
     await page.locator('#practice').click();
