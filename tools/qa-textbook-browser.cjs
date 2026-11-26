@@ -4,6 +4,25 @@ const { chromium } = require('playwright');
 const { spawn } = require('node:child_process');
 const http=require('node:http');
 const assert = require('node:assert/strict');
+const fs=require('node:fs'),crypto=require('node:crypto'),path=require('node:path');
+const facsimilePath='materials/textbook-pages/manifest.json';
+if(fs.existsSync(facsimilePath)){
+ const manifest=JSON.parse(fs.readFileSync(facsimilePath,'utf8'));
+ for(const [lesson,count] of [[3,23],[4,20]]){
+  const pages=manifest[String(lesson)].pages;
+  assert.equal(pages.length,count);
+  const pdf=fs.readFileSync('materials/lesson-0'+lesson+'.pdf');
+  assert.equal(crypto.createHash('sha1').update('blob '+pdf.length+'\0').update(pdf).digest('hex'),manifest[String(lesson)].source_git_sha);
+  for(const [i,item] of pages.entries()){
+   assert.equal(item.file,'lesson-0'+lesson+'-'+String(i+1).padStart(2,'0')+'.webp');
+   const image=fs.readFileSync(path.join('materials/textbook-pages',item.file));
+   assert.equal(image.toString('ascii',0,4),'RIFF');
+   assert.equal(image.toString('ascii',8,12),'WEBP');
+   assert.equal(crypto.createHash('sha256').update(image).digest('hex'),item.sha256);
+  }
+ }
+ console.log('PASS: 43 facsimile images, original PDF Git SHA and image SHA-256');
+}
 const port = 18937;
 const server = spawn('python3',['-m','http.server',String(port),'--bind','127.0.0.1'],{stdio:'ignore'});
 const base = 'http://127.0.0.1:'+port;
@@ -44,6 +63,48 @@ async function run(){
     await page.goto(base+'/additional-materials.html?book=1');
     assert.equal(await page.locator('#source option').count(),8);
     assert.equal(await page.locator('#source').inputValue(),'1');
+    if(fs.existsSync(facsimilePath)){
+      for(const [book,total] of [[0,23],[1,20]]){
+        await page.goto(base+'/additional-materials.html?book='+book);
+        const image=page.locator('#lecture-image img');
+        await image.waitFor({state:'visible',timeout:30000});
+        await image.evaluate(el=>el.decode());
+        assert.equal(await page.locator('#progress').innerText(),'1 / '+total);
+        const swipe=async(dx,dy=0)=>image.evaluate((el,{dx,dy})=>{
+          const t=(x,y)=>new Touch({identifier:1,target:el,clientX:x,clientY:y});
+          el.dispatchEvent(new TouchEvent('touchstart',{bubbles:true,touches:[t(195,150)],changedTouches:[t(195,150)]}));
+          el.dispatchEvent(new TouchEvent('touchend',{bubbles:true,touches:[],changedTouches:[t(195+dx,150+dy)]}));
+        },{dx,dy});
+        await swipe(-100);assert.equal(await page.locator('#progress').innerText(),'2 / '+total);
+        await image.evaluate(el=>el.decode());
+        await swipe(100);assert.equal(await page.locator('#progress').innerText(),'1 / '+total);
+        await page.locator('#plus').click();
+        await swipe(-100);assert.equal(await page.locator('#progress').innerText(),'1 / '+total);
+        await page.locator('#fit').click();
+        await page.locator('#page-select').selectOption(String(total-1));
+        await image.evaluate(el=>el.decode());
+        assert.equal(await page.locator('#progress').innerText(),total+' / '+total);
+        assert.equal(await page.locator('#next').isDisabled(),true);
+        await page.locator('#page-select').selectOption('0');
+        await image.evaluate(el=>el.decode());
+        await page.locator('#save-lecture').click();
+        await page.waitForFunction(()=>document.querySelector('#lecture-offline')?.textContent==='この教材は保存済み',null,{timeout:90000});
+        await page.evaluate(()=>navigator.serviceWorker.ready.then(()=>true));
+        await page.reload();
+        await image.waitFor({state:'visible',timeout:30000});
+        await page.waitForFunction(()=>!!navigator.serviceWorker.controller,null,{timeout:30000});
+        await context.setOffline(true);
+        try{
+          await page.reload();
+          await image.waitFor({state:'visible',timeout:30000});
+          await image.evaluate(el=>el.decode());
+          await swipe(-100);
+          await image.evaluate(el=>el.decode());
+          assert.equal(await page.locator('#progress').innerText(),'2 / '+total);
+        }finally{await context.setOffline(false)}
+        await page.locator('#page-select').selectOption('0');
+      }
+    }
     await page.locator('#source').selectOption('7');
     assert.match(await page.locator('#open').getAttribute('href'),/review-03-04-answers\.pdf$/);
     await page.goto(base+'/index.html');
