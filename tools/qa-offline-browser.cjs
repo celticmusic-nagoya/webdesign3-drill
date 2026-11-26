@@ -32,6 +32,26 @@ try{
  assert.notEqual(styles.linkBackground,'rgba(0, 0, 0, 0)','textbook link must have styled background');
  const button=page.locator('#offline-textbook-link');
  if(await button.count()!==1){console.error('OFFLINE_DIAGNOSTIC',JSON.stringify({url:page.url(),title:await page.title(),body:(await page.locator('body').innerText()).slice(0,600),sourceLink:html.includes('id="offline-textbook-link"'),errors}));throw Error('offline textbook link missing in rendered DOM')}
+ // Standalone guide: no sibling files or network needed.
+ await context.setOffline(true);
+ await page.locator('a[href="#offline-exam-guide"]').click();
+ await page.locator('#offline-pdf-image').waitFor({state:'visible'});
+ assert.equal(await page.locator('#offline-pdf-page').innerText(),'1 / 11');
+ assert.ok(await page.locator('#offline-pdf-image').evaluate(el=>el.src.startsWith('data:image/png;base64,')));
+ const swipe=async(dx,dy=0)=>page.locator('#offline-pdf-image').evaluate((el,{dx,dy})=>{
+  const t=(x,y)=>new Touch({identifier:1,target:el,clientX:x,clientY:y});
+  el.dispatchEvent(new TouchEvent('touchstart',{bubbles:true,touches:[t(195,150)],changedTouches:[t(195,150)]}));
+  el.dispatchEvent(new TouchEvent('touchend',{bubbles:true,touches:[],changedTouches:[t(195+dx,150+dy)]}));
+ },{dx,dy});
+ await swipe(-100);assert.equal(await page.locator('#offline-pdf-page').innerText(),'2 / 11');
+ await swipe(100);assert.equal(await page.locator('#offline-pdf-page').innerText(),'1 / 11');
+ await swipe(-20,100);assert.equal(await page.locator('#offline-pdf-page').innerText(),'1 / 11');
+ await page.locator('#offline-pdf-zoom-in').click();
+ await swipe(-100);assert.equal(await page.locator('#offline-pdf-page').innerText(),'1 / 11');
+ await page.locator('#offline-pdf-zoom-reset').click();
+ await swipe(-100);assert.equal(await page.locator('#offline-pdf-page').innerText(),'2 / 11');
+ await page.locator('#offline-reader-back').click();
+ await context.setOffline(false);
  await button.click();
  const overlay=page.locator('#offline-reader-overlay');
  await overlay.waitFor({state:'visible'});
