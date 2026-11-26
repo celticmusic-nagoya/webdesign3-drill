@@ -13,6 +13,7 @@ on:
       - 'docs/TEACHER_START.md'
       - 'docs/TEACHER_FOLDER_README.txt'
       - 'docs/AI_START.txt'
+      - 'docs/ONLINE_URL.txt'
       - 'tools/build-teacher-delivery.py'
       - 'docs/MAINTENANCE.md'
       - 'docs/RELEASE_CHECKLIST.md'
@@ -39,7 +40,7 @@ jobs:
       - run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends poppler-utils
       - run: npm install --no-save --no-package-lock tailwindcss@3.4.17 playwright@1.58.2
       - run: npx playwright install --with-deps chromium
-      - run: python -m pip install PyMuPDF==1.26.7 Pillow==11.3.0
+      - run: python -m pip install PyMuPDF==1.26.7 Pillow==11.3.0 qrcode==8.2
       - run: node tools/build-local.cjs
       - run: node tools/qa-review-source.cjs
       - run: node tools/qa-offline-browser.cjs

@@ -33,7 +33,7 @@ source/ に移動して実行:
 ```sh
 npm install --no-save --no-package-lock tailwindcss@3.4.17 playwright@1.58.2
 npx playwright install chromium
-python3 -m pip install PyMuPDF==1.26.7 Pillow==11.3.0
+python3 -m pip install PyMuPDF==1.26.7 Pillow==11.3.0 qrcode==8.2
 node tools/build-local.cjs
 node tools/qa-review-source.cjs
 node tools/qa-textbook-browser.cjs
@@ -41,10 +41,12 @@ node tools/qa-offline-browser.cjs
 node tools/build-teacher-package.cjs
 node tools/qa-teacher-package.cjs
 ```
-LinuxでChromiumのシステム依存が不足する場合は npx playwright install --with-deps chromium を利用（管理権限が必要な場合あり）。内側の引継ぎ原本は dist/teacher-handoff/ に、先生に渡す最終フォルダは dist/teacher-delivery/ に生成される。最終フォルダには app/、最初にお読みください.txt、ChatGPT引継ぎパッケージ.zip が入る。dist/teacher-delivery/ 全体をZIPにして渡す。元のsource/を残したまま作業する。
+LinuxでChromiumのシステム依存が不足する場合は npx playwright install --with-deps chromium を利用（管理権限が必要な場合あり）。内側の引継ぎ原本は dist/teacher-handoff/ に、先生に渡す最終フォルダは dist/teacher-delivery/ に生成される。最終フォルダには app/、最初にお読みください.txt、ChatGPT引継ぎパッケージ.zip、オンライン版QR.png が入る。dist/teacher-delivery/ 全体をZIPにして渡す。元のsource/を残したまま作業する。
 
 ## サーバーへ掲載（学校・自前サーバー）
 生成された app/ の中身だけを静的サイトの公開ディレクトリへ置く。PHP・DB・GitHubは不要。index.html と相対パスを維持し、HTTPS推奨。サブディレクトリでも動作するか確認する。この配布版はHTML内に画像・PDF・CSSを収録しており、外部CDNを必要としない。一般公開前に教材の許諾を確認。URLを知らせないだけではアクセス制限にならないので、校内限定ならサーバー側で認証・IP制限等を設定する。学習記録は各利用者のブラウザ内に残り、学校側で成績を自動集計する機能はない。別のURL/ファイルパスに移ると保存領域も変わる。通常問題集のバックアップはあるが、全ドリル・閲覧履歴を完全移行する機能はない。
 
 ## 現行基準
 2026-11-26、機能基準コミット ad8cc9da25fd60db56b3ac90dc7a8155cb76f577。通常問題300（基本120＋総合演習60＋総合復習120）、教科書問題158、穴埋め200（計658収録レコード、類似問題あり）。教科書4回13/10/23/20ページ、攻略マニュアル11ページ。学習再開、模擬試験、教科書参照・復帰、画像端クリック・左右矢印キー・スワイプによるページ送り、縮小・原本保存に対応。総合復習120問は原本正答照合済み、第20・25・52問は承認済み補完文。358問の意味上の全件照合、全データの一括バックアップ、Windows/Android実機の最新確認は未完了。実施済み自動QAと実機確認を区別する。
+
+オンライン版QRは docs/ONLINE_URL.txt から再生成する。サーバー移行時はそのURLと docs/TEACHER_FOLDER_README.txt の案内を更新し、再生成後にスマートフォンで読み取って確認する。

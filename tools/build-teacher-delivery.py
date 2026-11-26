@@ -5,12 +5,32 @@ import pathlib
 import shutil
 import sys
 import zipfile
+from urllib.parse import urlsplit
+import qrcode
+from PIL import Image
+import io
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 INNER = ROOT / "dist" / "teacher-handoff"
 DELIVERY = ROOT / "dist" / "teacher-delivery"
 README = "最初にお読みください.txt"
 ZIP = "ChatGPT引継ぎパッケージ.zip"
+QR = "オンライン版QR.png"
+
+def online_url():
+    url = (ROOT / "docs" / "ONLINE_URL.txt").read_text(encoding="utf-8").strip()
+    parsed = urlsplit(url)
+    assert parsed.scheme in ("https", "http") and parsed.hostname and not parsed.username and not parsed.password
+    return url
+
+def make_qr():
+    code = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_M, box_size=14, border=4)
+    code.add_data(online_url())
+    code.make(fit=True)
+    image = code.make_image(fill_color="black", back_color="white")
+    out = io.BytesIO()
+    image.save(out, format="PNG")
+    return out.getvalue()
 
 def hash_file(p):
     return hashlib.sha256(p.read_bytes()).hexdigest()
@@ -23,15 +43,21 @@ def create():
     # UTF-8 BOM and CRLF for Windows Notepad.
     text = (ROOT / "docs" / "TEACHER_FOLDER_README.txt").read_text(encoding="utf-8")
     (DELIVERY / README).write_bytes(b"\xef\xbb\xbf" + text.replace("\n", "\r\n").encode("utf-8"))
+    (DELIVERY / QR).write_bytes(make_qr())
     with zipfile.ZipFile(DELIVERY / ZIP, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=6) as z:
         for p in sorted(INNER.rglob("*")):
             if p.is_file():
                 z.write(p, p.relative_to(INNER).as_posix())
 
 def verify():
-    assert {p.name for p in DELIVERY.iterdir()} == {"app", README, ZIP}
+    assert {p.name for p in DELIVERY.iterdir()} == {"app", README, ZIP, QR}
     instructions = (DELIVERY / README).read_text(encoding="utf-8-sig")
     assert "index.html" in instructions and ZIP in instructions and "AI_START.txt" in instructions
+    assert QR in instructions and online_url() in instructions
+    assert (DELIVERY / QR).read_bytes() == make_qr()
+    with Image.open(DELIVERY / QR) as image:
+        assert image.format == "PNG" and image.width == image.height and image.width >= 300
+        image.load()
     expected = json.loads((INNER / "PACKAGE_MANIFEST.json").read_text(encoding="utf-8"))
     records = {r["path"]: r for r in expected["files"]}
     with zipfile.ZipFile(DELIVERY / ZIP) as z:

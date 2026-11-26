@@ -4,7 +4,7 @@
 
 - 毎回 README.md、AGENTS.md、docs/MAINTENANCE.md、対象ファイルを読み、現在版・目的・変更範囲を確認。原本、ID、保存キーを保護する。
 - 先生が教材内容、正答、出典・配布許諾、公開範囲を判断する。推定補完は明示し承認を得る。個人情報、認証情報、学生の成績個票は配布物に含めない。
-- source/ を編集し、app/ の生成済みHTMLだけを直接編集しない。作業前ZIPを別保存し、変更前後の差分と検査結果を記録。新しい版は tools/build-teacher-package.cjs で dist/teacher-delivery/ を生成し、app/、説明TXT、ChatGPT引継ぎパッケージ.zip をまとめて返す。内側ZIPには AI_START.txt を必ず含める。
+- source/ を編集し、app/ の生成済みHTMLだけを直接編集しない。作業前ZIPを別保存し、変更前後の差分と検査結果を記録。新しい版は tools/build-teacher-package.cjs で dist/teacher-delivery/ を生成し、app/、説明TXT、ChatGPT引継ぎパッケージ.zip、オンライン版QR.png をまとめて返す。公開先変更時は docs/ONLINE_URL.txt と説明TXTを同期する。内側ZIPには AI_START.txt を必ず含める。
 - 問題IDは固定、正答は0始まり、原本番号・参照ページを保持する。IDを再利用しない。問題の意味が変わる改訂では履歴互換性を検討する。
 - PDF原本は変更前SHA-256・ページ数・版を記録。原本・レンダー・本文抽出・参照先・オフライン埋込を同期する。
 - 構文、問題と原本の整合性、PC/スマホ、通信なしの単一HTML、保存・再開、PDF閲覧・保存・教科書参照の回帰を検証。未実行や不合格をPASSと報告しない。
