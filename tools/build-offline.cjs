@@ -24,7 +24,14 @@ const linkStart=html.indexOf('<a id="textbook-open-link" href="./textbook.html"'
 if(linkStart<0)throw Error('Actual textbook anchor not found');
 html=html.slice(0,linkStart)+html.slice(linkStart).replace('<a id="textbook-open-link" href="./textbook.html"','<a id="offline-textbook-link" href="#offline-textbook"');
 const embeddedReader=JSON.stringify(Buffer.from(readerHtml,'utf8').toString('base64'));
-const offlineUI=`<script>${swipeCode}</script><div id="offline-reader-overlay" hidden style="position:fixed;inset:0;z-index:99999;background:#0f172a;display:none;flex-direction:column">
+const offlineUI=`<style>
+#offline-pdf-viewer button{border:1px solid #64748b;border-radius:8px;padding:6px 10px;min-height:36px;background:#1e293b;color:#f8fafc}
+#offline-pdf-viewer button[aria-pressed="true"]{background:#1d4ed8;border-color:#93c5fd}
+#offline-pdf-viewer button:disabled{opacity:.4}
+#offline-pdf-viewer button:focus-visible{outline:2px solid #93c5fd;outline-offset:2px}
+#offline-reader-overlay[data-context="guide"] #offline-pdf-1,#offline-reader-overlay[data-context="guide"] #offline-pdf-2,#offline-reader-overlay[data-context="guide"] #offline-pdf-3,#offline-reader-overlay[data-context="guide"] #offline-pdf-4{display:none}
+@media(max-width:600px){#offline-pdf-viewer button{min-height:44px;padding:5px 8px;font-size:13px}}
+</style><script>${swipeCode}</script><div id="offline-reader-overlay" hidden style="position:fixed;inset:0;z-index:99999;background:#0f172a;display:none;flex-direction:column">
 <div style="display:flex;flex-wrap:wrap;gap:6px;padding:8px;background:#1e293b;color:white"><button id="offline-reader-back" type="button" style="padding:8px;background:#334155;color:white">← 戻る</button><button id="offline-pdf-1" type="button" style="padding:8px;background:#2563eb;color:white">第1回 PDFを開く</button><button id="offline-pdf-2" type="button" style="padding:8px;background:#2563eb;color:white">第2回 PDFを開く</button><button id="offline-pdf-3" type="button" style="padding:8px;background:#2563eb;color:white">第3回 PDFを開く</button><button id="offline-pdf-4" type="button" style="padding:8px;background:#2563eb;color:white">第4回 PDFを開く</button><span id="offline-pdf-help" role="status" aria-live="polite" style="font-size:12px;align-self:center;color:#cbd5e1">原資料をアプリ内で閲覧できます</span></div>
 <div id="offline-material-menu" hidden style="display:none;padding:8px;color:white;background:#1e293b"><label for="offline-material-select">教材を選択</label><select id="offline-material-select" style="display:block;width:100%;color:#0f172a;background:white;padding:8px"><option value="2">第3回 講義テキスト</option><option value="3">第4回 講義テキスト</option><option value="4">第3回 自宅学習・穴埋め</option><option value="5">第4回 自宅学習・穴埋め</option><option value="6">第1〜4回 総合復習60問｜問題冊子</option><option value="7">第1〜4回 総合復習60問｜解答・解説</option><option value="8">第3・4回 総合復習60問｜問題冊子</option><option value="9">第3・4回 総合復習60問｜解答・解説</option></select><button id="offline-material-drill" type="button" style="padding:8px">穴埋めドリルへ →</button><button id="offline-material-back" type="button" style="padding:8px">← 教科書へ</button></div>
 <iframe id="offline-reader-frame" title="オフライン教科書" style="width:100%;flex:1;border:0;background:white"></iframe>
@@ -277,10 +284,10 @@ frame.addEventListener('load',()=>{
   if(n>=2){e.stopImmediatePropagation();select.value=String(Number((frame.contentDocument.getElementById('original-figure-status')?.textContent||'').includes('第2回')));openOfflinePdf(n);}
  },true);
 });
-document.querySelectorAll('a[href="#offline-exam-guide"]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();overlay.hidden=false;overlay.style.display='flex';document.body.style.overflow='hidden';back.textContent='← トップへ';hideMaterials();openOfflinePdf(10);document.getElementById('offline-pdf-close').hidden=true;}));
+document.querySelectorAll('a[href="#offline-exam-guide"]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();overlay.hidden=false;overlay.style.display='flex';document.body.style.overflow='hidden';back.textContent='← トップへ';overlay.dataset.context='guide';hideMaterials();openOfflinePdf(10);document.getElementById('offline-pdf-close').hidden=true;}));
 open.addEventListener('click',function(e){e.preventDefault();frame.srcdoc=readerSource;overlay.hidden=false;overlay.style.display='flex';document.body.style.overflow='hidden'});
 window.openDrillReference=function(book,page){overlay.hidden=false;overlay.style.display='flex';document.body.style.overflow='hidden';back.textContent='← 問題に戻る';openOfflinePdf(book,page);document.getElementById('offline-pdf-close').hidden=true};
-back.addEventListener('click',function(){hideMaterials();back.textContent='← 戻る';document.getElementById('offline-pdf-close').hidden=false;pdfView.style.display='none';pdfView.hidden=true;pdfFrame.style.display='block';overlay.style.display='none';overlay.hidden=true;frame.removeAttribute('srcdoc');document.body.style.overflow=document.getElementById('offline-drill-overlay')?.hidden===false?'hidden':''});
+back.addEventListener('click',function(){hideMaterials();back.textContent='← 戻る';delete overlay.dataset.context;document.getElementById('offline-pdf-close').hidden=false;pdfView.style.display='none';pdfView.hidden=true;pdfFrame.style.display='block';overlay.style.display='none';overlay.hidden=true;frame.removeAttribute('srcdoc');document.body.style.overflow=document.getElementById('offline-drill-overlay')?.hidden===false?'hidden':''});
 })();
 </script>`;
 // Embed both drills for Android content:// entrypoints, while retaining extracted HTML copies.
