@@ -101,6 +101,43 @@ async function run(){
     // Both new review categories must be available and their questions loaded in the live app.
     assert.equal(await page.locator('#practice-category-select option[value="LECTURE_1_4_REVIEW"]').count(),1);
     assert.equal(await page.locator('#practice-category-select option[value="LECTURE_3_4_REVIEW"]').count(),1);
+    // In-app textbook reference: exact source page, return to same answer, and preserve reading position.
+    const refContext=await browser.newContext({viewport:{width:390,height:844}});
+    const refPage=await refContext.newPage();
+    try{
+      for(const [file,lesson] of [['homework-drill',1],['homework-drill',3],['textbook-original',2],['textbook-original',4]]){
+        await refPage.goto(base+'/'+file+'.html');
+        await refPage.evaluate(()=>{localStorage.setItem('web3_textbook_position',JSON.stringify({book:0,page:0,font:1}));localStorage.setItem('web3_lecture_page_0','0');localStorage.setItem('web3_lecture_page_1','0');});
+        await refPage.locator('#scope').selectOption(String(lesson));
+        await refPage.locator('#practice').click();
+        await refPage.locator('#auto').uncheck();
+        const question=await refPage.locator('#question').innerText();
+        await refPage.locator('#choices input').first().check();
+        await refPage.locator('#explain').click();
+        const link=refPage.locator('#explanation a[data-lesson][data-page]');
+        const sourcePage=Number(await link.getAttribute('data-page'));
+        assert.equal(Number(await link.getAttribute('data-lesson')),lesson);
+        await link.click();
+        await refPage.locator('#reference-dialog[open]').waitFor();
+        const frame=refPage.frameLocator('#reference-frame');
+        if(lesson<=2){
+          await frame.locator('#page-label').waitFor({state:'visible'});
+          assert.match(await frame.locator('#page-label').innerText(),new RegExp('・ '+sourcePage+' / '));
+        }else{
+          await frame.locator('#lecture-reader').waitFor({state:'visible'});
+          assert.equal(await frame.locator('#progress').innerText(),sourcePage+' / '+(lesson===3?23:20));
+        }
+        await refPage.locator('#reference-close').click();
+        assert.equal(await refPage.locator('#reference-dialog').isVisible(),false);
+        assert.equal(await refPage.locator('#question').innerText(),question);
+        assert.equal(await refPage.locator('#choices input').first().isChecked(),true);
+        assert.equal(await refPage.locator('#next').isEnabled(),true);
+        assert.deepEqual(await refPage.evaluate(()=>JSON.parse(localStorage.getItem('web3_textbook_position'))),{book:0,page:0,font:1});
+        assert.equal(await refPage.evaluate(()=>localStorage.getItem('web3_lecture_page_0')),'0');
+        assert.equal(await refPage.evaluate(()=>localStorage.getItem('web3_lecture_page_1')),'0');
+      }
+      console.log('PASS: in-app textbook references across all four lectures and return to graded answer');
+    }finally{await refContext.close()}
     const imported=await page.evaluate(()=>({
       total:QUESTIONS.length,
       a:QUESTIONS.filter(q=>q.category==='LECTURE_1_4_REVIEW').length,
