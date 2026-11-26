@@ -11,6 +11,10 @@ on:
       - 'AGENTS.md'
       - 'README.md'
       - 'docs/TEACHER_START.md'
+      - 'docs/TEACHER_FOLDER_README.txt'
+      - 'docs/AI_START.txt'
+      - 'docs/ONLINE_URL.txt'
+      - 'tools/build-teacher-delivery.py'
       - 'docs/MAINTENANCE.md'
       - 'docs/RELEASE_CHECKLIST.md'
       - 'tools/build-local.cjs'
@@ -36,7 +40,7 @@ jobs:
       - run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends poppler-utils
       - run: npm install --no-save --no-package-lock tailwindcss@3.4.17 playwright@1.58.2
       - run: npx playwright install --with-deps chromium
-      - run: python -m pip install PyMuPDF==1.26.7 Pillow==11.3.0
+      - run: python -m pip install PyMuPDF==1.26.7 Pillow==11.3.0 qrcode==8.2
       - run: node tools/build-local.cjs
       - run: node tools/qa-review-source.cjs
       - run: node tools/qa-offline-browser.cjs
@@ -46,7 +50,7 @@ jobs:
       - run: node tools/qa-teacher-package.cjs
       - uses: actions/upload-artifact@v4
         with:
-          name: webdesign3-teacher-handoff
-          path: dist/teacher-handoff/
+          name: webdesign3-teacher-ready-folder
+          path: dist/teacher-delivery/
           if-no-files-found: error
           retention-days: 30
