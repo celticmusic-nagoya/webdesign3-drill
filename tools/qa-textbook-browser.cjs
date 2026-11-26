@@ -72,7 +72,15 @@ async function run(){
       await pc.goto(base+'/exam-guide.html');
       const original=pc.locator('#pdf-scroll');
       await original.locator('img').waitFor({state:'visible'});
+      await original.locator('img').evaluate(el=>el.decode());
+      await pc.locator('#zoom-page').click();
+      assert.ok(await original.locator('img').evaluate(el=>el.getBoundingClientRect().height<=innerHeight-115));
+      await pc.locator('#zoom-fit').click();
+      for(let n=0;n<8;n++)await pc.locator('#zoom-out').click();
+      assert.equal(await pc.locator('#pdf-zoom').innerText(),'25%');
       await edge(original,'right');assert.equal(await pc.locator('#count').innerText(),'2 / 11');
+      assert.match(await pc.locator('#original-pdf').getAttribute('href'),/#page=2$/);
+      await pc.locator('#zoom-fit').click();
       await original.locator('img').evaluate(el=>el.decode());
       await edge(original,'left');assert.equal(await pc.locator('#count').innerText(),'1 / 11');
       await edge(original,'left');assert.equal(await pc.locator('#count').innerText(),'1 / 11');

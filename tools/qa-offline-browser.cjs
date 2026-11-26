@@ -2,7 +2,7 @@
 'use strict';
 const {chromium}=require('playwright');
 const {pathToFileURL}=require('node:url');
-const path=require('node:path'),assert=require('node:assert/strict'),fs=require('node:fs');
+const path=require('node:path'),assert=require('node:assert/strict'),fs=require('node:fs'),crypto=require('node:crypto');
 (async()=>{
 const file=path.resolve('dist/webdesign3-offline/index.html');
 const html=fs.readFileSync(file,'utf8');
@@ -46,6 +46,7 @@ try{
  await swipe(-100);assert.equal(await page.locator('#offline-pdf-page').innerText(),'2 / 11');
  await swipe(100);assert.equal(await page.locator('#offline-pdf-page').innerText(),'1 / 11');
  await swipe(-20,100);assert.equal(await page.locator('#offline-pdf-page').innerText(),'1 / 11');
+ await page.locator('#offline-pdf-zoom-reset').click();
  await page.locator('#offline-pdf-zoom-in').click();
  await swipe(-100);assert.equal(await page.locator('#offline-pdf-page').innerText(),'1 / 11');
  await page.locator('#offline-pdf-zoom-reset').click();
@@ -60,9 +61,32 @@ try{
  await edge('right');assert.equal(await page.locator('#offline-pdf-page').innerText(),(before+1)+' / 11');
  await edge('left');assert.equal(await page.locator('#offline-pdf-page').innerText(),before+' / 11');
  await edge('center');assert.equal(await page.locator('#offline-pdf-page').innerText(),before+' / 11');
+ await page.locator('#offline-pdf-zoom-reset').click();
  await page.locator('#offline-pdf-zoom-in').click();
  await edge('right');assert.equal(await page.locator('#offline-pdf-page').innerText(),before+' / 11');
  await page.locator('#offline-reader-back').click();
+ // Wide screen: fit one page without vertical overflow; preserve reduced zoom navigation.
+ await page.setViewportSize({width:1600,height:820});
+ await page.locator('a[href="#offline-exam-guide"]').click();
+ await page.locator('#offline-pdf-image').evaluate(el=>el.decode());
+ await page.locator('#offline-pdf-fit-page').click();
+ await page.waitForFunction(()=>{const im=document.querySelector('#offline-pdf-image'),sc=document.querySelector('#offline-pdf-scroll');return im.getBoundingClientRect().height<=sc.clientHeight-20});
+ const fit=Number((await page.locator('#offline-pdf-zoom-label').innerText()).replace('%',''));
+ assert.ok(fit<100,'Wide desktop whole-page fit must shrink the PDF');
+ await page.locator('#offline-pdf-zoom-reset').click();
+ for(let i=0;i<8;i++)await page.locator('#offline-pdf-zoom-out').click();
+ assert.equal(await page.locator('#offline-pdf-zoom-label').innerText(),'25%');
+ const p0=Number((await page.locator('#offline-pdf-page').innerText()).split('/')[0]);
+ await edge('right');assert.equal(await page.locator('#offline-pdf-page').innerText(),(p0+1)+' / 11');
+ const downloadPromise=page.waitForEvent('download');
+ await page.locator('#offline-pdf-download').click();
+ const download=await downloadPromise;
+ assert.equal(download.suggestedFilename(),'攻略マニュアル.pdf');
+ const actual=crypto.createHash('sha256').update(fs.readFileSync(await download.path())).digest('hex');
+ const expected=crypto.createHash('sha256').update(fs.readFileSync('materials/攻略マニュアル.pdf')).digest('hex');
+ assert.equal(actual,expected,'Embedded original PDF must equal repository bytes');
+ await page.locator('#offline-reader-back').click();
+ await page.setViewportSize({width:390,height:844});
  await context.setOffline(false);
  await button.click();
  const overlay=page.locator('#offline-reader-overlay');
