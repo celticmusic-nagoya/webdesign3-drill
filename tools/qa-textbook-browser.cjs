@@ -170,6 +170,43 @@ async function run(){
     assert.match(await page.locator('#page-label').innerText(),/1 \/ 10/);
     await page.goto(base+'/index.html');
     assert.match(await page.locator('#textbook-resume-label').innerText(),/第2回・1ページ/);
+    // Study sessions must survive reload without reordering or double-counting answers.
+    for(const [file,key] of [['homework-drill','web3_homework_session_v1'],['textbook-original','web3_original_session_v1']]){
+      await page.goto(base+'/'+file+'.html');
+      await page.evaluate(key=>localStorage.removeItem(key),key);await page.reload();
+      await page.locator('#scope').selectOption('1');
+      await page.locator('#practice').click();
+      await page.locator('#auto').uncheck();
+      const q=await page.locator('#question').innerText();
+      const choices=await page.locator('#choices input').evaluateAll(els=>els.map(x=>x.value));
+      await page.locator('#choices input').first().check();
+      const feedback=await page.locator('#feedback').innerText();
+      await page.locator('#leave').click();
+      await page.locator('#resume').waitFor({state:'visible'});
+      await page.reload();
+      await page.locator('#resume').click();
+      assert.equal(await page.locator('#question').innerText(),q);
+      assert.deepEqual(await page.locator('#choices input').evaluateAll(els=>els.map(x=>x.value)),choices);
+      assert.equal(await page.locator('#feedback').innerText(),feedback);
+      assert.equal(await page.locator('#choices input').first().isChecked(),true);
+      assert.equal(await page.locator('#auto').isChecked(),false);
+      await page.locator('#next').click();
+      assert.match(await page.locator('#position').innerText(),/^2 \/ /);
+      await page.reload();await page.locator('#resume').click();
+      assert.match(await page.locator('#position').innerText(),/^2 \/ /);
+      assert.equal(await page.locator('#choices input:checked').count(),0);
+      await page.evaluate(key=>localStorage.removeItem(key),key);
+      await page.locator('#leave').click();
+      await page.evaluate(key=>localStorage.removeItem(key),key);
+    }
+    await page.goto(base+'/index.html');
+    const clock=await page.evaluate(()=>{
+      startExam();clearInterval(state.exam.timer);
+      state.exam.deadline=Date.now()+60000;updateExamTimer();
+      const left=state.exam.timeLeft;
+      state.exam.deadline=null;return left;
+    });
+    assert.ok(clock>=59&&clock<=60,'Mock timer must follow deadline instead of interval count');
     await page.goto(base+'/homework-drill.html');
     await page.locator('#scope').selectOption('3');
     await page.locator('#practice').click();
