@@ -23,7 +23,7 @@ function readSession(){try{
  }catch(e){return null}}
 function saveSession(){if(!list.length||pos>=list.length)return false;try{localStorage.setItem(SESSION_KEY,JSON.stringify({version:1,mode,pos,scope:Number($('scope').value),auto:$('auto').checked,questions:list.map(q=>({id:q.id,signature:signature(q),order:q.order})),answers:answers.map(a=>({id:a.q.id,selected:a.selected})),updated:Date.now()}));return true}catch(e){$('session-status').textContent='途中経過を保存できません。ブラウザの保存設定を確認してください。';return false}}
 function clearSession(){try{localStorage.removeItem(SESSION_KEY)}catch(e){}refreshResume()}
-function refreshResume(){const v=readSession();$('resume-panel').hidden=!v;$('resume-info').textContent=v?'保存済み：'+(v.mode==='exam'?'実力テスト':'問題演習')+' '+v.answers.length+' / '+v.questions.length+'問回答済み':''}
+function refreshResume(){const v=readSession();$('resume-panel').hidden=!v;$('resume-info').textContent=v?'保存済み：'+(v.mode==='exam'?'実力テスト':'問題演習')+' '+v.answers.length+' / '+v.questions.length+'問回答済み。新しく開始すると途中記録を上書きします。':''}
 function resumeSession(){const v=readSession();if(!v){refreshResume();return}cancelTimer();mode=v.mode;pos=v.pos;list=v.questions.map(x=>({...bankById.get(x.id),order:x.order}));answers=v.answers.map((x,i)=>({q:list[i],selected:x.selected}));if([0,1,2,3,4].includes(v.scope))$('scope').value=String(v.scope);$('auto').checked=v.auto!==false;$('setup').hidden=true;$('result').hidden=true;$('quiz').hidden=false;render();if(answers.length===pos+1){const chosen=answers[pos].selected;$('choices').querySelectorAll('input').forEach(x=>{x.checked=Number(x.value)===chosen});applyAnswer(chosen,false)}}
 $('resume').onclick=resumeSession;
 $('discard-session').onclick=()=>{if(confirm('途中の学習記録のみ削除しますか？'))clearSession()};
