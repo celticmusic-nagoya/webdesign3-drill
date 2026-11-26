@@ -1,22 +1,6 @@
-const CACHE_NAME = 'web3-study-100-android-v1';
-const ASSETS = ['./', './index.html', './manifest.webmanifest'];
-self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(ASSETS)));
-  self.skipWaiting();
-});
-self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(keys =>
-    Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
-  ));
-  self.clients.claim();
-});
-self.addEventListener('fetch', e => {
-  if (e.request.method !== 'GET') return;
-  e.respondWith(
-    fetch(e.request).then(r => {
-      const copy = r.clone();
-      caches.open(CACHE_NAME).then(c => c.put(e.request, copy));
-      return r;
-    }).catch(() => caches.match(e.request).then(r => r || caches.match('./index.html')))
-  );
-});
+const CACHE_NAME='web3-study-exam-guide-v2';
+const ASSETS=["./","./index.html","./manifest.webmanifest","./exam-guide.html","./textbook.html","./textbook-original.html","./homework-drill.html","./materials/question-sets-03-04.js","./materials/textbook-original.js","./materials/homework-drill.js"];
+const scope=new URL(self.registration.scope);
+self.addEventListener('install',e=>e.waitUntil((async()=>{const c=await caches.open(CACHE_NAME);await c.addAll(ASSETS);await self.skipWaiting()})()));
+self.addEventListener('activate',e=>e.waitUntil((async()=>{for(const k of await caches.keys())if(k.startsWith('web3-study-')&&k!==CACHE_NAME)await caches.delete(k);await self.clients.claim()})()));
+self.addEventListener('fetch',e=>{const q=e.request,u=new URL(q.url);if(q.method!=='GET'||q.headers.has('range'))return;const local=u.origin===scope.origin&&u.pathname.startsWith(scope.pathname);if(!local)return;e.respondWith((async()=>{const c=await caches.open(CACHE_NAME);try{const r=await fetch(q);if(r.ok&&r.status===200)await c.put(q,r.clone());return r}catch(err){const hit=await c.match(q,{ignoreSearch:q.mode==='navigate'});return hit||new Response('Offline: resource unavailable',{status:503,headers:{'Content-Type':'text/plain; charset=utf-8'}})}})())});
