@@ -2,7 +2,7 @@
 const books=[['第3回 講義テキスト','lesson-03.pdf'],['第4回 講義テキスト','lesson-04.pdf'],['第3回 自宅学習・穴埋め','homework-03.pdf'],['第4回 自宅学習・穴埋め','homework-04.pdf'],['第1〜4回 総合復習60問｜問題冊子','review-01-04-questions.pdf'],['第1〜4回 総合復習60問｜解答・解説','review-01-04-answers.pdf'],['第3・4回 総合復習60問｜問題冊子','review-03-04-questions.pdf'],['第3・4回 総合復習60問｜解答・解説','review-03-04-answers.pdf']];
 const $=id=>document.getElementById(id),sel=$('source'),viewer=$('viewer'),open=$('open'),status=$('status'),reader=$('lecture-reader'),surface=$('lecture-image');let items=[],page=0,zoom=1,token=0,manifestPromise=null,pdfDoc=null,enginePromise=null,renderId=0;
 books.forEach(([name],i)=>sel.add(new Option(name,i)));
-const CACHE='web3-study-reader-v10';
+const CACHE='web3-study-reader-v12';
 const MANIFEST=new URL('./materials/textbook-pages/manifest.json',location.href).href;
 const ENGINE=['https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js','https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'];
 function manifest(){if(!manifestPromise)manifestPromise=fetch(MANIFEST).then(r=>{if(!r.ok)throw Error('manifest');return r.json()}).catch(e=>{manifestPromise=null;throw e});return manifestPromise}

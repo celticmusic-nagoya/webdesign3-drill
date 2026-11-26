@@ -275,6 +275,21 @@ async function run(){
     await page.reload();
     assert.equal(await page.evaluate(()=>{switchTab('practice');return state.practice.currentIndex}),1);
     await page.evaluate(()=>{localStorage.removeItem('web3_practice_session_v1');});
+    // Interrupted mock exam retains answer/index and absolute deadline across reload.
+    const savedExam=await page.evaluate(()=>{
+      switchTab('exam');startExam();const q=state.exam.questions[0];answerExam(q.correct);navigateExamQuestion(1);
+      return {deadline:state.exam.deadline,index:state.exam.currentIndex,answers:state.exam.answers,ids:state.exam.questions.map(x=>x.id),options:state.exam.questions.map(x=>x.options)};
+    });
+    await page.reload();await page.evaluate(()=>switchTab('exam'));
+    await page.locator('#exam-resume-btn').click();
+    const resumedExam=await page.evaluate(()=>({deadline:state.exam.deadline,index:state.exam.currentIndex,answers:state.exam.answers,ids:state.exam.questions.map(x=>x.id),options:state.exam.questions.map(x=>x.options)}));
+    assert.deepEqual(resumedExam,savedExam);
+    await page.evaluate(()=>{const key='web3_mock_exam_session_v1',v=JSON.parse(localStorage.getItem(key));v.deadline=Date.now()-1000;localStorage.setItem(key,JSON.stringify(v));});
+    await page.reload();await page.evaluate(()=>switchTab('exam'));
+    assert.equal(await page.locator('#exam-resume-btn').innerText(),'前回の模擬試験を採点');
+    await page.locator('#exam-resume-btn').click();
+    assert.equal(await page.locator('#exam-score-text').innerText(),'1 / 25');
+    assert.equal(await page.evaluate(()=>localStorage.getItem('web3_mock_exam_session_v1')),null);
     const clock=await page.evaluate(()=>{
       startExam();clearInterval(state.exam.timer);
       state.exam.deadline=Date.now()+60000;updateExamTimer();
