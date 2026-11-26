@@ -1,0 +1,270 @@
+{
+  "3": {
+    "source_git_sha": "9802179df9348942ebc7bb85895e68fe68244a89",
+    "pages": [
+      {
+        "file": "lesson-03-01.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "ebd65f9be42d2d588d1223c8bf655888ad131350f6167230f72acb8e21b04b04"
+      },
+      {
+        "file": "lesson-03-02.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "0064693af94da2befe1fc4d43fbff27612f3ae1bd8cec4c64c37da206e2e18e0"
+      },
+      {
+        "file": "lesson-03-03.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "f398965b18d799be5cd45e527ed6156f573c6f0279b73864f81ac7d9505a4efa"
+      },
+      {
+        "file": "lesson-03-04.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "2d7ff6273bca6b6ce3cb4dcb1be900a811140c5711f737fc62f9408a5ae34451"
+      },
+      {
+        "file": "lesson-03-05.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "f255cf7423ef24533e0ca850668ada79ac28b1b79517131feb453a3e0373b448"
+      },
+      {
+        "file": "lesson-03-06.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "d79c75fabd56536e7909d18b62f010d5f800d4cc2dadc62e85e532ee6a103c46"
+      },
+      {
+        "file": "lesson-03-07.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "b45d09beffdeaa78b9281f4c5c892b05a2efe214f526807c999a8784b488cb67"
+      },
+      {
+        "file": "lesson-03-08.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "d977553090b9ede2577b6729d500c6dcd2ff2a28ef091f52d5503b5b1ad12b4e"
+      },
+      {
+        "file": "lesson-03-09.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "f2a5218a13bc72f4959857e9b8a89dc302ad677131b18461841a9cc39d1eaa23"
+      },
+      {
+        "file": "lesson-03-10.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "ef541ab3c4b1c3b66c2f67579d432f8a72bd51a6eed2f3faf19cf67e7ab2e091"
+      },
+      {
+        "file": "lesson-03-11.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "bb35f8ad536d3526aa1a99a0be20360e6b275c86c247aa25b738c28f0cdd4ca9"
+      },
+      {
+        "file": "lesson-03-12.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "d1f8666d81f6be1d14e2e3dea5bb1a6bfaa37b0f86b1bf8fd35b6aec95feb17e"
+      },
+      {
+        "file": "lesson-03-13.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "a03afea1f4d7449549f31e9d2bd14f92f18bd1bd32c68ccc29ca26fa2412463c"
+      },
+      {
+        "file": "lesson-03-14.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "5ac304f3330c223dc104ae17bd1961157814891e75a9d6106ffdb00c3d7882fd"
+      },
+      {
+        "file": "lesson-03-15.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "96e2da545ffe7d355d97c67d49e7f8ab14bb4a62d7e0890e7b79c5069a8f59b3"
+      },
+      {
+        "file": "lesson-03-16.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "42c4a2d991757fd9e03a1d72d909e733201c2291704c0760df915f716d9d9904"
+      },
+      {
+        "file": "lesson-03-17.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "50ecc97c9a96cb013ef74379a6f5ed4f7c60833afbf45f189b9e6ad7edfd21d3"
+      },
+      {
+        "file": "lesson-03-18.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "b14b80565af954aebdcc727aa1e1bbf5eba5f67320e2fd5b3e6948edef400a09"
+      },
+      {
+        "file": "lesson-03-19.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "16b53c3773bef84184544d5c2b5af77dd2833922036d44e16ef083f984d16b38"
+      },
+      {
+        "file": "lesson-03-20.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "c51f99e8579341a2973a40403633a398aed974d55e4d10719ee2657605281cb4"
+      },
+      {
+        "file": "lesson-03-21.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "095e7f23975af624a27bd58554b7598505b7a04dabeeb32be82e47eb6b40ba59"
+      },
+      {
+        "file": "lesson-03-22.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "2cd5a49c630ee9d9e3646ab15695e1b848a2a27963b80205d310a7bd088c8df9"
+      },
+      {
+        "file": "lesson-03-23.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "c4733895977719226df7b8f5a62bee8a18157e1613d541680fedf33f4b328f43"
+      }
+    ]
+  },
+  "4": {
+    "source_git_sha": "5f92a96812554ec66b4d2b5e5c9c919b1a5c6692",
+    "pages": [
+      {
+        "file": "lesson-04-01.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "503e722aa0b7cb37ea13dd109a3d76ab93f62e0658f40029d274121ba1b3ec44"
+      },
+      {
+        "file": "lesson-04-02.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "fbbf22213d5405849d36078ec35a46b1286ef0763d739e2b0d1eb1d78071b8cc"
+      },
+      {
+        "file": "lesson-04-03.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "533f46fc1ac37eb0d2dc75a0c64c5b8216f9e2d84ed461d62b64a53d38d3049f"
+      },
+      {
+        "file": "lesson-04-04.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "98bf38babb582566aa0ad2f6f277979dc8230796ce4d05404b725bcf354091d4"
+      },
+      {
+        "file": "lesson-04-05.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "cf45b4915072f30696c91534d6308ac42ec315bc75dd2537461b44766cb79f91"
+      },
+      {
+        "file": "lesson-04-06.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "e11919252ac42b440e65f1bf38fd2331cc06704c3cd988a1f89545aa4716ba8a"
+      },
+      {
+        "file": "lesson-04-07.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "99ea8d89310f893075fc4e07d88a926596422bb3729dcd7c6a49978e8e07fd00"
+      },
+      {
+        "file": "lesson-04-08.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "0502ab5ecc24e59bab8598d2316706a737e61a0de73652d18ffad25d7e457679"
+      },
+      {
+        "file": "lesson-04-09.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "69ca10a170d57ba47a39f2e661b8f8b334c5f4afcabbf7c1fbd59726174f336e"
+      },
+      {
+        "file": "lesson-04-10.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "f3c5c64033ee65d6684ad1e22a2f5bbab2b7044391dfcfa46c2087f886529c2e"
+      },
+      {
+        "file": "lesson-04-11.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "42136e6f193e8bafdb663bc715b99da1fc2e0940d9b6e56f7072b41515fece70"
+      },
+      {
+        "file": "lesson-04-12.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "1e2611d9eadf10f53b6ab4817812bca24a1f926a58a35f98105d744d636c325e"
+      },
+      {
+        "file": "lesson-04-13.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "c3c695cad11c3a803f2493b0e3324a32bb77f9fee7e232ae570d1f4da6be7e9f"
+      },
+      {
+        "file": "lesson-04-14.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "09613c1d7cdf124b76ec6d985940b756bce900c1fc18dfefc41ca472d61ddb4e"
+      },
+      {
+        "file": "lesson-04-15.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "8ce76e272bf0b18c367023dba226ff82586416c986ab0a0fc271f2a4839a63c6"
+      },
+      {
+        "file": "lesson-04-16.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "468fe5bdbd9f37d043e0f6c116a569e9d3b3692d2cdc6b4faf25d7b46bae6ae5"
+      },
+      {
+        "file": "lesson-04-17.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "49e7e3e24717a76e99a29534071a2fb3ea7e08c2eb2202e52d413c6b72296847"
+      },
+      {
+        "file": "lesson-04-18.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "8e671e233a635387ccb0f19d3e2c6572bccb73908a397af51023adcf6fb8734f"
+      },
+      {
+        "file": "lesson-04-19.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "0fbcc1e63104e0dd9b27dd71ffcafd655cd6fb42a659526e8c972082563f9c00"
+      },
+      {
+        "file": "lesson-04-20.webp",
+        "width": 1103,
+        "height": 1547,
+        "sha256": "46ba45ebd54b4bd85c38341750a223cb616c2b426696dec632a667614bc9abf1"
+      }
+    ]
+  }
+}
