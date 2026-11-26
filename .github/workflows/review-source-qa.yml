@@ -1,0 +1,28 @@
+name: Review source answer QA
+on:
+  pull_request:
+    paths:
+      - 'materials/question-sets-03-04.js'
+      - 'materials/review-*-answers.pdf'
+      - 'tools/qa-review-source.cjs'
+      - '.github/workflows/review-source-qa.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'materials/question-sets-03-04.js'
+      - 'materials/review-*-answers.pdf'
+      - 'tools/qa-review-source.cjs'
+      - '.github/workflows/review-source-qa.yml'
+permissions:
+  contents: read
+jobs:
+  original-answer-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends poppler-utils
+      - run: node tools/qa-review-source.cjs
