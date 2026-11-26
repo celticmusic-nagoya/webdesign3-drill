@@ -1,0 +1,13 @@
+ウェブデザイン技能検定3級 学習アプリ — AI引継ぎ開始指示
+
+このZIPが先生から添付された場合は、以下を先生の依頼に沿って実行してください。
+まずZIPを安全に展開し、PACKAGE_MANIFEST.json の収録ファイルのSHA-256を検証してください。
+source/AGENTS.md、source/README.md、source/docs/TEACHER_START.md、source/docs/MAINTENANCE.md、source/docs/RELEASE_CHECKLIST.md を読み、引継ぎ準備を行ってください。
+
+GitHubは使用しません。source/ が保守正本であり、app/ は配布用の生成物です。
+先生が具体的な更新指示をしていない場合、ファイルを改変せず、現在の機能・教材・検証済み事項・未確認事項と、教材追加・修正・サーバー掲載の依頼方法を日本語で簡潔に案内してください。
+具体的な依頼がある場合は、関連原本を読み、既存の固定問題ID・学習保存互換性・原本を保護して変更してください。出典の不明点・推定補完・公開可否は明示してください。
+更新後は source/ の tools/build-local.cjs で app/ を再生成し、docs/MAINTENANCE.md に従いQAを実施します。続けて tools/build-teacher-package.cjs を実行し、dist/teacher-delivery/ に新しい配布フォルダ（app/、最初にお読みください.txt、ChatGPT引継ぎパッケージ.zip）を生成してください。tools/qa-teacher-package.cjs で検証した後、フォルダ全体をZIPで先生に返してください。
+変更記録、QA結果・未確認事項を source/docs/ に追加してください。古い版を上書きせず、配布用フォルダを作成してください。
+サーバー公開は先生の明示指示に従い、app/ のみを掲載します。個人情報・認証情報・生徒の成績個票を同梱しません。
+ZIP処理・実行環境・権限に制約がある場合は、できた作業と未実施の作業を区別し、編集済みファイルや再現手順を返してください。

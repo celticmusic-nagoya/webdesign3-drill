@@ -14,8 +14,11 @@ for(const dir of ['materials','tools','docs'])fs.cpSync(path.join(root,dir),path
 fs.copyFileSync(path.join(root,'docs','TEACHER_START.md'),path.join(dest,'00_はじめに.md'));
 fs.copyFileSync(path.join(root,'docs','MAINTENANCE.md'),path.join(dest,'01_更新とサーバー掲載.md'));
 fs.copyFileSync(path.join(root,'docs','RELEASE_CHECKLIST.md'),path.join(dest,'02_配布チェックリスト.md'));
+fs.copyFileSync(path.join(root,'docs','AI_START.txt'),path.join(dest,'AI_START.txt'));
 const records=[];
 function walk(dir){for(const item of fs.readdirSync(dir,{withFileTypes:true})){const p=path.join(dir,item.name);if(item.isDirectory())walk(p);else if(item.isFile()){const b=fs.readFileSync(p);records.push({path:path.relative(dest,p).split(path.sep).join('/'),size:b.length,sha256:crypto.createHash('sha256').update(b).digest('hex')});}}}
 walk(dest);records.sort((a,b)=>a.path.localeCompare(b.path));
 fs.writeFileSync(path.join(dest,'PACKAGE_MANIFEST.json'),JSON.stringify({schema:1,created_at:new Date().toISOString(),source_revision:process.env.HANDOFF_SOURCE_REVISION||null,files:records},null,2)+'\n');
 console.log('Teacher handoff:',dest,records.length,'files');
+
+require('node:child_process').execFileSync('python3',[path.join(root,'tools','build-teacher-delivery.py')],{stdio:'inherit'});

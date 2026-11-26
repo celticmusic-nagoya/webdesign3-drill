@@ -4,10 +4,12 @@ const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypt
 const {chromium}=require('playwright');
 const root=path.resolve(__dirname,'../dist/teacher-handoff'),manifest=JSON.parse(fs.readFileSync(path.join(root,'PACKAGE_MANIFEST.json'),'utf8'));
 for(const f of manifest.files){const b=fs.readFileSync(path.join(root,f.path));assert.equal(b.length,f.size,f.path);assert.equal(crypto.createHash('sha256').update(b).digest('hex'),f.sha256,f.path)}
-const app=path.join(root,'app');
+require('node:child_process').execFileSync('python3',[path.resolve(__dirname,'build-teacher-delivery.py'),'--verify-only'],{stdio:'inherit'});
+const app=path.resolve(__dirname,'../dist/teacher-delivery/app');
 assert.ok(fs.existsSync(path.join(root,'source','tools','build-local.cjs')));
 assert.ok(fs.existsSync(path.join(root,'source','AGENTS.md')));
 assert.ok(fs.existsSync(path.join(root,'00_はじめに.md')));
+assert.ok(fs.existsSync(path.join(root,'AI_START.txt')));
 const server=http.createServer((req,res)=>{
  const url=new URL(req.url,'http://127.0.0.1');
  if(!url.pathname.startsWith('/school/')){res.writeHead(404);return res.end()}
