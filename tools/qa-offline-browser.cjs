@@ -37,6 +37,9 @@ try{
  await page.locator('a[href="#offline-exam-guide"]').click();
  await page.locator('#offline-pdf-image').waitFor({state:'visible'});
  assert.equal(await page.locator('#offline-pdf-page').innerText(),'1 / 11');
+ await page.keyboard.press('ArrowRight');assert.equal(await page.locator('#offline-pdf-page').innerText(),'2 / 11');
+ await page.keyboard.press('ArrowLeft');assert.equal(await page.locator('#offline-pdf-page').innerText(),'1 / 11');
+ await page.keyboard.press('ArrowLeft');assert.equal(await page.locator('#offline-pdf-page').innerText(),'1 / 11');
  assert.ok(await page.locator('#offline-pdf-image').evaluate(el=>el.src.startsWith('data:image/png;base64,')));
  const swipe=async(dx,dy=0)=>page.locator('#offline-pdf-image').evaluate((el,{dx,dy})=>{
   const t=(x,y)=>new Touch({identifier:1,target:el,clientX:x,clientY:y});
@@ -86,6 +89,8 @@ try{
  await imageEdge('center');assert.equal(await page.locator('#offline-pdf-page').innerText(),fitPage+' / 11');
  await edge('right');assert.equal(await page.locator('#offline-pdf-page').innerText(),(fitPage+1)+' / 11');
  await edge('left');assert.equal(await page.locator('#offline-pdf-page').innerText(),fitPage+' / 11');
+ await page.keyboard.press('ArrowRight');assert.equal(await page.locator('#offline-pdf-page').innerText(),(fitPage+1)+' / 11');
+ await page.keyboard.press('ArrowLeft');assert.equal(await page.locator('#offline-pdf-page').innerText(),fitPage+' / 11');
  await page.locator('#offline-pdf-zoom-reset').click();
  for(let i=0;i<8;i++)await page.locator('#offline-pdf-zoom-out').click();
  assert.equal(await page.locator('#offline-pdf-zoom-label').innerText(),'25%');
@@ -121,6 +126,10 @@ try{
  const frame=page.frameLocator('#offline-reader-frame');
  await frame.locator('#page-label').waitFor({state:'visible'});
  assert.match(await frame.locator('#page-label').innerText(),/1 \/ 13/);
+ await frame.locator('#page-text').click({position:{x:100,y:30}});
+ await page.keyboard.press('ArrowRight');assert.match(await frame.locator('#page-label').innerText(),/2 \/ 13/);
+ await page.keyboard.press('ArrowLeft');assert.match(await frame.locator('#page-label').innerText(),/1 \/ 13/);
+ await frame.locator('#global-search').focus();await page.keyboard.press('ArrowRight');assert.match(await frame.locator('#page-label').innerText(),/1 \/ 13/);
  await frame.locator('#next').click();
  assert.match(await frame.locator('#page-label').innerText(),/2 \/ 13/);
  await frame.locator('#original-figure-canvas').waitFor({state:'visible',timeout:30000});

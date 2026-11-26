@@ -76,7 +76,7 @@ async function run(){
       await pc.locator('#zoom-page').click();
       assert.ok(await original.locator('img').evaluate(el=>el.getBoundingClientRect().height<=innerHeight-115));
       const visibleImageEdge=async(side)=>{
-        const im=original.locator('img');await im.evaluate(el=>el.decode());
+        const count=(await pc.locator('#count').innerText()).split(' / ')[0];const im=original.locator('img[alt^="原本 '+count+'ページ"]');await im.waitFor({state:'visible'});await im.evaluate(el=>el.decode());
         await im.evaluate(el=>el.scrollIntoView({block:'center',behavior:'instant'}));
         const b=await im.boundingBox();assert.ok(b&&b.width>20&&b.height>20);
         await pc.mouse.click(b.x+(side==='left'?8:side==='right'?b.width-8:b.width/2),b.y+b.height/2);
@@ -84,6 +84,11 @@ async function run(){
       await visibleImageEdge('right');assert.equal(await pc.locator('#count').innerText(),'2 / 11');
       await visibleImageEdge('left');assert.equal(await pc.locator('#count').innerText(),'1 / 11');
       await visibleImageEdge('center');assert.equal(await pc.locator('#count').innerText(),'1 / 11');
+      await pc.keyboard.press('ArrowRight');assert.equal(await pc.locator('#count').innerText(),'2 / 11');
+      await pc.keyboard.press('ArrowLeft');assert.equal(await pc.locator('#count').innerText(),'1 / 11');
+      await pc.keyboard.press('ArrowLeft');assert.equal(await pc.locator('#count').innerText(),'1 / 11');
+      await pc.locator('#search').focus();await pc.keyboard.press('ArrowRight');assert.equal(await pc.locator('#count').innerText(),'1 / 11');
+      await pc.locator('#search').blur();
       await pc.locator('#zoom-fit').click();
       for(let n=0;n<3;n++)await pc.locator('#zoom-out').click();
       assert.equal(await pc.locator('#pdf-zoom').innerText(),'25%');
@@ -96,6 +101,8 @@ async function run(){
       await edge(original,'center');assert.equal(await pc.locator('#count').innerText(),'1 / 11');
       await pc.locator('#zoom-in').click();
       await edge(original,'right');assert.equal(await pc.locator('#count').innerText(),'1 / 11');
+      await pc.keyboard.press('ArrowRight');assert.equal(await pc.locator('#count').innerText(),'2 / 11');
+      await pc.keyboard.press('ArrowLeft');assert.equal(await pc.locator('#count').innerText(),'1 / 11');
       await pc.locator('#zoom-fit').click();
       await pc.locator('#mode-text').click();
       const text=pc.locator('#page');
@@ -105,12 +112,17 @@ async function run(){
       const body=pc.locator('#page-text');
       await edge(body,'right');assert.match(await pc.locator('#page-label').innerText(),/2 \/ 13/);
       await edge(body,'left');assert.match(await pc.locator('#page-label').innerText(),/1 \/ 13/);
+      await pc.keyboard.press('ArrowRight');assert.match(await pc.locator('#page-label').innerText(),/2 \/ 13/);
+      await pc.keyboard.press('ArrowLeft');assert.match(await pc.locator('#page-label').innerText(),/1 \/ 13/);
+      await pc.locator('#global-search').focus();await pc.keyboard.press('ArrowRight');assert.match(await pc.locator('#page-label').innerText(),/1 \/ 13/);
       for(const [book,total] of [[0,23],[1,20]]){
         await pc.goto(base+'/additional-materials.html?book='+book);
         const surface=pc.locator('#lecture-image');
         await surface.locator('img').waitFor({state:'visible',timeout:30000});
         await edge(surface,'right');assert.equal(await pc.locator('#progress').innerText(),'2 / '+total);
         await edge(surface,'left');assert.equal(await pc.locator('#progress').innerText(),'1 / '+total);
+        await pc.keyboard.press('ArrowRight');assert.equal(await pc.locator('#progress').innerText(),'2 / '+total);
+        await pc.keyboard.press('ArrowLeft');assert.equal(await pc.locator('#progress').innerText(),'1 / '+total);
       }
       console.log('PASS: desktop edge navigation, center and zoom guard across guide and textbooks');
     }finally{await desktop.close()}

@@ -77,5 +77,20 @@ function bind(surface,{previous,next,canTurn=()=>true,canPrevious=()=>true,canNe
   turn(dir);
  },{passive:true});
 }
-root.StudySwipe={bind,direction,edgeDirection,pageEdgeDirection};
+// Bind once per document/reader. Arrow keys also work after using toolbar buttons.
+function bindKeys(doc,{previous,next,active=()=>true,canPrevious=()=>true,canNext=()=>true}){
+ const handler=e=>{
+  if(e.defaultPrevented||e.isComposing||e.altKey||e.ctrlKey||e.metaKey||e.shiftKey||!active())return;
+  if(e.key!=='ArrowLeft'&&e.key!=='ArrowRight')return;
+  const target=e.target;
+  if(target&&(target.isContentEditable||target.closest?.('input,textarea,select,[contenteditable]:not([contenteditable="false"]),[role="textbox"],[role="slider"],[role="combobox"],[role="listbox"],[role="menu"],[role="tablist"]')))return;
+  const selection=doc.getSelection?.();if(selection&&!selection.isCollapsed)return;
+  e.preventDefault();
+  if(e.repeat)return;
+  if(e.key==='ArrowLeft'){if(canPrevious())previous()}else if(canNext())next();
+ };
+ doc.addEventListener('keydown',handler);
+ return ()=>doc.removeEventListener('keydown',handler);
+}
+root.StudySwipe={bind,bindKeys,direction,edgeDirection,pageEdgeDirection};
 })(window);

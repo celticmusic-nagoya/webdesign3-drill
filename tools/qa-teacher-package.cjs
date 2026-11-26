@@ -39,6 +39,8 @@ const server=http.createServer((req,res)=>{
   assert.equal(await page.locator('#offline-pdf-page').innerText(),'2 / 11');
   await imageEdge('left');
   assert.equal(await page.locator('#offline-pdf-page').innerText(),'1 / 11');
+  await page.keyboard.press('ArrowRight');assert.equal(await page.locator('#offline-pdf-page').innerText(),'2 / 11');
+  await page.keyboard.press('ArrowLeft');assert.equal(await page.locator('#offline-pdf-page').innerText(),'1 / 11');
   await page.locator('#offline-reader-back').click();
   await page.locator('#offline-textbook-link').click();
   await page.frameLocator('#offline-reader-frame').locator('#page-label').waitFor();
