@@ -16,7 +16,7 @@ if(html.includes('cdn.tailwindcss.com')||html.includes('fonts.googleapis.com'))t
 // file:// and Android content:// URLs cannot reliably resolve sibling HTML files.
 // Embed the reader in the entrypoint and show it in a sandboxed same-origin iframe.
 const swipeCode=fs.readFileSync('reader-swipe.js','utf8');
-const readerHtml=fs.readFileSync('textbook.html','utf8').replace('<script src="./reader-swipe.js"></script>',()=>'<script>'+swipeCode+'</script>');
+const readerHtml=fs.readFileSync('textbook.html','utf8').replace(/<script src="https:\/\/cdnjs\.cloudflare\.com\/ajax\/libs\/pdf\.js\/3\.11\.174\/pdf\.min\.js" defer><\/script>/,'').replace('<script src="./reader-swipe.js"></script>',()=>'<script>'+swipeCode+'</script>');
 html=html.replace('href="./exam-guide.html"','href="#offline-exam-guide"');
 html=html.replace(/<script>if\('serviceWorker' in navigator&&location.protocol!=='file:'\)navigator.serviceWorker.register\('\.\/sw\.js'\).catch\(console.warn\);<\/script>/,'');
 if(!html.includes('href="./textbook.html"'))throw Error('Reader navigation link missing');
@@ -186,12 +186,14 @@ function renderPdfPage(){
  const pages=embeddedPageImages[pdfBook]||[];
  if(pdfPage<1||pdfPage>pages.length){pdfLabel.textContent='原資料ページがありません';return;}
  pdfImage.src=pages[pdfPage-1];
+ pdfImage.alt=(pdfBook===10?'試験攻略マニュアル':'原資料')+' '+pdfPage+'ページ';
  pdfLabel.textContent=pdfPage+' / '+pages.length;
  document.getElementById('offline-pdf-prev').disabled=pdfPage<=1;document.getElementById('offline-pdf-next').disabled=pdfPage>=pages.length;document.getElementById('offline-pdf-scroll').scrollTop=0;
  if(pdfBook>=2){try{localStorage.setItem('web3_offline_pdf_page_'+pdfBook,String(pdfPage))}catch(e){}}
 }
 function openOfflinePdf(i,requestedPage){
  pdfBook=i;pdfPage=1;
+ document.getElementById('offline-pdf-help').textContent=i===10?'試験攻略マニュアル（全11ページ）':'原資料をアプリ内で閲覧できます';
  if(i>=2){try{const stored=Number(localStorage.getItem('web3_offline_pdf_page_'+i));if(Number.isInteger(stored)&&stored>=1&&stored<=embeddedPageImages[i].length)pdfPage=stored}catch(e){}}
  document.getElementById('offline-pdf-close').textContent=i>=2?'教科書メニューへ':'教科書の同じページへ';
  try{
