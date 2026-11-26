@@ -288,6 +288,7 @@ fs.copyFileSync('reader-swipe.js',path.join(out,'reader-swipe.js'));
 fs.copyFileSync('exam-guide.html',path.join(out,'exam-guide.html'));
 fs.copyFileSync('materials/攻略マニュアル.pdf',path.join(out,'materials/攻略マニュアル.pdf'));
 fs.cpSync('materials/exam-guide-pages',path.join(out,'materials/exam-guide-pages'),{recursive:true});
+if(fs.existsSync('materials/textbook-pages/manifest.json'))fs.cpSync('materials/textbook-pages',path.join(out,'materials/textbook-pages'),{recursive:true});
 fs.copyFileSync('materials/question-sets-03-04.js',path.join(out,'materials/question-sets-03-04.js'));
 for(const name of ['lesson-03.pdf','lesson-04.pdf','homework-03.pdf','homework-04.pdf','review-01-04-questions.pdf','review-01-04-answers.pdf','review-03-04-questions.pdf','review-03-04-answers.pdf'])fs.copyFileSync(path.join('materials',name),path.join(out,'materials',name));
 const manifest=JSON.parse(fs.readFileSync('materials/SOURCE_MANIFEST.json','utf8'));
