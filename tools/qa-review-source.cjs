@@ -18,7 +18,14 @@ const sources=[
 const result=[];
 for(const [category,file] of sources){
  const pdf=material(file);
- const raw=execFileSync('pdftotext',['-layout',pdf,'-'],{encoding:'utf8'}).normalize('NFKC');
+ const expectedSha={
+  'review-01-04-answers.pdf':'a61b21640ba39daea040f0a9197d15a3d3d90f635a1d40c328d7d8144e8fc82e',
+  'review-03-04-answers.pdf':'db843b6e8295f4c3a388d69c20d936255f2f1df2580e3bd8d0810d6ca9efc92e'
+ }[file];
+ const actualSha=crypto.createHash('sha256').update(fs.readFileSync(pdf)).digest('hex');
+ assert.equal(actualSha,expectedSha,file+' must match the independently inspected uploaded PDF');
+ // MuPDF reads the embedded text even when Poppler cannot resolve the PDF font tags.
+ const raw=execFileSync('python3',['-c','import pymupdf,sys; d=pymupdf.open(sys.argv[1]); print("\\n".join(p.get_text() for p in d))',pdf],{encoding:'utf8'}).normalize('NFKC');
  const matches=[...raw.matchAll(/第\s*(\d+)\s*問\s*正解\s*:\s*([1-4○×])/g)];
  assert.equal(matches.length,60,category+' source answer count');
  const keys=new Map(matches.map(m=>[Number(m[1]),m[2]]));
