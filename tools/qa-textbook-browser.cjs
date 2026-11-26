@@ -76,7 +76,7 @@ async function run(){
       await pc.locator('#zoom-page').click();
       assert.ok(await original.locator('img').evaluate(el=>el.getBoundingClientRect().height<=innerHeight-115));
       await pc.locator('#zoom-fit').click();
-      for(let n=0;n<8;n++)await pc.locator('#zoom-out').click();
+      for(let n=0;n<3;n++)await pc.locator('#zoom-out').click();
       assert.equal(await pc.locator('#pdf-zoom').innerText(),'25%');
       await edge(original,'right');assert.equal(await pc.locator('#count').innerText(),'2 / 11');
       assert.match(await pc.locator('#original-pdf').getAttribute('href'),/#page=2$/);
