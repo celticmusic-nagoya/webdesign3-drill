@@ -46,8 +46,27 @@ async function run(){
     const desktop=await browser.newContext({viewport:{width:1280,height:900}});
     const pc=await desktop.newPage();
     const edge=async(locator,side)=>{
-      const width=await locator.evaluate(el=>el.clientWidth);
-      await locator.click({position:{x:side==='left'?10:side==='right'?width-10:Math.floor(width/2),y:24}});
+      // Tall PDF surfaces may extend behind the sticky navigation. Use an actual
+      // visible, unobstructed point, not a fixed offset near the top of the image.
+      await locator.evaluate(el=>el.scrollIntoView({block:'start',behavior:'instant'}));
+      let point;
+      await pc.waitForFunction(({id,side})=>{
+        const el=document.getElementById(id);if(!el)return false;
+        const rect=el.getBoundingClientRect(),w=el.clientWidth;
+        const x=rect.left+el.clientLeft+(side==='left'?10:side==='right'?w-10:Math.floor(w/2));
+        const top=Math.max(0,rect.top+el.clientTop),bottom=Math.min(innerHeight,rect.top+el.clientTop+el.clientHeight);
+        for(let y=top+16;y<bottom-8;y+=16)if(el.contains(document.elementFromPoint(x,y)))return true;
+        return false;
+      },{id:await locator.getAttribute('id'),side});
+      point=await locator.evaluate((el,side)=>{
+        const rect=el.getBoundingClientRect(),w=el.clientWidth;
+        const x=rect.left+el.clientLeft+(side==='left'?10:side==='right'?w-10:Math.floor(w/2));
+        const top=Math.max(0,rect.top+el.clientTop),bottom=Math.min(innerHeight,rect.top+el.clientTop+el.clientHeight);
+        for(let y=top+16;y<bottom-8;y+=16)if(el.contains(document.elementFromPoint(x,y)))return {x,y};
+        return null;
+      },side);
+      assert.ok(point,'Reader edge must have a visible mouse target');
+      await pc.mouse.click(point.x,point.y);
     };
     try{
       await pc.goto(base+'/exam-guide.html');
