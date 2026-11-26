@@ -802,7 +802,12 @@
                     <div><div class="text-xs text-slate-400 font-medium">合格基準</div><div class="text-lg font-black text-emerald-400">70%以上</div></div>
                 </div>
 
-                <button onclick="startExam()" class="w-full sm:w-auto px-8 py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-xl transition shadow-xl shadow-blue-600/30 text-base">
+                <div id="exam-resume-panel" class="hidden space-y-3" role="region" aria-label="中断した模擬試験">
+                    <p id="exam-resume-info" class="text-sm text-slate-300" role="status"></p>
+                    <button id="exam-resume-btn" onclick="resumeMockExam()" class="w-full px-6 py-3 bg-emerald-700 text-white font-bold rounded-xl">前回の模擬試験を再開</button>
+                    <p class="text-xs text-slate-400">中断中も制限時間は進みます。時間切れの場合は保存済みの回答で採点します。</p>
+                </div>
+                <button onclick="requestNewMockExam()" class="w-full sm:w-auto px-8 py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-xl transition shadow-xl shadow-blue-600/30 text-base">
                     模擬試験を開始する
                 </button>
             </div>
@@ -1290,6 +1295,7 @@
             }
 
             clearPracticeAutoNextTimer();
+            if(tabId==='exam')updateMockResume();
             if (tabId === 'practice' && state.practice.questions.length === 0) {
                 if(!restorePracticeSession())startPracticeSession('normal');
             } else if (tabId === 'weak') {
@@ -1533,6 +1539,57 @@
         }
 
         // --- EXAM LOGIC ---
+        const MOCK_SESSION_KEY='web3_mock_exam_session_v1';
+        function saveMockExam(){
+            const e=state.exam;
+            if(!Number.isFinite(e.deadline)||e.questions.length!==25)return;
+            try{
+                const originals=new Map(QUESTIONS.map(q=>[q.id,q]));
+                const questions=e.questions.map(q=>({id:q.id,signature:questionSignature(originals.get(q.id)),question:q.question,options:q.options,correct:q.correct}));
+                localStorage.setItem(MOCK_SESSION_KEY,JSON.stringify({version:1,deadline:e.deadline,index:e.currentIndex,questions,answers:e.answers}));
+            }catch(err){console.warn('Mock exam session unavailable',err);}
+        }
+        function readMockExam(){
+            try{
+                const v=JSON.parse(localStorage.getItem(MOCK_SESSION_KEY)||'null');
+                if(!v||v.version!==1||!Number.isSafeInteger(v.deadline)||v.deadline<=0||v.deadline>Date.now()+2700000||!Array.isArray(v.questions)||v.questions.length!==25||!Number.isInteger(v.index)||v.index<0||v.index>=25||!v.answers||typeof v.answers!=='object'||Array.isArray(v.answers))return null;
+                const originals=new Map(QUESTIONS.map(q=>[q.id,q])),ids=new Set(),questions=[];
+                for(const x of v.questions){
+                    const q=originals.get(x.id);
+                    if(!q||ids.has(x.id)||x.signature!==questionSignature(q)||!Array.isArray(x.options)||JSON.stringify([...x.options].sort())!==JSON.stringify([...q.options].sort())||!Number.isInteger(x.correct)||x.correct<0||x.correct>=x.options.length||x.options[x.correct]!==q.options[q.correct])return null;
+                    const prefixes=q.type==='tf'?['','次の記述について、正しければ「○」、誤っていれば「×」を選びなさい。\n','Webデザイン技能検定3級の学習として、次の記述の正誤を判断しなさい。\n']:['','次の問いについて、最も適切なものを1つ選びなさい。\n','Web制作・Web技術の基礎知識として、次の問いに答えなさい。\n'];
+                    if(!prefixes.some(prefix=>x.question===prefix+q.question))return null;
+                    ids.add(x.id);questions.push({...q,question:x.question,options:x.options,correct:x.correct});
+                }
+                const answers={},byId=new Map(questions.map(q=>[String(q.id),q]));
+                for(const [id,n] of Object.entries(v.answers)){const q=byId.get(id);if(!q||!Number.isInteger(n)||n<0||n>=q.options.length)return null;answers[id]=n;}
+                return {deadline:v.deadline,currentIndex:v.index,questions,answers};
+            }catch(e){return null;}
+        }
+        function updateMockResume(){
+            const v=readMockExam(),panel=document.getElementById('exam-resume-panel');
+            panel.classList.toggle('hidden',!v);
+            if(v){
+                const seconds=Math.max(0,Math.ceil((v.deadline-Date.now())/1000));
+                document.getElementById('exam-resume-info').textContent='保存済み：'+Object.keys(v.answers).length+' / 25問回答済み'+(seconds?'・残り約'+Math.ceil(seconds/60)+'分':'・制限時間終了');
+                document.getElementById('exam-resume-btn').textContent=seconds?'前回の模擬試験を再開':'前回の模擬試験を採点';
+            }
+        }
+        function requestNewMockExam(){
+            if(readMockExam()&&!confirm('前回の模擬試験を破棄して新しく開始しますか？'))return;
+            startExam();
+        }
+        function resumeMockExam(){
+            const v=readMockExam();if(!v){updateMockResume();return;}
+            clearInterval(state.exam.timer);
+            Object.assign(state.exam,v);
+            document.getElementById('exam-intro').classList.add('hidden');
+            document.getElementById('exam-result').classList.add('hidden');
+            document.getElementById('exam-active').classList.remove('hidden');
+            state.exam.timer=setInterval(updateExamTimer,1000);
+            if(Date.now()>=v.deadline){updateExamTimer();return;}
+            renderExamQuestion();updateExamTimer();
+        }
         function startExam() {
             document.getElementById('exam-intro').classList.add('hidden');
             document.getElementById('exam-result').classList.add('hidden');
@@ -1592,6 +1649,7 @@
 
             document.getElementById('exam-prev-btn').disabled = state.exam.currentIndex === 0;
             renderExamQuestionGrid();
+            saveMockExam();
         }
 
         function renderExamQuestionGrid() {
@@ -1646,6 +1704,8 @@
         function finishExam() {
             clearInterval(state.exam.timer);state.exam.timer=null;state.exam.deadline=null;
             if (!state.exam.questions.length) return;
+            try{localStorage.removeItem(MOCK_SESSION_KEY)}catch(e){}
+            updateMockResume();
             let correctCount = 0;
             const categoryResult = {};
 
@@ -1965,6 +2025,7 @@
             if (confirm('すべての学習データを初期化しますか？')) {
                 localStorage.removeItem('web3_master_data');
                 localStorage.removeItem(PRACTICE_SESSION_KEY);
+                localStorage.removeItem(MOCK_SESSION_KEY);
                 location.reload();
             }
         }
@@ -1974,6 +2035,7 @@
         window.onload = function() {
             loadUserData();
             updateTextbookResumeLabel();
+            updateMockResume();
             switchTab('dashboard');
             setupFlashcardSwipe(); updateWeakUI();
             const autoToggle=document.getElementById('practice-auto-next-toggle');
