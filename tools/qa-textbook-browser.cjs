@@ -42,6 +42,42 @@ async function run(){
     const page=await context.newPage();
     const errors=[];
     page.on('pageerror',e=>errors.push(e.message));
+    // Real mouse events in desktop layout, independently from touch tests.
+    const desktop=await browser.newContext({viewport:{width:1280,height:900}});
+    const pc=await desktop.newPage();
+    const edge=async(locator,side)=>{
+      const width=await locator.evaluate(el=>el.clientWidth);
+      await locator.click({position:{x:side==='left'?10:side==='right'?width-10:Math.floor(width/2),y:24}});
+    };
+    try{
+      await pc.goto(base+'/exam-guide.html');
+      const original=pc.locator('#pdf-scroll');
+      await original.locator('img').waitFor({state:'visible'});
+      await edge(original,'right');assert.equal(await pc.locator('#count').innerText(),'2 / 11');
+      await original.locator('img').evaluate(el=>el.decode());
+      await edge(original,'left');assert.equal(await pc.locator('#count').innerText(),'1 / 11');
+      await edge(original,'left');assert.equal(await pc.locator('#count').innerText(),'1 / 11');
+      await edge(original,'center');assert.equal(await pc.locator('#count').innerText(),'1 / 11');
+      await pc.locator('#zoom-in').click();
+      await edge(original,'right');assert.equal(await pc.locator('#count').innerText(),'1 / 11');
+      await pc.locator('#zoom-fit').click();
+      await pc.locator('#mode-text').click();
+      const text=pc.locator('#page');
+      await edge(text,'right');assert.equal(await pc.locator('#count').innerText(),'2 / 11');
+      await edge(text,'left');assert.equal(await pc.locator('#count').innerText(),'1 / 11');
+      await pc.goto(base+'/textbook.html');
+      const body=pc.locator('#page-text');
+      await edge(body,'right');assert.match(await pc.locator('#page-label').innerText(),/2 \/ 13/);
+      await edge(body,'left');assert.match(await pc.locator('#page-label').innerText(),/1 \/ 13/);
+      for(const [book,total] of [[0,23],[1,20]]){
+        await pc.goto(base+'/additional-materials.html?book='+book);
+        const surface=pc.locator('#lecture-image');
+        await surface.locator('img').waitFor({state:'visible',timeout:30000});
+        await edge(surface,'right');assert.equal(await pc.locator('#progress').innerText(),'2 / '+total);
+        await edge(surface,'left');assert.equal(await pc.locator('#progress').innerText(),'1 / '+total);
+      }
+      console.log('PASS: desktop edge navigation, center and zoom guard across guide and textbooks');
+    }finally{await desktop.close()}
     await page.goto(base+'/index.html');
     // Both new review categories must be available and their questions loaded in the live app.
     assert.equal(await page.locator('#practice-category-select option[value="LECTURE_1_4_REVIEW"]').count(),1);

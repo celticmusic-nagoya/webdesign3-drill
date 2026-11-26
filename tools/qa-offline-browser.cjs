@@ -51,6 +51,18 @@ try{
  await page.locator('#offline-pdf-zoom-reset').click();
  await swipe(-100);assert.equal(await page.locator('#offline-pdf-page').innerText(),'2 / 11');
  await page.locator('#offline-reader-back').click();
+ await page.waitForTimeout(550);
+ const surface=page.locator('#offline-pdf-scroll');
+ // Reopen guide at its saved position, and exercise real mouse edge clicks.
+ await page.locator('a[href="#offline-exam-guide"]').click();
+ const edge=async(side)=>{const width=await surface.evaluate(el=>el.clientWidth);await surface.click({position:{x:side==='left'?10:side==='right'?width-10:Math.floor(width/2),y:24}})};
+ const before=Number((await page.locator('#offline-pdf-page').innerText()).split('/')[0]);
+ await edge('right');assert.equal(await page.locator('#offline-pdf-page').innerText(),(before+1)+' / 11');
+ await edge('left');assert.equal(await page.locator('#offline-pdf-page').innerText(),before+' / 11');
+ await edge('center');assert.equal(await page.locator('#offline-pdf-page').innerText(),before+' / 11');
+ await page.locator('#offline-pdf-zoom-in').click();
+ await edge('right');assert.equal(await page.locator('#offline-pdf-page').innerText(),before+' / 11');
+ await page.locator('#offline-reader-back').click();
  await context.setOffline(false);
  await button.click();
  const overlay=page.locator('#offline-reader-overlay');
