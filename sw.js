@@ -1,4 +1,4 @@
-const CACHE_NAME='web3-study-exam-guide-v3';
+const CACHE_NAME='web3-study-exam-guide-v4';
 const ASSETS=["./","./index.html","./manifest.webmanifest","./exam-guide.html","./textbook.html","./textbook-original.html","./homework-drill.html","./materials/question-sets-03-04.js","./materials/textbook-original.js","./materials/homework-drill.js"];
 const PDFS=['./materials/lesson-01.pdf','./materials/lesson-02.pdf','./materials/lesson-03.pdf','./materials/lesson-04.pdf','./materials/homework-03.pdf','./materials/homework-04.pdf'];
 const scope=new URL(self.registration.scope);
