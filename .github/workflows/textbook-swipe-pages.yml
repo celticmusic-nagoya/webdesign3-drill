@@ -1,0 +1,53 @@
+name: Textbook swipe pages
+on:
+  push:
+    branches: [feature/reader-swipe]
+    paths: ['.github/workflows/textbook-swipe-pages.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install PyMuPDF==1.26.5 Pillow==11.3.0
+      - name: Render lecture PDFs
+        run: |
+          python - <<'PY'
+          import fitz, hashlib, pathlib, json
+          from PIL import Image
+          root=pathlib.Path('materials')
+          out=root/'textbook-pages';out.mkdir(exist_ok=True)
+          books={}
+          for lesson in (3,4):
+              src=root/f'lesson-{lesson:02}.pdf'
+              data=src.read_bytes()
+              sha=hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()
+              expected={3:'9802179df9348942ebc7bb85895e68fe68244a89',4:'5f92a96812554ec66b4d2b5e5c9c919b1a5c6692'}
+              assert sha==expected[lesson],sha
+              d=fitz.open(src); assert len(d)>0
+              items=[]
+              for i,p in enumerate(d):
+                  pix=p.get_pixmap(matrix=fitz.Matrix(1.8,1.8),alpha=False)
+                  im=Image.frombytes('RGB',(pix.width,pix.height),pix.samples)
+                  dest=out/f'lesson-{lesson:02}-{i+1:02}.webp'
+                  im.save(dest,quality=90)
+                  with Image.open(dest) as check:
+                      check.load();assert check.size==im.size
+                  items.append(dict(file=dest.name,width=im.width,height=im.height,sha256=hashlib.sha256(dest.read_bytes()).hexdigest()))
+              books[str(lesson)]=dict(source_git_sha=sha,pages=items)
+          (out/'manifest.json').write_text(json.dumps(books,indent=2)+'\n')
+          PY
+      - name: Commit page images
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add materials/textbook-pages
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "Render lecture 3 and 4 pages"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
