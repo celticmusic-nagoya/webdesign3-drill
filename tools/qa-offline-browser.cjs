@@ -78,6 +78,18 @@ try{
  assert.equal(await page.locator('#offline-pdf-zoom-label').innerText(),'25%');
  const p0=Number((await page.locator('#offline-pdf-page').innerText()).split('/')[0]);
  await edge('right');assert.equal(await page.locator('#offline-pdf-page').innerText(),(p0+1)+' / 11');
+ // Inspect original-open link without invoking the native PDF plugin in headless CI.
+ const original=await page.evaluate(async()=>{
+  let opened=null;const capture=e=>{const a=e.target.closest('a');if(a&&a.href.startsWith('blob:')){e.preventDefault();opened={href:a.href,target:a.target};}};
+  document.addEventListener('click',capture,true);
+  document.getElementById('offline-pdf-original').click();
+  document.removeEventListener('click',capture,true);
+  if(!opened)return null;
+  const response=await fetch(opened.href.split('#')[0]);const bytes=new Uint8Array(await response.arrayBuffer());
+  return {...opened,mime:response.headers.get('content-type'),signature:String.fromCharCode(...bytes.slice(0,5))};
+ });
+ assert.ok(original&&original.target==='_blank'&&original.mime==='application/pdf'&&original.signature==='%PDF-');
+ assert.ok(original.href.endsWith('#page='+(p0+1)));
  const downloadPromise=page.waitForEvent('download');
  await page.locator('#offline-pdf-download').click();
  const download=await downloadPromise;
