@@ -1,22 +1,7 @@
-const CACHE_NAME = 'web3-study-100-android-v1';
-const ASSETS = ['./', './index.html', './manifest.webmanifest'];
-self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(ASSETS)));
-  self.skipWaiting();
-});
-self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(keys =>
-    Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
-  ));
-  self.clients.claim();
-});
-self.addEventListener('fetch', e => {
-  if (e.request.method !== 'GET') return;
-  e.respondWith(
-    fetch(e.request).then(r => {
-      const copy = r.clone();
-      caches.open(CACHE_NAME).then(c => c.put(e.request, copy));
-      return r;
-    }).catch(() => caches.match(e.request).then(r => r || caches.match('./index.html')))
-  );
-});
+const CACHE_NAME='web3-study-exam-guide-v3';
+const ASSETS=["./","./index.html","./manifest.webmanifest","./exam-guide.html","./textbook.html","./textbook-original.html","./homework-drill.html","./materials/question-sets-03-04.js","./materials/textbook-original.js","./materials/homework-drill.js"];
+const PDFS=['./materials/lesson-01.pdf','./materials/lesson-02.pdf','./materials/lesson-03.pdf','./materials/lesson-04.pdf','./materials/homework-03.pdf','./materials/homework-04.pdf'];
+const scope=new URL(self.registration.scope);
+self.addEventListener('install',e=>e.waitUntil((async()=>{const c=await caches.open(CACHE_NAME);await c.addAll(ASSETS);await Promise.allSettled(PDFS.map(p=>c.add(p)));await self.skipWaiting()})()));
+self.addEventListener('activate',e=>e.waitUntil((async()=>{for(const k of await caches.keys())if(k.startsWith('web3-study-')&&k!==CACHE_NAME)await caches.delete(k);await self.clients.claim()})()));
+self.addEventListener('fetch',e=>{const q=e.request,u=new URL(q.url);if(q.method!=='GET')return;const local=u.origin===scope.origin&&u.pathname.startsWith(scope.pathname);if(!local)return;if(q.headers.has('range')){e.respondWith((async()=>{try{return await fetch(q)}catch(err){const c=await caches.open(CACHE_NAME),hit=await c.match(q.url);if(!hit)return new Response('Offline PDF unavailable',{status:503});const bytes=await hit.arrayBuffer(),m=/^bytes=(\d+)-(\d*)$/.exec(q.headers.get('range'));if(!m)return hit;const start=Number(m[1]),end=m[2]?Math.min(Number(m[2]),bytes.byteLength-1):bytes.byteLength-1;if(start>end)return new Response(null,{status:416,headers:{'Content-Range':'bytes */'+bytes.byteLength}});return new Response(bytes.slice(start,end+1),{status:206,headers:{'Content-Type':'application/pdf','Content-Range':'bytes '+start+'-'+end+'/'+bytes.byteLength,'Content-Length':String(end-start+1),'Accept-Ranges':'bytes'}})}})());return;}e.respondWith((async()=>{const c=await caches.open(CACHE_NAME);try{const r=await fetch(q);if(r.ok&&r.status===200)await c.put(q,r.clone());return r}catch(err){const hit=await c.match(q,{ignoreSearch:q.mode==='navigate'});return hit||new Response('Offline: resource unavailable',{status:503,headers:{'Content-Type':'text/plain; charset=utf-8'}})}})())});
