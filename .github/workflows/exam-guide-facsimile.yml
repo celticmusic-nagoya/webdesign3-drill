@@ -1,0 +1,50 @@
+name: Exam guide facsimile
+on:
+  push:
+    branches: [feature/exam-guide-facsimile]
+    paths: ['.github/workflows/exam-guide-facsimile.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install PyMuPDF==1.26.5 Pillow==11.3.0
+      - name: Render and verify
+        run: |
+          python - <<'PY'
+          import fitz, hashlib, pathlib, json
+          from PIL import Image
+          src=pathlib.Path('materials/攻略マニュアル.pdf')
+          data=src.read_bytes()
+          sha=hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()
+          assert sha=='69eb55345a4cde22a004d5b3651107b8a322edbf',sha
+          d=fitz.open(src); assert len(d)==11
+          out=pathlib.Path('materials/exam-guide-pages');out.mkdir(exist_ok=True)
+          items=[]
+          for i,p in enumerate(d):
+              pix=p.get_pixmap(matrix=fitz.Matrix(2,2),alpha=False)
+              im=Image.frombytes('RGB',(pix.width,pix.height),pix.samples)
+              dest=out/f'page-{i+1:02}.webp'
+              im.save(dest,quality=94)
+              with Image.open(dest) as check:
+                  check.load();assert check.size==im.size
+              items.append(dict(page=i+1,width=im.width,height=im.height,sha256=hashlib.sha256(dest.read_bytes()).hexdigest()))
+          (out/'manifest.json').write_text(json.dumps(dict(source_git_sha=sha,pages=items),indent=2)+'\n')
+          PY
+      - name: Commit generated assets
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add materials/exam-guide-pages
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "Render all 11 canonical exam guide pages"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
