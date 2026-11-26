@@ -1,0 +1,46 @@
+name: Teacher handoff package
+on:
+  pull_request:
+    paths:
+      - 'AGENTS.md'
+      - 'README.md'
+      - 'docs/TEACHER_START.md'
+      - 'docs/MAINTENANCE.md'
+      - 'docs/RELEASE_CHECKLIST.md'
+      - 'tools/build-local.cjs'
+      - 'tools/build-teacher-package.cjs'
+      - 'tools/qa-teacher-package.cjs'
+      - 'tools/render-reader-pages.py'
+      - '.github/workflows/teacher-handoff.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  handoff:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends poppler-utils
+      - run: npm install --no-save --no-package-lock tailwindcss@3.4.17 playwright@1.58.2
+      - run: npx playwright install --with-deps chromium
+      - run: python -m pip install PyMuPDF==1.26.7 Pillow==11.3.0
+      - run: node tools/build-local.cjs
+      - run: node tools/qa-review-source.cjs
+      - run: node tools/qa-offline-browser.cjs
+      - run: node tools/build-teacher-package.cjs
+        env:
+          HANDOFF_SOURCE_REVISION: ${{ github.event.pull_request.head.sha || github.sha }}
+      - run: node tools/qa-teacher-package.cjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: webdesign3-teacher-handoff
+          path: dist/teacher-handoff/
+          if-no-files-found: error
+          retention-days: 30
