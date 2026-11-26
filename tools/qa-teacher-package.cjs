@@ -30,8 +30,17 @@ const server=http.createServer((req,res)=>{
   await page.locator('a[href="#offline-exam-guide"]').click();
   await page.locator('#offline-pdf-image').evaluate(el=>el.decode());
   assert.equal(await page.locator('#offline-pdf-page').innerText(),'1 / 11');
-  await page.locator('#offline-pdf-next').click();
+  const imageEdge=async(side)=>{
+   const image=page.locator('#offline-pdf-image');await image.evaluate(el=>el.decode());
+   const b=await image.boundingBox();assert.ok(b&&b.width>20);
+   await page.mouse.click(b.x+(side==='right'?b.width-8:8),b.y+Math.min(24,b.height/2));
+  };
+  await imageEdge('right');
   assert.equal(await page.locator('#offline-pdf-page').innerText(),'2 / 11');
+  await imageEdge('left');
+  assert.equal(await page.locator('#offline-pdf-page').innerText(),'1 / 11');
+  await page.keyboard.press('ArrowRight');assert.equal(await page.locator('#offline-pdf-page').innerText(),'2 / 11');
+  await page.keyboard.press('ArrowLeft');assert.equal(await page.locator('#offline-pdf-page').innerText(),'1 / 11');
   await page.locator('#offline-reader-back').click();
   await page.locator('#offline-textbook-link').click();
   await page.frameLocator('#offline-reader-frame').locator('#page-label').waitFor();

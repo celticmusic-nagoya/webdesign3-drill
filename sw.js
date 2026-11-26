@@ -1,4 +1,4 @@
-const CACHE_NAME='web3-study-reader-v13';
+const CACHE_NAME='web3-study-reader-v15';
 const ASSETS=["./","./index.html","./manifest.webmanifest","./exam-guide.html","./textbook.html","./textbook-original.html","./homework-drill.html","./materials/question-sets-03-04.js","./materials/textbook-original.js","./materials/homework-drill.js","./materials/攻略マニュアル.pdf"];
 ASSETS.push("./reader-swipe.js","./additional-materials.html");
 ASSETS.push(...Array.from({length:11},(_,i)=>'./materials/exam-guide-pages/page-'+String(i+1).padStart(2,'0')+'.webp'));

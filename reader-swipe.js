@@ -7,7 +7,14 @@ function edgeDirection(x,width){
  const edge=Math.min(64,Math.max(28,width*.12));
  return x<edge?-1:x>=width-edge?1:0;
 }
-function bind(surface,{previous,next,canTurn=()=>true,canPrevious=()=>true,canNext=()=>true}){
+// The displayed page can be much narrower than its scroll container in fit-page mode.
+// Include both the image edge and the adjacent blank margin; preserve a neutral center.
+function pageEdgeDirection(x,left,width){
+ if(!Number.isFinite(x)||!Number.isFinite(left)||!Number.isFinite(width)||width<=0)return 0;
+ const edge=Math.min(64,Math.max(28,width*.12),width*.25);
+ return x<left+edge?-1:x>=left+width-edge?1:0;
+}
+function bind(surface,{previous,next,canTurn=()=>true,canPrevious=()=>true,canNext=()=>true,pageElement=()=>null}){
  if(!surface)return;
  let start=null,mouseStart=null,lastTouch=0,edgeHover=0;
  const available=dir=>dir===-1?canPrevious():dir===1?canNext():false;
@@ -16,7 +23,11 @@ function bind(surface,{previous,next,canTurn=()=>true,canPrevious=()=>true,canNe
  const edgeAt=e=>{
   const rect=surface.getBoundingClientRect();
   const x=e.clientX-rect.left-surface.clientLeft,y=e.clientY-rect.top-surface.clientTop;
-  if(y<0||y>=surface.clientHeight)return 0;
+  if(y<0||y>=surface.clientHeight||x<0||x>=surface.clientWidth)return 0;
+  const page=pageElement(),bounds=page?.getBoundingClientRect();
+  if(bounds&&bounds.width>0&&bounds.height>0&&bounds.width<=surface.clientWidth+1){
+   return pageEdgeDirection(e.clientX,bounds.left,bounds.width);
+  }
   return edgeDirection(x,surface.clientWidth);
  };
  const hover=dir=>{
@@ -66,5 +77,20 @@ function bind(surface,{previous,next,canTurn=()=>true,canPrevious=()=>true,canNe
   turn(dir);
  },{passive:true});
 }
-root.StudySwipe={bind,direction,edgeDirection};
+// Bind once per document/reader. Arrow keys also work after using toolbar buttons.
+function bindKeys(doc,{previous,next,active=()=>true,canPrevious=()=>true,canNext=()=>true}){
+ const handler=e=>{
+  if(e.defaultPrevented||e.isComposing||e.altKey||e.ctrlKey||e.metaKey||e.shiftKey||!active())return;
+  if(e.key!=='ArrowLeft'&&e.key!=='ArrowRight')return;
+  const target=e.target;
+  if(target&&(target.isContentEditable||target.closest?.('input,textarea,select,[contenteditable]:not([contenteditable="false"]),[role="textbox"],[role="slider"],[role="combobox"],[role="listbox"],[role="menu"],[role="tablist"]')))return;
+  const selection=doc.getSelection?.();if(selection&&!selection.isCollapsed)return;
+  e.preventDefault();
+  if(e.repeat)return;
+  if(e.key==='ArrowLeft'){if(canPrevious())previous()}else if(canNext())next();
+ };
+ doc.addEventListener('keydown',handler);
+ return ()=>doc.removeEventListener('keydown',handler);
+}
+root.StudySwipe={bind,bindKeys,direction,edgeDirection,pageEdgeDirection};
 })(window);
