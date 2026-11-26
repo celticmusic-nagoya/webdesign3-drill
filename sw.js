@@ -1,11 +1,12 @@
-const CACHE_NAME='web3-study-exam-guide-v6';
+const CACHE_NAME='web3-study-reader-v7';
 const ASSETS=["./","./index.html","./manifest.webmanifest","./exam-guide.html","./textbook.html","./textbook-original.html","./homework-drill.html","./materials/question-sets-03-04.js","./materials/textbook-original.js","./materials/homework-drill.js","./materials/攻略マニュアル.pdf"];
+ASSETS.push("./reader-swipe.js","./additional-materials.html");
 ASSETS.push(...Array.from({length:11},(_,i)=>'./materials/exam-guide-pages/page-'+String(i+1).padStart(2,'0')+'.webp'));
 const PDFS=['./materials/lesson-01.pdf','./materials/lesson-02.pdf','./materials/lesson-03.pdf','./materials/lesson-04.pdf','./materials/homework-03.pdf','./materials/homework-04.pdf'];
 const ENGINE=['https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js','https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'];
 const OPTIONAL=[...PDFS,...ENGINE,'https://cdn.tailwindcss.com/'];
 const scope=new URL(self.registration.scope);
-self.addEventListener('install',e=>e.waitUntil((async()=>{const c=await caches.open(CACHE_NAME);await c.addAll(ASSETS);await Promise.allSettled(OPTIONAL.map(p=>c.add(p)));await self.skipWaiting()})()));
+self.addEventListener('install',e=>e.waitUntil((async()=>{const c=await caches.open(CACHE_NAME);await c.addAll(ASSETS);try{const u=new URL('./materials/textbook-pages/manifest.json',scope);const res=await fetch(u);if(res.ok){const data=await res.clone().json();const pages=Object.values(data).flatMap(b=>b.pages.map(p=>'./materials/textbook-pages/'+p.file));await c.addAll(pages);await c.put(u,res)}}catch(err){console.warn('Lecture page cache unavailable',err)}await Promise.allSettled(OPTIONAL.map(p=>c.add(p)));await self.skipWaiting()})()));
 self.addEventListener('activate',e=>e.waitUntil((async()=>{for(const k of await caches.keys())if(k.startsWith('web3-study-')&&k!==CACHE_NAME)await caches.delete(k);await self.clients.claim()})()));
 async function cachedRange(c,q){
  const hit=await c.match(q.url);if(!hit)return new Response('Offline PDF unavailable',{status:503});
