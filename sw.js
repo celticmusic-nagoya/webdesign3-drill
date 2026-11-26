@@ -1,5 +1,6 @@
-const CACHE_NAME='web3-study-exam-guide-v5';
+const CACHE_NAME='web3-study-exam-guide-v6';
 const ASSETS=["./","./index.html","./manifest.webmanifest","./exam-guide.html","./textbook.html","./textbook-original.html","./homework-drill.html","./materials/question-sets-03-04.js","./materials/textbook-original.js","./materials/homework-drill.js","./materials/攻略マニュアル.pdf"];
+ASSETS.push(...Array.from({length:11},(_,i)=>'./materials/exam-guide-pages/page-'+String(i+1).padStart(2,'0')+'.webp'));
 const PDFS=['./materials/lesson-01.pdf','./materials/lesson-02.pdf','./materials/lesson-03.pdf','./materials/lesson-04.pdf','./materials/homework-03.pdf','./materials/homework-04.pdf'];
 const ENGINE=['https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js','https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'];
 const OPTIONAL=[...PDFS,...ENGINE,'https://cdn.tailwindcss.com/'];
