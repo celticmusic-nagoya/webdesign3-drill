@@ -219,6 +219,25 @@ async function run(){
       await page.evaluate(key=>localStorage.removeItem(key),key);
     }
     await page.goto(base+'/index.html');
+    // Ordinary question bank: exact variant, answer and index persist on reload.
+    const ordinary=await page.evaluate(()=>{
+      localStorage.removeItem('web3_practice_session_v1');
+      switchTab('practice');startPracticeSession('normal');
+      document.getElementById('practice-auto-next-toggle').checked=false;
+      const q=state.practice.questions[0];answerPractice(q.correct);
+      return {question:q.question,options:q.options,answer:q.correct,total:state.userData.totalAnswered};
+    });
+    await page.reload();
+    const restored=await page.evaluate(()=>{
+      switchTab('practice');const q=state.practice.questions[0];
+      const answer=state.practice.answers[q.id];answerPractice(q.correct);
+      return {question:q.question,options:q.options,answer,total:state.userData.totalAnswered};
+    });
+    assert.deepEqual(restored,ordinary,'Reload must preserve the question and not double-count a graded answer');
+    await page.evaluate(()=>{nextPracticeQuestion();});
+    await page.reload();
+    assert.equal(await page.evaluate(()=>{switchTab('practice');return state.practice.currentIndex}),1);
+    await page.evaluate(()=>{localStorage.removeItem('web3_practice_session_v1');});
     const clock=await page.evaluate(()=>{
       startExam();clearInterval(state.exam.timer);
       state.exam.deadline=Date.now()+60000;updateExamTimer();
