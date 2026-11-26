@@ -1,16 +1,11 @@
-# Webデザイン技能検定3級 学習アプリ 100問｜Android・スマホ最適化版
+# ウェブデザイン技能検定3級 学習アプリ
 
-## 今回の修正
-- 問題集の「前の問題 / 次の問題」をモバイル下部ナビの上に常時見えやすくする sticky UI に変更
-- モバイル下部ナビ分の余白を確保
-- Androidでのタップ領域を確保
-- 単語帳カードに左右スワイプ操作を追加
-- 左スワイプ：次の単語
-- 右スワイプ：前の単語
-- 上下スクロールは通常どおり動作
-- スワイプ直後にカードのタップ反転が誤発火しないよう制御
-- 単語カードを再生成した場合もスワイプ機能を再バインド
-- タブ切替時にメインスクロール位置を先頭へ戻す
+PC・スマホ対応の教材閲覧・学習・試験対策アプリ。先生への引継ぎはGitHubを必要としません。
 
-## GitHub Pages
-`index.html` を置き換え、`manifest.webmanifest` と `sw.js` を同じ階層に配置してください。
+- [先生向け引継ぎ・初回指示](docs/TEACHER_START.md)
+- [編集・再生成・サーバー掲載手順](docs/MAINTENANCE.md)
+- [AI共通保守規約](AGENTS.md)
+- [検査・配布チェックリスト](docs/RELEASE_CHECKLIST.md)
+- [総合復習の原本照合](docs/REVIEW_SOURCE_AUDIT_20261126.md)
+
+配布パッケージは app/（実行版）と source/（編集原本）の2つに分ける。app/index.html を開けば通信なしで利用できる。source/ から tools/build-local.cjs で再生成し、tools/build-teacher-package.cjs で引継ぎ一式を再作成する。GitHub Actionsを使う場合は Teacher handoff package の成果物を取得する。先生側の管理・更新・サーバー掲載は独立して可能。
