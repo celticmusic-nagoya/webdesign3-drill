@@ -127,6 +127,17 @@ async function run(){
       console.log('PASS: desktop edge navigation, center and zoom guard across guide and textbooks');
     }finally{await desktop.close()}
     await page.goto(base+'/index.html');
+    // JS exam preparation from online source index (not the standalone build).
+    await page.locator('#js-prep-reader-link').click();
+    assert.equal(await page.locator('#jsp-page-select').inputValue(),'1');
+    await page.locator('#jsp-reader-next').click();assert.equal(await page.locator('#jsp-page-select').inputValue(),'2');
+    await page.locator('#jsp-quiz-tab').click();await page.locator('#jsp-start-all').click();
+    const jsQuestion=await page.locator('#jsp-question').innerText();
+    await page.locator('#jsp-choices button[data-choice="0"]').click();assert.equal(await page.locator('#jsp-feedback').getAttribute('data-result'),'correct');
+    await page.locator('#jsp-reference').click();assert.equal(await page.locator('#jsp-page-select').inputValue(),'1');
+    await page.locator('#jsp-back-question').click();assert.equal(await page.locator('#jsp-question').innerText(),jsQuestion);
+    await page.locator('#jsp-close').click();
+    console.log('PASS: online JS prep reader, quiz and source reference');
     // Both new review categories must be available and their questions loaded in the live app.
     assert.equal(await page.locator('#practice-category-select option[value="LECTURE_1_4_REVIEW"]').count(),1);
     assert.equal(await page.locator('#practice-category-select option[value="LECTURE_3_4_REVIEW"]').count(),1);

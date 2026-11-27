@@ -27,21 +27,23 @@ try{
  await page.locator('#jsp-page-select').selectOption('4');assert.equal(await page.locator('#jsp-reader-next').isDisabled(),true);
  await page.locator('#jsp-quiz-tab').click();await page.locator('#jsp-start-all').click();
  const question=await page.locator('#jsp-question').innerText();
- await page.locator('#jsp-choices button').nth(1).click();assert.equal(await page.locator('#jsp-feedback').getAttribute('data-result'),'wrong');
+ const firstOrder=await page.locator('#jsp-choices button').evaluateAll(bs=>bs.map(b=>b.dataset.choice));
+ await page.locator('#jsp-choices button[data-choice="1"]').click();assert.equal(await page.locator('#jsp-feedback').getAttribute('data-result'),'wrong');
  await page.locator('#jsp-reference').click();assert.equal(await page.locator('#jsp-page-select').inputValue(),'1');
  await page.locator('#jsp-back-question').click();assert.equal(await page.locator('#jsp-question').innerText(),question);assert.equal(await page.locator('#jsp-feedback').getAttribute('data-result'),'wrong');
  await page.locator('#jsp-close').click();await page.reload();
  await page.locator('#js-prep-quiz-link').click();assert.equal(await page.locator('#jsp-question').innerText(),question);
+ assert.deepEqual(await page.locator('#jsp-choices button').evaluateAll(bs=>bs.map(b=>b.dataset.choice)),firstOrder);
  await page.locator('#jsp-quiz-next').click();assert.match(await page.locator('#jsp-question').innerText(),/ECMAScript/);
- await page.locator('#jsp-choices button').nth(1).click();assert.equal(await page.locator('#jsp-feedback').getAttribute('data-result'),'correct');
+ await page.locator('#jsp-choices button[data-choice="1"]').click();assert.equal(await page.locator('#jsp-feedback').getAttribute('data-result'),'correct');
  // Complete the course, verify exactly 39 correct and one wrong, retry only that item.
  for(let i=2;i<bank.length;i++){
-  await page.locator('#jsp-quiz-next').click();await page.locator('#jsp-choices button').nth(bank[i].correct).click();
+  await page.locator('#jsp-quiz-next').click();await page.locator('#jsp-choices button[data-choice="'+bank[i].correct+'"]').click();
  }
  await page.locator('#jsp-quiz-next').click();
  assert.match(await page.locator('#js-prep-dialog').innerText(),/39 \/ 40問 正解/);
  await page.locator('#jsp-retry').click();assert.equal(await page.locator('#jsp-question').innerText(),question);
- await page.locator('#jsp-choices button').nth(0).click();await page.locator('#jsp-quiz-next').click();
+ await page.locator('#jsp-choices button[data-choice="0"]').click();await page.locator('#jsp-quiz-next').click();
  assert.match(await page.locator('#js-prep-dialog').innerText(),/1 \/ 1問 正解/);
  assert.deepEqual(errors,[]);
  console.log('PASS: offline JS reader, keyboard, question explanation, reference return, resume, all 40 answers, wrong-only retry');
