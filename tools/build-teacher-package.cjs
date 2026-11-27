@@ -8,7 +8,7 @@ assert.ok(fs.readFileSync(path.join(built,'index.html'),'utf8').includes('id="of
 fs.rmSync(dest,{recursive:true,force:true});fs.mkdirSync(dest,{recursive:true});
 fs.cpSync(built,path.join(dest,'app'),{recursive:true});
 const source=path.join(dest,'source');fs.mkdirSync(source);
-const files=['index.html','textbook.html','textbook-original.html','homework-drill.html','additional-materials.html','exam-guide.html','reader-swipe.js','sw.js','manifest.webmanifest','README.md','AGENTS.md'];
+const files=['index.html','textbook.html','textbook-original.html','homework-drill.html','additional-materials.html','exam-guide.html','reader-swipe.js','js-exam-prep.js','sw.js','manifest.webmanifest','README.md','AGENTS.md'];
 for(const file of files)fs.copyFileSync(path.join(root,file),path.join(source,file));
 for(const dir of ['materials','tools','docs'])fs.cpSync(path.join(root,dir),path.join(source,dir),{recursive:true});
 fs.copyFileSync(path.join(root,'docs','TEACHER_START.md'),path.join(dest,'00_はじめに.md'));

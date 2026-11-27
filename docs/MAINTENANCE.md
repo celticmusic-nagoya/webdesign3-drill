@@ -13,6 +13,7 @@ app/index.html は単一HTMLとして動く生成物。app/ には原本PDFと�
 | 第1・2回教科書 | textbook.html、materials/lesson-01.pdf、lesson-02.pdf、SOURCE_MANIFEST.json |
 | 第3・4回・追加教材 | additional-materials.html、materials/lesson-03.pdf、lesson-04.pdf など、textbook-pages/manifest.json |
 | 攻略マニュアル | exam-guide.html、materials/攻略マニュアル.pdf、exam-guide-pages/manifest.json |
+| JS直前対策（4ページ・40問） | materials/js-exam-prep.js（資料・問題・原本SHA）、js-exam-prep.js（閲覧・演習）、index.html |
 | 閲覧操作 | reader-swipe.js |
 | ソース版PWA | sw.js、manifest.webmanifest |
 | 配布版生成 | tools/build-offline.cjs、tools/build-local.cjs、tools/build-teacher-package.cjs |
@@ -50,3 +51,5 @@ LinuxでChromiumのシステム依存が不足する場合は npx playwright ins
 2026-11-26、機能基準コミット ad8cc9da25fd60db56b3ac90dc7a8155cb76f577。通常問題300（基本120＋総合演習60＋総合復習120）、教科書問題158、穴埋め200（計658収録レコード、類似問題あり）。教科書4回13/10/23/20ページ、攻略マニュアル11ページ。学習再開、模擬試験、教科書参照・復帰、画像端クリック・左右矢印キー・スワイプによるページ送り、縮小・原本保存に対応。総合復習120問は原本正答照合済み、第20・25・52問は承認済み補完文。358問の意味上の全件照合、全データの一括バックアップ、Windows/Android実機の最新確認は未完了。実施済み自動QAと実機確認を区別する。
 
 オンライン版QRは docs/ONLINE_URL.txt から再生成する。サーバー移行時はそのURLと docs/TEACHER_FOLDER_README.txt の案内を更新し、再生成後にスマートフォンで読み取って確認する。
+
+JS特化問題は独立キー web3_js_exam_prep_v1 に保存する。新問題IDはJS-001以降の固定文字列。全分野・分野別・誤答復習、正答と解説、資料参照・復帰に対応。資料の原本PDFは提供時のSHA-256をデータ内に記録済み。現行アプリ内はテキスト再構成版で、PDFバイナリ自体は未登録。原本を別途保管する。問題は資料を基にした学習用で、過去問の逐語転載ではない。

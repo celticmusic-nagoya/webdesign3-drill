@@ -8,6 +8,7 @@ on:
       - 'materials/**'
       - 'tools/build-offline.cjs'
       - 'tools/qa-offline-browser.cjs'
+      - 'tools/qa-js-exam-prep.cjs'
       - 'AGENTS.md'
       - 'README.md'
       - 'docs/TEACHER_START.md'
@@ -44,6 +45,7 @@ jobs:
       - run: node tools/build-local.cjs
       - run: node tools/qa-review-source.cjs
       - run: node tools/qa-offline-browser.cjs
+      - run: node tools/qa-js-exam-prep.cjs
       - run: node tools/build-teacher-package.cjs
         env:
           HANDOFF_SOURCE_REVISION: ${{ github.event.pull_request.head.sha || github.sha }}
