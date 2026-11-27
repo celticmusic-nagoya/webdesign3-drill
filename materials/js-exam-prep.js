@@ -701,7 +701,7 @@ window.JS_EXAM_PREP={
         "undefined"
       ],
       "correct": 0,
-      "explanation": "先頭は0番。1番はY、2番はZ。"
+      "explanation": "配列の番号は0から始まるため、先頭のXは0番。1番はY、2番はZ。"
     },
     {
       "id": "JS-034",
