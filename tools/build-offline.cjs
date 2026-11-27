@@ -16,6 +16,11 @@ if(html.includes('cdn.tailwindcss.com')||html.includes('fonts.googleapis.com'))t
 // file:// and Android content:// URLs cannot reliably resolve sibling HTML files.
 // Embed the reader in the entrypoint and show it in a sandboxed same-origin iframe.
 const swipeCode=fs.readFileSync('reader-swipe.js','utf8');
+for(const file of ['reader-swipe.js','materials/js-exam-prep.js','js-exam-prep.js']){
+ const tag='<script src="./'+file+'"></script>';
+ if(!html.includes(tag))throw Error('Missing JS prep script '+file);
+ html=html.replace(tag,()=>'<script>'+fs.readFileSync(file,'utf8').replace(/<\/script/gi,'<\\/script')+'</script>');
+}
 const readerHtml=fs.readFileSync('textbook.html','utf8').replace(/<script src="https:\/\/cdnjs\.cloudflare\.com\/ajax\/libs\/pdf\.js\/3\.11\.174\/pdf\.min\.js" defer><\/script>/,'').replace('<script src="./reader-swipe.js"></script>',()=>'<script>'+swipeCode+'</script>');
 html=html.replace('href="./exam-guide.html"','href="#offline-exam-guide"');
 html=html.replace(/<script>if\('serviceWorker' in navigator&&location.protocol!=='file:'\)navigator.serviceWorker.register\('\.\/sw\.js'\).catch\(console.warn\);<\/script>/,'');
@@ -334,6 +339,7 @@ for(const name of ['textbook-original','homework-drill']){
 fs.copyFileSync('additional-materials.html',path.join(out,'additional-materials.html'));
 fs.copyFileSync('reader-swipe.js',path.join(out,'reader-swipe.js'));
 fs.copyFileSync('exam-guide.html',path.join(out,'exam-guide.html'));
+for(const name of ['js-exam-prep.js','materials/js-exam-prep.js'])fs.copyFileSync(name,path.join(out,name));
 fs.copyFileSync('materials/攻略マニュアル.pdf',path.join(out,'materials/攻略マニュアル.pdf'));
 fs.cpSync('materials/exam-guide-pages',path.join(out,'materials/exam-guide-pages'),{recursive:true});
 if(fs.existsSync('materials/textbook-pages/manifest.json'))fs.cpSync('materials/textbook-pages',path.join(out,'materials/textbook-pages'),{recursive:true});
